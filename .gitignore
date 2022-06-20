@@ -1,0 +1,11 @@
+# DSStore
+.DS_Store
+
+# Generated files
+bin/
+build/
+ci/
+
+# IntelliJ
+*.iml
+**/.idea/
