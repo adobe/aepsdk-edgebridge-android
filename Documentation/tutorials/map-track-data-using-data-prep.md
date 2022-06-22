@@ -25,9 +25,9 @@ In the following steps, the examples assume the schema configured with the datas
 ## Select data
 While creating a new datastream, select **Save and Add Mapping** to go to the **Select data** step directly.  Alternately, if using an already saved datastream, select **Edit Mapping**. From here, provide a sample JSON object that represents the data layer used in the application as sent from the Edge Bridge mobile extension.
 
-The following are examples of the JSON objects sent from the Edge Bridge mobile extension. The Experience event sent from the Edge Bridge extension contains both **xdm** and **data** JSON objects. The **data** object contains the context data passed to the _MobileCore.trackAction()_ and _MobileCore.trackState()_ APIs.
+The following are examples of the JSON objects sent from the Edge Bridge mobile extension. The Experience event sent from the Edge Bridge extension contains both **xdm** and **data** JSON objects. The **data** object contains the context data passed to the `MobileCore.trackAction()` and `MobileCore.trackState()` APIs.
 
-The following is an example of an _MobileCore.trackAction_ API call and the resulting JSON Experience event sent to the Edge Network. Note the JSON is truncated to show just the relevant data.
+The following is an example of an `MobileCore.trackAction` API call and the resulting JSON Experience event sent to the Edge Network. Note the JSON is truncated to show just the relevant data.
 ```swift
 MobileCore.track(action: "add_to_cart", data: ["product.id": "12345", "product.add.event": "1", "product.name": "wide_brim_sunhat", "product.units": "1"])
 ```
@@ -76,7 +76,7 @@ MobileCore.track(action: "add_to_cart", data: ["product.id": "12345", "product.a
 </p></details>
 
 
-The following is an example of a _MobileCore.trackState_ API call and the resulting JSON Experience event sent to the Edge Network. Note the JSON is truncated to show just the relevant data.
+The following is an example of a `MobileCore.trackState` API call and the resulting JSON Experience event sent to the Edge Network. Note the JSON is truncated to show just the relevant data.
 ```swift
 MobileCore.track(state: "hats/sunhat/wide_brim_sunhat_id12345", data: ["product.name": "wide_brim_sunhat", "product.id": "12345", "product.view.event": "1"])
 ```
