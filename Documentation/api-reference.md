@@ -1,4 +1,4 @@
-# Adobe Experience Platform Edge Bridge for iOS
+# Adobe Experience Platform Edge Bridge for Android
 
 ## API Reference
 
@@ -12,65 +12,36 @@
 ### extensionVersion
 Returns the version of the Edge Bridge extension.
 
-#### Swift
+#### Java
 
 ##### Syntax
-```swift
-static var extensionVersion: String
+```java
+public static String extensionVersion()
 ```
 
 ##### Examples
-```swift
-let extensionVersion = EdgeBridge.extensionVersion
-```
-
-#### Objective-C
-
-##### Syntax
-```objectivec
-+ (nonnull NSString*) extensionVersion;
-```
-
-##### Examples
-```objectivec
-NSString *extensionVersion = [AEPMobileEdgeBridge extensionVersion];
+```java
+String extensionVersion = EdgeBridge.extensionVersion();
 ```
 
 ------
 
 ### registerExtension
-In iOS, the registration occurs by passing the Edge Bridge extension to the `MobileCore.registerExtension` API.
+Registers the Edge Bridge extension with the Mobile Core extension.
 
-#### Swift
+#### Java
 
 ##### Syntax
-```swift
-static func registerExtensions(_ extensions: [NSObject.Type], 
-                               _ completion: (() -> Void)? = nil)
+```java
+public static void registerExtension()
 ```
 
 ##### Examples
-```swift
-import AEPEdgeBridge
+```java
+import com.adobe.marketing.mobile.edge.bridge.EdgeBridge;
 
 ...
-MobileCore.registerExtensions([EdgeBridge.self])
-```
-
-#### Objective-C
-
-##### Syntax
-```objectivec
-+ (void) registerExtensions: (NSArray<Class*>* _Nonnull) extensions 
-                 completion: (void (^ _Nullable)(void)) completion;
-```
-
-##### Examples
-```objectivec
-@import AEPEdgeIdentity;
-
-...
-[AEPMobileCore registerExtensions:@[AEPMobileEdgeBridge.class] completion:nil];
+EdgeBridge.registerExtension();
 ```
 
 ------
