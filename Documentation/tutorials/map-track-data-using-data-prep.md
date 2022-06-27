@@ -28,8 +28,33 @@ While creating a new datastream, select **Save and Add Mapping** to go to the **
 The following are examples of the JSON objects sent from the Edge Bridge mobile extension. The Experience event sent from the Edge Bridge extension contains both **xdm** and **data** JSON objects. The **data** object contains the context data passed to the `MobileCore.trackAction()` and `MobileCore.trackState()` APIs.
 
 The following is an example of an `MobileCore.trackAction` API call and the resulting JSON Experience event sent to the Edge Network. Note the JSON is truncated to show just the relevant data.
-```swift
-MobileCore.track(action: "add_to_cart", data: ["product.id": "12345", "product.add.event": "1", "product.name": "wide_brim_sunhat", "product.units": "1"])
+
+#### Java
+```java
+MobileCore.trackAction(
+  "add_to_cart",
+  new HashMap<String, String>() {
+    {
+      put("product.id", "12345");
+      put("product.add.event", "1");
+      put("product.name", "wide_brim_sunhat");
+      put("product.units", "1");
+    }
+  }
+);
+```
+
+#### Kotlin
+```kotlin
+MobileCore.trackAction(
+  "add_to_cart",
+  mapOf<String, String>(
+      "product.id" to "12345",
+      "product.add.event" to "1",
+      "product.name" to "wide_brim_sunhat",
+      "product.units" to "1"
+  )
+)
 ```
 
 <details>
@@ -77,8 +102,31 @@ MobileCore.track(action: "add_to_cart", data: ["product.id": "12345", "product.a
 
 
 The following is an example of a `MobileCore.trackState` API call and the resulting JSON Experience event sent to the Edge Network. Note the JSON is truncated to show just the relevant data.
-```swift
-MobileCore.track(state: "hats/sunhat/wide_brim_sunhat_id12345", data: ["product.name": "wide_brim_sunhat", "product.id": "12345", "product.view.event": "1"])
+
+#### Java
+```java
+MobileCore.trackState(
+  "hats/sunhat/wide_brim_sunhat_id12345",
+  new HashMap<String, String>() {
+    {
+      put("product.name", "wide_brim_sunhat");
+      put("product.id", "12345");
+      put("product.view.event", "1");
+    }
+  }
+);
+```
+
+#### Kotlin
+```kotlin
+MobileCore.trackState(
+  "hats/sunhat/wide_brim_sunhat_id12345",
+  mapOf<String, String>(
+      "product.name" to "wide_brim_sunhat",
+      "product.id" to "12345",
+      "product.view.event" to "1"
+  )
+)
 ```
 
 <details>
@@ -161,4 +209,4 @@ The mapping process may be repeated for additional source data if needed by sele
 
 > **Note**
 > The Edge Bridge extension automatically sets an _xdm.eventType_ value of _analytics.track_. However, the value may be changed by adding a new mapping row in Data Prep by setting the **Target Field** to "eventType".
-> ![map eventType](../assets/map-eventtype.png)
+![map eventType](../assets/map-eventtype.png)
