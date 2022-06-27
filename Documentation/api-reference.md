@@ -24,6 +24,18 @@ public static String extensionVersion()
 String extensionVersion = EdgeBridge.extensionVersion();
 ```
 
+#### Kotlin
+
+##### Syntax
+```kotlin
+fun extensionVersion(): String!
+```
+
+##### Examples
+```kotlin
+val extensionVersion = EdgeBridge.extensionVersion()
+```
+
 ------
 
 ### registerExtension
@@ -41,7 +53,24 @@ public static void registerExtension()
 import com.adobe.marketing.mobile.edge.bridge.EdgeBridge;
 
 ...
+
 EdgeBridge.registerExtension();
+```
+
+#### Kotlin
+
+##### Syntax
+```kotlin
+fun registerExtension()
+```
+
+##### Examples
+```kotlin
+import com.adobe.marketing.mobile.edge.bridge.EdgeBridge
+
+...
+
+EdgeBridge.registerExtension()
 ```
 
 ------
