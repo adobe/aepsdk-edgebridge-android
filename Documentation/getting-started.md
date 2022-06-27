@@ -59,7 +59,7 @@ public class MobileApp extends Application {
         MobileCore.start(new AdobeCallback () {
             @Override
             public void call(Object o) {
-                MobileCore.configureWithAppID("yourAppId");
+                MobileCore.configureWithAppID("yourEnvironmentFileID");
             }
         });      
       } catch (Exception e) {
