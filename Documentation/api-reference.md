@@ -2,10 +2,10 @@
 
 ## API Reference
 
-| APIs                                           		|
+| APIs                                           |
 | ---------------------------------------------- |
-| [extensionVersion](#extensionversion)	|
-| [registerExtension](#registerextension)	|
+| [extensionVersion](#extensionversion)	         |
+| [registerExtension](#registerextension)	     |
 
 ------
 
