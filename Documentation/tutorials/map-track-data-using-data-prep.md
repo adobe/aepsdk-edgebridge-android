@@ -209,4 +209,5 @@ The mapping process may be repeated for additional source data if needed by sele
 
 > **Note**
 > The Edge Bridge extension automatically sets an _xdm.eventType_ value of _analytics.track_. However, the value may be changed by adding a new mapping row in Data Prep by setting the **Target Field** to "eventType".
+
 ![map eventType](../assets/map-eventtype.png)
