@@ -92,7 +92,7 @@ jobs:
           #   The test command
           test-command: make ci-functional-test
       
-      # Code coverage
+      # code coverage
       - run:
           name: Upload Code Coverage Report
           command: |
