@@ -2,7 +2,7 @@ version: 2.1
 orbs:
   android: circleci/android@1.0
 
-# Workflows orchestrate a set of jobs to be run;
+# Workflows orchestrate a set of jobs to be run
 workflows:
   version: 2
   build-test-deploy:
