@@ -13,12 +13,12 @@ spotless {
 }
 
 android {
-    compileSdk 31
+    compileSdkVersion 31
 
     defaultConfig {
         applicationId "com.adobe.marketing.mobile.edge.bridge.testapp"
-        minSdk 19
-        targetSdk 31
+        minSdkVersion 19
+        targetSdkVersion 31
         versionCode 1
         versionName "1.0"
 
