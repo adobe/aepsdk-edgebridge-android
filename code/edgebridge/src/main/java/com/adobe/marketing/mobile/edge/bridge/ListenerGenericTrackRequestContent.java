@@ -77,7 +77,7 @@ class ListenerGenericTrackRequestContent extends ExtensionListener {
 	 *
 	 * @return a {@link EdgeBridgeExtension} object registered with the eventHub
 	 */
-	private EdgeBridgeExtension getEdgeBridgeExtension() {
+	EdgeBridgeExtension getEdgeBridgeExtension() {
 		return (EdgeBridgeExtension) getParentExtension();
 	}
 }

@@ -14,17 +14,54 @@ package com.adobe.marketing.mobile.edge.bridge;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
 
+import android.app.Application;
+import android.content.Context;
+import com.adobe.marketing.mobile.Extension;
+import com.adobe.marketing.mobile.ExtensionErrorCallback;
+import com.adobe.marketing.mobile.MobileCore;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.powermock.api.mockito.PowerMockito;
+import org.powermock.core.classloader.annotations.PrepareForTest;
+import org.powermock.modules.junit4.PowerMockRunner;
 
-public class ExtensionVersionTest {
+@RunWith(PowerMockRunner.class)
+@PrepareForTest({ MobileCore.class })
+public class EdgeBridgeTest {
+
+	@Mock
+	Application mockApplication;
+
+	@Mock
+	Context mockContext;
+
+	@Before
+	public void setup() {
+		PowerMockito.mockStatic(MobileCore.class);
+		Mockito.when(MobileCore.getApplication()).thenReturn(mockApplication);
+		Mockito.when(mockApplication.getApplicationContext()).thenReturn(mockContext);
+	}
 
 	@Test
-	public void extensionVersion_verifyModuleVersionInPropertiesFile_asEqual() {
+	public void testRegisterExtension() {
+		EdgeBridge.registerExtension();
+
+		PowerMockito.verifyStatic(MobileCore.class, times(1));
+		MobileCore.registerExtension((Class<? extends Extension>) any(), any(ExtensionErrorCallback.class));
+	}
+
+	@Test
+	public void testExtensionVersion_verifyModuleVersionInPropertiesFile_asEqual() {
 		Properties properties = loadProperties("../gradle.properties");
 
 		assertNotNull(EdgeBridge.extensionVersion());
