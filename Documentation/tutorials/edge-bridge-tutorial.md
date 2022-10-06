@@ -281,7 +281,7 @@ In order to see EdgeBridge events, in the connected app instance:
 3. Click the `RAW EVENT` dropdown (**2**) in the event details window to see the event data payload.
 4. Verify that the `contextdata` matches what was sent by the Analytics `trackAction`/`trackState` API.
 
-<img src="../assets/edge-bridge-tutorial/assurance-analytics-track-event.jpg" alt="Simulator tracking buttons" width="800"/>
+<img src="../assets/edge-bridge-tutorial/assurance-analytics-track-event.png" alt="Simulator tracking buttons" width="800"/>
 
 5. Now click the `Edge Bridge Request` event (**1**) in the events table
 6. Click the `RAW EVENT` dropdown (**2**) in the event details window; notice the slight differences in the payload structure as a result of the `Edge Bridge Request` event conforming to the format of an Edge event.
