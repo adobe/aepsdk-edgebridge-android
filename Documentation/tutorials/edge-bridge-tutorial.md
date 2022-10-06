@@ -9,10 +9,10 @@
   - [2. Configure a Rule to forward PII events to Edge Network](#2-configure-a-rule-to-forward-pii-events-to-edge-network)
 - [Client-side implementation](#client-side-implementation)
   - [1. Get a copy of the files (code and tutorial app)](#1-get-a-copy-of-the-files-code-and-tutorial-app)
-  - [2. Install Edge Bridge using dependency manager (Gradle)](#2-install-edge-bridge-using-dependency-manager-swift-package-manager)
+  - [2. Install Edge Bridge using dependency manager (Gradle)](#2-install-edge-bridge-using-dependency-manager-gradle)
   - [3. Update tutorial app code to enable Edge Bridge functionality](#3-update-tutorial-app-code-to-enable-edge-bridge-functionality)
     - [Add the Edge Bridge extension](#add-the-edge-bridge-extension)
-    - [Remove Analytics and AEPIdentity](#remove-analytics-and-aepidentity)
+    - [Remove Analytics and Identity](#remove-analytics-and-identity)
   - [4. Run app](#4-run-app)
   - [5. `trackAction`/`trackState` implementation examples](#5-trackactiontrackstate-implementation-examples)
 - [Initial validation with Assurance](#initial-validation-with-assurance)
@@ -322,6 +322,16 @@ For a quick overview of the capabilities of Data Prep, watch the following [vide
 >
 
 </p></details>
+
+To open the data prep mapper: 
+1. Select **Datastreams** (**1**) in the left-side navigation panel.
+2. Select your datastream (**2**).
+
+<img src="../assets/edge-bridge-tutorial/datastreams-mapper-nav-1.png" alt="Select data from Edge Bridge event" width="1100"/>  
+
+3. Select **Edit Mapping** (**1**) in the right-side navigation panel.  
+
+<img src="../assets/edge-bridge-tutorial/datastreams-mapper-nav-2.png" alt="Select data from Edge Bridge event" width="1100"/>
 
 Currently, the data mapper UI only allows for one JSON payload to be mapped per datastream. This means for a given datastream, all of the potential event payloads need to be merged so that they can be mapped at once.
 
