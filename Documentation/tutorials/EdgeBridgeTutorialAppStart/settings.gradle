@@ -12,5 +12,5 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "EdgeBridgeTutorialAppStart"
+rootProject.name = "EdgeBridgeTutorialApp"
 include ':app'

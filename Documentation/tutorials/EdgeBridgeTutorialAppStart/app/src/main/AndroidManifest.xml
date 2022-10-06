@@ -12,13 +12,13 @@
         android:name="MainApp"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.EdgeBridgeTutorialAppStart"
+        android:theme="@style/Theme.EdgeBridgeTutorialApp"
         tools:targetApi="31">
         <activity
             android:name="MainActivity"
             android:exported="true"
             android:label="@string/app_name"
-            android:theme="@style/Theme.EdgeBridgeTutorialAppStart.NoActionBar">
+            android:theme="@style/Theme.EdgeBridgeTutorialApp.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -38,7 +38,7 @@
             android:name=".AssuranceActivity"
             android:label="Connect to Assurance"
             android:parentActivityName=".MainActivity"
-            android:theme="@style/Theme.EdgeBridgeTutorialAppStart">
+            android:theme="@style/Theme.EdgeBridgeTutorialApp">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".AssuranceActivity" />
