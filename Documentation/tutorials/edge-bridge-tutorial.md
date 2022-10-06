@@ -9,7 +9,7 @@
   - [2. Configure a Rule to forward PII events to Edge Network](#2-configure-a-rule-to-forward-pii-events-to-edge-network)
 - [Client-side implementation](#client-side-implementation)
   - [1. Get a copy of the files (code and tutorial app)](#1-get-a-copy-of-the-files-code-and-tutorial-app)
-  - [2. Install Edge Bridge using dependency manager (Swift Package Manager)](#2-install-edge-bridge-using-dependency-manager-swift-package-manager)
+  - [2. Install Edge Bridge using dependency manager (Gradle)](#2-install-edge-bridge-using-dependency-manager-swift-package-manager)
   - [3. Update tutorial app code to enable Edge Bridge functionality](#3-update-tutorial-app-code-to-enable-edge-bridge-functionality)
     - [Add the Edge Bridge extension](#add-the-edge-bridge-extension)
     - [Remove Analytics and AEPIdentity](#remove-analytics-and-aepidentity)
@@ -38,7 +38,7 @@ graph LR;
 ```
 
 ### Environment
-- macOS machine with a recent version of Xcode installed.
+- Android Studio version which supports Gradle plugin 7.2 and a working Android simulator
 
 ### Prerequisites
 - A timestamp enabled report suite is configured for mobile data collection.
@@ -151,78 +151,92 @@ The collectPII API for Analytics does not send events to the Edge Network by def
 
 ## Client-side implementation
 ### 1. Get a copy of the files (code and tutorial app)
-1. Open the code repository: https://github.com/adobe/aepsdk-edgebridge-ios
+1. Open the code repository: https://github.com/adobe/aepsdk-edgebridge-android
 2. Click **Code** in the top right
 3. In the window that opens, click **Download ZIP**; by default it should land in your **Downloads** folder.
    - Optionally, move the ZIP to your **Documents** folder
 4. Unzip the archived file by double clicking it.
 5. Navigate inside the unarchived file, then to Documentation -> tutorials -> EdgeBridgeTutorialAppStart.
-6. Double click on EdgeBridgeTutorialApp.xcworkspace. This should automatically open the Xcode IDE.
+6. Right click **settings.gradle** and select **Open With -> Other....**
+7. Pick **Android Studio** and click **Open**
 
-### 2. Install Edge Bridge using dependency manager (Swift Package Manager)
+### 2. Install Edge Bridge using dependency manager (Gradle)
 The next task is to add the necessary dependencies that will enable the Edge Bridge extension to function.
 
-1. In Xcode, from the top bar select File -> Add Packages...
+1. In Android Studio, click the dropdown chevron next to **Gradle Scripts** in the left-side navigation panel to open the folder
+2. Double click file **build.gradle** (Module: EdgeBridgeTutorialAppStart.app); note that there are two `build.gradle` files, the one we want is the module level one that ends with `.app`.
 
-2. Install the AEPEdgeBridge extension.
-  - In the "Search or Enter URL" box, type https://github.com/adobe/aepsdk-edgebridge-ios.git and click Enter.
-  - Select the aepsdk-edgebridge-ios package
-  - For Dependency Rule select **Branch** and type `dev`
-  - Select Add Package.
+Inside this file, you will see a code block for this tutorial that is greyed out, because it is block commented out. It's marked by the header and footer:
+`Edge Bridge Tutorial - code section (n/m)`
+Where `n` is the current section and `m` is the total number of sections in the file.
 
-3. Remove the AEPAnalytics extension.
-  - In Xcode, from the left side file navigator, select **EdgeBridgeTutorialApp**.
-  - Select PROJECT -> EdgeBridgeTutorialApp
-  - Select **Package dependencies**
-  - Select **AEPAnalytics** and then the minus (-) button under the table, then select **Remove**.
-
-4. Discussion: After this step, in this tutorial app there are no other Adobe Experience Cloud Solution extensions. At this point the import and registration for AEPIdentity extension can also be removed since AEPEdgeIdentity takes care of the identity piece on the Edge extensions.
-
-<details>
-  <summary> Using CocoaPods instead? </summary><p>
-
-**CocoaPods**
-This tutorial assumes a project using Swift Package Manager (SPM) for package dependency management, but if following along with a project that uses CocoaPods, refer to the [README for instructions on how to add the EdgeBridge extension](../../README.md#cocoapods).
-
-</p></details>
-
-### 3. Update tutorial app code to enable Edge Bridge functionality
-#### Add the Edge Bridge extension
-There is one file that needs to be updated to enable the Edge Bridge extension:  
-1. `AppDelegate.swift`
-   
-Inside you will see code blocks for this tutorial that are greyed out, because they are commented out. They are marked by the header and footer `EdgeBridge Tutorial - code section n/m` (where `n` is the current section and `m` is the total number of sections in the file).
-
-To uncomment the section and activate the code, simply add a forward slash at the front of the header:
-```swift
-/* EdgeBridge Tutorial - code section (1/2)
+To activate the code, simply add a forward slash `/` at the front of the **header**:
+```java
+/* Edge Bridge Tutorial - code section (1/2)
 ```
 To:
-```swift
-//* EdgeBridge Tutorial - code section (1/2)
+```java
+//* Edge Bridge Tutorial - code section (1/2)
 ```
-Make sure to uncomment all sections within the file (the total will tell you how many sections there are).
 
-#### Remove Analytics and AEPIdentity
-To remove the Analytics and AEPIdentity extensions:
-1. Click the dropdown chevron next to `EdgeBridgeTutorialApp` in the left-side navigation panel.
-2. Click the dropdown chevron next to the `EdgeBridgeTutorialApp` folder.
-3. Click the `AppDelegate.swift` file.
+Next, remove the Analytics dependency by removing a forward slash `/` at the front of the **header**:
+```java
+//* Edge Bridge Tutorial - remove section (2/2)
+```
+To:
+```java
+/* Edge Bridge Tutorial - remove section (2/2)
+```
 
+With the block uncommented, you should see a blue ribbon appear at the top of the code view window, with text like: "Gradle files have changed since last project sync. A project sync may be necessary for the IDE to work properly."
+
+1. Click ***Sync Now***.
+
+Gradle will use the configuration settings we just activated to install all of the Edge Bridge extensions we want for our tutorial app, and allow us to use their features within the app's code.
+
+
+### 3. Update tutorial app code to enable Edge Bridge functionality
+There is one file that needs to be updated to enable the Edge Bridge extension:
+
+1. Click dropdown chevrons to expand the folders: **java** -> **com.adobe.marketing.mobile** (the first one which should not be highlighted in green) -> **tutorial**.
+2. Double click to open the **MainApp** file, which should be under the **tutorial** folder.
+3. First update the `ENVIRONMENT_FILE_ID` value to the mobile property ID published in the first section.
+   - See how to get your mobile property ID in the instructions for [getting the mobile property ID](https://git.corp.adobe.com/dms-mobile/platform-extension/blob/edge-send-event-tutorial/Documentation/Tutorials/edge-send-event-tutorial.md#getting-the-mobile-property-id).
+
+#### Add the Edge Bridge extension
+Inside you will see code blocks for this tutorial that are greyed out, because they are commented out. They are marked by the header and footer `Edge Bridge Tutorial - code section n/m` (where `n` is the current section and `m` is the total number of sections in the file).
+
+To uncomment the section and activate the code, simply add a forward slash at the front of the header:
+```java
+/* Edge Bridge Tutorial - code section (1/2)
+```
+To:
+```java
+//* Edge Bridge Tutorial - code section (1/2)
+```
+Find the next `Edge Bridge Tutorial - code section (2/2)` and uncomment by adding a forward slash to register the Edge Bridge extension with the Mobile SDK.
+
+#### Remove Analytics and Identity
 Inside you will see code blocks for this tutorial marked by a header and footer `EdgeBridge Tutorial - remove section (n/m)` (where `n` is the current section and `m` is the total number of sections in the file).
 
-Simply delete everything between the header and footer, and make sure to do this for all "remove section" blocks within the file.
+Simply delete everything between the header and footer.
+
+The first `Edge Bridge Tutorial - remove section (3/4)`, removes the import statements for Analytics and Identity while the second, `Edge Bridge Tutorial - remove section (4/4)`, removes the registration code for Analytics and Identity.
 
 For details on the various Edge extensions used, see the [table of related projects](../../README.md#related-projects).
 
 ### 4. Run app   
-In Xcode, select the app target you want to run, and the destination device to run it on (either simulator or physical device). Then press the play button.
+In Android Studio
+1. Set the app target (1) to **app** (if not already).
+2. Choose which destination device (2) to run it on.
+3. Click the green play button (3).
 
-You should see your application running on the device you selected, with logs being displayed in the console in Xcode.
+You should see your application running on the device you selected, with logs being displayed in the debug console in Android Studio.
 
 > **Note**
-> If the debug console area is not shown by default, activate it by selecting:  
-> View -> Debug Area -> Show Debug Area
+> If the log console area is not shown by default, activate it by selecting:
+> View -> Tool Windows -> Logcat
+
 
 ### 5. `trackAction`/`trackState` implementation examples   
 With Edge Bridge extension successfully installed and registered, you can make the regular Analytics `trackAction` and `trackState` calls, which will be captured by Edge Bridge extension and sent to the Edge Network.
@@ -235,7 +249,7 @@ Assurance is the AEP tool for inspecting all events that Adobe extensions send o
 ### 1. Set up the Assurance session 
 To create a new Assurance session and connect to it, see the instructions on [setting up an Assurance session](https://github.com/adobe/aepsdk-edge-ios/blob/dev/Documentation/Tutorials/edge-send-event-tutorial.md#1-set-up-the-assurance-session), using the base URL value:
 ```
-edgebridgetutorialapp://
+edgebridgetutorialapp://main
 ```
 
 ### 2. Connect the app to the Assurance session  
