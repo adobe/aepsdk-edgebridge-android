@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">EdgeBridgeTutorialApp</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- First fragment view strings -->
+    <string name="track_action_button">Track Action</string>
+    <string name="track_state_button">Track State</string>
+    <string name="connect_to_assurance_button">Connect to Assurance</string>
+    <string name="assurance_titleEnterSessionURL">Enter the Assurance Session URL:</string>
+    <string name="assurance_btnConnectToAssuranceSession">Connect</string>
+    <string name="action_connect_assurance">Connect to Assurance</string>
+    <string name="trigger_rule_button">Trigger Rule</string>
+</resources>
