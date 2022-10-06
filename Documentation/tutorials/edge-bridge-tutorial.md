@@ -253,7 +253,22 @@ edgebridgetutorialapp://main
 ```
 
 ### 2. Connect the app to the Assurance session  
-To connect the tutorial app to the Assurance session, see the instructions on [connecting the app to the Assurance session](https://github.com/adobe/aepsdk-edge-ios/blob/dev/Documentation/Tutorials/edge-send-event-tutorial.md#2-connect-to-the-app).
+To connect to Assurance, we will use the session link method:
+
+1. Copy the session link; you can click the icon of a double overlapping box to the right of the link to copy it.
+  - If using a physical device, it may be helpful to have a way to send this link to the device (ex: email, text, etc.). Alternatively, you can use the camera on your physical device to scan the QR code.
+2. Open the tutorial app and tap the 3 dot menu (**1**) in the top right. Select **Connect to Assurance**.
+
+<img src="../assets/edge-bridge-tutorial/app-assurance-menu-andriod.png" alt="Simulator tracking buttons" width="400"/>
+
+3. Paste the Assurance session link copied from step 1 into the text field and tap the Connect button.
+
+<img src="../assets/edge-bridge-tutorial/app-assurance-connection-andriod.png" alt="Simulator tracking buttons" width="400"/>
+
+4. App should open and show the Assurance PIN screen to authenticate the session connection; enter the PIN from the session details and tap **Connect (1)**.
+
+<img src="../assets/edge-bridge-tutorial/assurance-andriod-pin.png" alt="Simulator tracking buttons" width="400"/>
+
 
 ### 3. Event transactions view - check for EdgeBridge events  
 #### `trackAction`/`trackState` events
