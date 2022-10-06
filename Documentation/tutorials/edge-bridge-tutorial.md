@@ -259,15 +259,15 @@ To connect to Assurance, we will use the session link method:
   - If using a physical device, it may be helpful to have a way to send this link to the device (ex: email, text, etc.). Alternatively, you can use the camera on your physical device to scan the QR code.
 2. Open the tutorial app and tap the 3 dot menu (**1**) in the top right. Select **Connect to Assurance**.
 
-<img src="../assets/edge-bridge-tutorial/app-assurance-menu-andriod.png" alt="Simulator tracking buttons" width="400"/>
+<img src="../assets/edge-bridge-tutorial/app-assurance-menu-android.png" alt="Simulator tracking buttons" width="400"/>
 
 3. Paste the Assurance session link copied from step 1 into the text field and tap the Connect button.
 
-<img src="../assets/edge-bridge-tutorial/app-assurance-connection-andriod.png" alt="Simulator tracking buttons" width="400"/>
+<img src="../assets/edge-bridge-tutorial/app-assurance-connection-android.png" alt="Simulator tracking buttons" width="400"/>
 
 4. App should open and show the Assurance PIN screen to authenticate the session connection; enter the PIN from the session details and tap **Connect (1)**.
 
-<img src="../assets/edge-bridge-tutorial/assurance-andriod-pin.png" alt="Simulator tracking buttons" width="400"/>
+<img src="../assets/edge-bridge-tutorial/assurance-android-pin.png" alt="Simulator tracking buttons" width="400"/>
 
 
 ### 3. Event transactions view - check for EdgeBridge events  
