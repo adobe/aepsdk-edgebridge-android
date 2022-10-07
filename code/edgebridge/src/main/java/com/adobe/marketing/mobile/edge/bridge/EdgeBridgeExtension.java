@@ -264,7 +264,7 @@ class EdgeBridgeExtension extends Extension {
 							"%s - Failed to dispatch Edge Bridge request event with id '%s': %s",
 							SELF_LOG_TAG,
 							event.getUniqueIdentifier(),
-							extensionError.getErrorName()
+							extensionError != null ? extensionError.getErrorName() : "unexpected"
 						)
 					);
 				}

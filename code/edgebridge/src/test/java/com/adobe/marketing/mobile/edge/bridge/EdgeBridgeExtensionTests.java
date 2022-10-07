@@ -12,6 +12,9 @@
 package com.adobe.marketing.mobile.edge.bridge;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -22,7 +25,9 @@ import android.app.Application;
 import android.content.Context;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.ExtensionApi;
+import com.adobe.marketing.mobile.ExtensionError;
 import com.adobe.marketing.mobile.ExtensionErrorCallback;
+import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,7 +37,6 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -44,7 +48,7 @@ import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({ MobileCore.class, ExtensionApi.class })
+@PrepareForTest({ MobileCore.class, ExtensionApi.class, ExtensionErrorCallback.class, ExtensionError.class })
 public class EdgeBridgeExtensionTests {
 
 	private EdgeBridgeExtension extension;
@@ -86,7 +90,7 @@ public class EdgeBridgeExtensionTests {
 				eq(ListenerGenericTrackRequestContent.class),
 				callbackCaptor.capture()
 			);
-		Assert.assertNotNull(
+		assertNotNull(
 			"The extension callback for Generic Track listener should not be null",
 			callbackCaptor.getValue()
 		);
@@ -98,10 +102,7 @@ public class EdgeBridgeExtensionTests {
 				eq(ListenerRulesEngineResponseContent.class),
 				callbackCaptor.capture()
 			);
-		Assert.assertNotNull(
-			"The extension callback for Rules Engine listener should not be null",
-			callbackCaptor.getValue()
-		);
+		assertNotNull("The extension callback for Rules Engine listener should not be null", callbackCaptor.getValue());
 	}
 
 	// ========================================================================================
@@ -202,6 +203,14 @@ public class EdgeBridgeExtensionTests {
 		};
 
 		assertEquals(expectedData, responseEvent.getEventData());
+	}
+
+	@Test(expected = Test.None.class)
+	public void test_handleTrackRequest_withNullEvent_doesNotThrow() {
+		extension.handleTrackRequest(null);
+
+		PowerMockito.verifyStatic(MobileCore.class, Mockito.never());
+		MobileCore.dispatchEvent(any(Event.class), any(ExtensionErrorCallback.class));
 	}
 
 	@Test
@@ -323,6 +332,14 @@ public class EdgeBridgeExtensionTests {
 		};
 
 		assertEquals(expectedData, responseEvent.getEventData());
+	}
+
+	@Test(expected = Test.None.class)
+	public void test_handleRulesEngineResponse_withNullEvent_doesNotThrow() {
+		extension.handleRulesEngineResponse(null);
+
+		PowerMockito.verifyStatic(MobileCore.class, Mockito.never());
+		MobileCore.dispatchEvent(any(Event.class), any(ExtensionErrorCallback.class));
 	}
 
 	@Test
@@ -788,6 +805,63 @@ public class EdgeBridgeExtensionTests {
 
 		PowerMockito.verifyStatic(MobileCore.class, Mockito.never());
 		MobileCore.dispatchEvent(any(Event.class), any(ExtensionErrorCallback.class));
+	}
+
+	@Test
+	public void test_handleValidEvent_whenDispatchThrows_logsMessage() {
+		final Event event = new Event.Builder(
+			"Test Track Event",
+			EdgeBridgeTestConstants.EventType.GENERIC_TRACK,
+			EdgeBridgeTestConstants.EventSource.REQUEST_CONTENT
+		)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("action", "Test Action");
+						put(
+							"contextdata",
+							new HashMap<String, Object>() {
+								{
+									put("testKey", "testValue");
+								}
+							}
+						);
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		final ArgumentCaptor<ExtensionErrorCallback> errorCallbackCaptor = ArgumentCaptor.forClass(
+			ExtensionErrorCallback.class
+		);
+
+		PowerMockito.verifyStatic(MobileCore.class, Mockito.times(1));
+		MobileCore.dispatchEvent(any(Event.class), errorCallbackCaptor.capture());
+
+		errorCallbackCaptor.getValue().error(null); // Mocking call to ExtensionErrorCallback with null, ExtensionError is not instantiable
+		final ArgumentCaptor<String> logMessageCaptor = ArgumentCaptor.forClass(String.class);
+		PowerMockito.verifyStatic(MobileCore.class, Mockito.times(1));
+		MobileCore.log(any(LoggingMode.class), any(String.class), logMessageCaptor.capture());
+		assertTrue(
+			logMessageCaptor
+				.getValue()
+				.startsWith("EdgeBridgeExtension - Failed to dispatch Edge Bridge request event with id")
+		);
+	}
+
+	// ========================================================================================
+	// getExecutor
+	// ========================================================================================
+	@Test
+	public void testGetExecutor_notNull() {
+		assertNotNull(extension.getExecutor());
+	}
+
+	@Test
+	public void testGetExecutor_singleton() {
+		assertSame(extension.getExecutor(), extension.getExecutor());
 	}
 
 	// ========================================================================================
