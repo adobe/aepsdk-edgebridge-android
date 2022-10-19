@@ -37,6 +37,7 @@ graph LR;
 - Android Studio version which supports Gradle plugin 7.2 and a working Android simulator.
 
 ### Prerequisites
+- The tutorial app for this exercise already includes the Edge extensions. If you want to learn more about this, check out the [Edge tutorial](https://github.com/adobe/aepsdk-edge-ios/tree/main/Documentation/Tutorials).
 - A timestamp enabled report suite is configured for mobile data collection.
 - A tag (also known as mobile property) is configured in Data Collection UI which has Adobe Analytics extension installed and configured.
 
@@ -190,6 +191,9 @@ With the block uncommented, you should see a blue ribbon appear at the top of th
 
 Gradle will use the configuration settings we just activated to install all of the Edge Bridge extensions we want for our tutorial app, and allow us to use their features within the app's code.
 
+> **Note**  
+> After this step, there are no Adobe Experience Cloud Solution extensions in the app. At this point, the import and registration for the AEPIdentity extension can also be removed since AEPEdgeIdentity takes care of the identity functionality for the Edge extensions.
+> If your application still uses Adobe Experience Cloud Solution extensions, such as Adobe Target, Adobe Campaign, etc. (find the full list [here](https://aep-sdks.gitbook.io/docs/)) you should ignore the steps below for removing AEPIdentity and continue to use the extension.
 
 ### 3. Update tutorial app code to enable Edge Bridge functionality
 There is one file that needs to be updated to enable the Edge Bridge extension:
