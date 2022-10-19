@@ -4,24 +4,20 @@
 - [Overview](#overview)
   - [Environment](#environment)
   - [Prerequisites](#prerequisites)
-  - [Adobe Experience Platform setup](#adobe-experience-platform-setup)
+- [Adobe Experience Platform setup](#adobe-experience-platform-setup)
   - [1. Set up mobile property](#1-set-up-mobile-property)
   - [2. Configure a Rule to forward PII events to Edge Network](#2-configure-a-rule-to-forward-pii-events-to-edge-network)
 - [Client-side implementation](#client-side-implementation)
   - [1. Get a copy of the files (code and tutorial app)](#1-get-a-copy-of-the-files-code-and-tutorial-app)
   - [2. Install Edge Bridge using dependency manager (Gradle)](#2-install-edge-bridge-using-dependency-manager-gradle)
   - [3. Update tutorial app code to enable Edge Bridge functionality](#3-update-tutorial-app-code-to-enable-edge-bridge-functionality)
-    - [Add the Edge Bridge extension](#add-the-edge-bridge-extension)
-    - [Remove Analytics and Identity](#remove-analytics-and-identity)
   - [4. Run app](#4-run-app)
   - [5. `trackAction`/`trackState` implementation examples](#5-trackactiontrackstate-implementation-examples)
 - [Initial validation with Assurance](#initial-validation-with-assurance)
   - [1. Set up the Assurance session](#1-set-up-the-assurance-session)
   - [2. Connect the app to the Assurance session](#2-connect-the-app-to-the-assurance-session)
   - [3. Event transactions view - check for EdgeBridge events](#3-event-transactions-view---check-for-edgebridge-events)
-    - [`trackAction`/`trackState` events](#trackactiontrackstate-events)
-    - [Trigger rule-based `trackAction` events](#trigger-rule-based-trackaction-events)
-- [Data prep mapping](#data-prep-mapping)
+- [Data Prep mapping](#data-prep-mapping)
 - [Final validation using Assurance](#final-validation-using-assurance)
 
 ## Overview
@@ -38,13 +34,13 @@ graph LR;
 ```
 
 ### Environment
-- Android Studio version which supports Gradle plugin 7.2 and a working Android simulator
+- Android Studio version which supports Gradle plugin 7.2 and a working Android simulator.
 
 ### Prerequisites
 - A timestamp enabled report suite is configured for mobile data collection.
 - A tag (also known as mobile property) is configured in Data Collection UI which has Adobe Analytics extension installed and configured.
 
-### Adobe Experience Platform setup
+## Adobe Experience Platform setup
 Before any app changes we need to set up some configuration items on the Adobe Experience Platform (AEP) side. The end goal of this section is to create a mobile property that controls the configuration settings for the various AEP extensions used in this tutorial.
 
 ### 1. Set up mobile property  
@@ -203,7 +199,7 @@ There is one file that needs to be updated to enable the Edge Bridge extension:
 3. First update the `ENVIRONMENT_FILE_ID` value to the mobile property ID published in the first section.
    - See how to get your mobile property ID in the instructions for [getting the mobile property ID](https://github.com/adobe/aepsdk-edge-ios/blob/dev/Documentation/Tutorials/edge-send-event-tutorial.md#getting-the-mobile-property-id-).
 
-#### Add the Edge Bridge extension
+#### Add the Edge Bridge extension <!-- omit in toc -->
 Inside you will see code blocks for this tutorial that are greyed out, because they are commented out. They are marked by the header and footer `Edge Bridge Tutorial - code section n/m` (where `n` is the current section and `m` is the total number of sections in the file).
 
 To uncomment the section and activate the code, simply add a forward slash at the front of the header:
@@ -216,7 +212,7 @@ To:
 ```
 Find the next `Edge Bridge Tutorial - code section (2/2)` and uncomment by adding a forward slash to register the Edge Bridge extension with the Mobile SDK.
 
-#### Remove Analytics and Identity
+#### Remove Analytics and Identity <!-- omit in toc -->
 Inside you will see code blocks for this tutorial marked by a header and footer `EdgeBridge Tutorial - remove section (n/m)` (where `n` is the current section and `m` is the total number of sections in the file).
 
 Simply delete everything between the header and footer.
@@ -271,7 +267,7 @@ To connect to Assurance, we will use the session link method:
 
 
 ### 3. Event transactions view - check for EdgeBridge events  
-#### `trackAction`/`trackState` events
+#### `trackAction`/`trackState` events <!-- omit in toc -->
 In order to see EdgeBridge events, in the connected app instance:
 1. Trigger a `trackAction` and/or `trackState` within the app which the Edge Bridge extension will convert into Edge events. This event will be captured by the Assurance extension and shown in the web session viewer.
 
@@ -296,14 +292,14 @@ The top level EventType is converted from a `generic.track` to `edge` (that is, 
 > **Note**
 > The two new top level properties `xdm` and `data` are standard Edge event properties that are part of the Edge platform's XDM schema-based system for event data organization that enables powerful, customizable data processing. However, because the `contextdata` is not yet mapped to an XDM schema, it is not in a usable form for the Edge platform. We will solve this issue by mapping the event data to an XDM schema in the next section.
 
-#### Trigger rule-based `trackAction` events
+#### Trigger rule-based `trackAction` events <!-- omit in toc -->
 Rules-based trackAction/trackState events are also converted to Edge events by the Edge Bridge extension. Select the **Trigger Rule** button (**1**) to trigger a rule that creates a trackAction event.
 
 <img src="../assets/edge-bridge-tutorial/simulator-trigger-rule-button.png" alt="Simulator tracking buttons" width="400"/>
 
 Just like the `trackAction`/`trackState` events above, the Edge Bridge extension will convert the PII trackAction event into an Edge event.
 
-## Data prep mapping
+## Data Prep mapping
 
 <details>
   <summary> Data Prep background</summary><p>
@@ -333,7 +329,7 @@ To open the data prep mapper:
 
 <img src="../assets/edge-bridge-tutorial/datastreams-mapper-nav-2.png" alt="Select data from Edge Bridge event" width="1100"/>
 
-Currently, the data mapper UI only allows for one JSON payload to be mapped per datastream. This means for a given datastream, all of the potential event payloads need to be merged so that they can be mapped at once.
+Currently, the data mapper UI only allows for one JSON payload to be mapped per datastream. This means for a given datastream, all of the potential event payloads need to be merged so that they can be mapped at once. Note that Data Prep requires that the **data** and **xdm** objects are top-level objects in the provided JSON source.
 
 The properties from both `trackAction` and `trackState` events from the tutorial app need to be combined into a single JSON. For simplicity, the merged data structure has been provided below:
 
@@ -375,6 +371,12 @@ The properties from both `trackAction` and `trackState` events from the tutorial
 </p></details>
 
 <img src="../assets/edge-bridge-tutorial/datastreams-json-paste.png" alt="Select data from Edge Bridge event" width="1100"/>  
+
+> **Note**
+> XDM source fields are automatically mapped if the same field appears in the target schema. For example, the fields _xdm.\_id_ and _xdm.timestamp_ are required fields in a time-series XDM schema so you will notice they are automatically mapped from the source data to the target schema and do not require a mapping entry.
+
+> **Note**
+> The Edge Bridge extension automatically sets an _xdm.eventType_ value of _analytics.track_. However, the value may be changed by adding a new mapping row in Data Prep by setting the **Target Field** to "eventType".
 
 3. Click the `Add new mapping` button (**1**).
 

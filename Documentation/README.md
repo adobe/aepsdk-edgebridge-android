@@ -1,4 +1,4 @@
-# EdgeBridge extension documentation
+# Edge Bridge Extension Documentation
 
 ## Contents
 
