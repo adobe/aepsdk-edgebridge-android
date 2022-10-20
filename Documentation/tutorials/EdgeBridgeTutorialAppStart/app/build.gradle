@@ -50,7 +50,7 @@ dependencies {
     implementation 'com.adobe.marketing.mobile:edgeidentity:1.1.0'
 
     /* Edge Bridge Tutorial - code section (1/2)
-    implementation 'com.adobe.marketing.mobile:edgebridge:1.+'
+    implementation 'com.adobe.marketing.mobile:edgebridge:1.0.0'
     // Edge Bridge Tutorial - code section (1/2) */
 
     //* Edge Bridge Tutorial - remove section (2/2)
