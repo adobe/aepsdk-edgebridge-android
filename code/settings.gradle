@@ -1,0 +1,3 @@
+rootProject.name = "edgebridge-sdk"
+include ':app'
+include ':edgebridge'
