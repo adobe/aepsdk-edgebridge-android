@@ -23,11 +23,11 @@ import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.edge.consent.Consent;
 
-/* Edge Bridge Tutorial - code section (1/2)
+//* Edge Bridge Tutorial - code section (1/2)
 import com.adobe.marketing.mobile.edge.bridge.EdgeBridge;
 // Edge Bridge Tutorial - code section (1/2) */
 
-//* Edge Bridge Tutorial - remove section (1/2)
+/* Edge Bridge Tutorial - remove section (1/2)
 import com.adobe.marketing.mobile.Analytics;
 import com.adobe.marketing.mobile.Identity;
 // Edge Bridge Tutorial - remove section (1/2) */
@@ -55,11 +55,11 @@ public class MainApp extends Application {
             Edge.registerExtension();
             com.adobe.marketing.mobile.edge.identity.Identity.registerExtension();
 
-            /* Edge Bridge Tutorial - code section (2/2)
+            //* Edge Bridge Tutorial - code section (2/2)
             EdgeBridge.registerExtension();
             // Edge Bridge Tutorial - code section (2/2) */
 
-            //* Edge Bridge Tutorial - remove section (2/2)
+            /* Edge Bridge Tutorial - remove section (2/2)
             com.adobe.marketing.mobile.Identity.registerExtension();
             Analytics.registerExtension();
             // Edge Bridge Tutorial - remove section (2/2) */
