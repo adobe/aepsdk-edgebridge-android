@@ -50,7 +50,7 @@ dependencies {
     implementation 'com.adobe.marketing.mobile:edgeidentity:1.1.0'
 
     /* Edge Bridge Tutorial - code section (1/2)
-    implementation fileTree(dir: 'libs', include: ['edgebridge-release-1.0.0-beta.aar'])
+    implementation 'com.adobe.marketing.mobile:edgebridge:1.+'
     // Edge Bridge Tutorial - code section (1/2) */
 
     //* Edge Bridge Tutorial - remove section (2/2)
