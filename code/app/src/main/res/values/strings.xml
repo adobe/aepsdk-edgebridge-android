@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Edge Bridge</string>
+    <string name="track_action">Track Action</string>
+    <string name="track_state">Track State</string>
+    <string name="trigger_consequence">Trigger Consequence</string>
+    <string name="label_session_url">Copy Assurance Session URL here</string>
+    <string name="btn_connect">Connect</string>
+    <string name="assurance">Assurance</string>
+</resources>
