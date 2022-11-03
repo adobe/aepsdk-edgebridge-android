@@ -29,7 +29,15 @@
                     android:host="main" />
             </intent-filter>
         </activity>
-        <activity android:name=".AssuranceActivity"/>
+        <activity
+            android:name=".AssuranceActivity"
+            android:label="Connect to Assurance"
+            android:parentActivityName=".MainActivity"
+            android:theme="@style/Theme.CustomSettings">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".AssuranceActivity" />
+        </activity>
     </application>
 
 </manifest>
