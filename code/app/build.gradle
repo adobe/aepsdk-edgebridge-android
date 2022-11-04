@@ -13,7 +13,9 @@ spotless {
 }
 
 android {
-    compileSdkVersion 31
+    namespace 'com.adobe.marketing.mobile.edge.bridge.testapp'
+
+    compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
         applicationId "com.adobe.marketing.mobile.edge.bridge.testapp"
@@ -38,7 +40,6 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
-    namespace 'com.adobe.marketing.mobile.edge.bridge.testapp'
 }
 
 dependencies {
