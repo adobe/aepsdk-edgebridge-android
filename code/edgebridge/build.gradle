@@ -25,6 +25,8 @@ spotless {
 }
 
 android {
+    namespace 'com.adobe.marketing.mobile.edge.bridge'
+    
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
@@ -45,6 +47,7 @@ android {
     buildTypes {
         debug {
             testCoverageEnabled true
+            debuggable true
         }
 
         release {
@@ -61,7 +64,6 @@ android {
         sourceCompatibility rootProject.ext.sourceCompatibility
         targetCompatibility rootProject.ext.targetCompatibility
     }
-    namespace 'com.adobe.marketing.mobile.edge.bridge'
 }
 
 android.libraryVariants.all { variant ->
@@ -104,37 +106,6 @@ publish.dependsOn('assemblePhone')
 
 publishing {
     publications {
-        aar(MavenPublication) {
-            groupId = 'com.adobe.marketing.mobile'
-            artifactId = rootProject.moduleName
-            version = rootProject.moduleVersion
-            artifact("$buildDir/outputs/aar/${rootProject.moduleAARName}")
-            artifact javadocPublish
-            pom.withXml {
-                asNode().appendNode('name', mavenRepoName)
-                asNode().appendNode('description', mavenRepoDescription)
-                asNode().appendNode('url', 'https://aep-sdks.gitbook.io/docs/')
-                def scmNode = asNode().appendNode('scm')
-                scmNode.appendNode('url', 'https://github.com/adobe/aepsdk-edgebridge-android/')
-
-
-                def developersNode = asNode().appendNode('developers')
-                def developerNode = developersNode.appendNode('developer')
-                developerNode.appendNode('id', 'adobe')
-                developerNode.appendNode('name', 'adobe')
-
-                def licensesNode = asNode().appendNode('licenses')
-                def licenseNode = licensesNode.appendNode('license')
-                licenseNode.appendNode('name', 'Adobe Proprietary')
-
-                def dependenciesNode = asNode().appendNode('dependencies')
-
-                def coreDependencyNode = dependenciesNode.appendNode('dependency')
-                coreDependencyNode.appendNode('groupId', 'com.adobe.marketing.mobile')
-                coreDependencyNode.appendNode('artifactId', 'core')
-                coreDependencyNode.appendNode('version', mavenCoreVersion)
-            }
-        }
         release(MavenPublication) {
             groupId = 'com.adobe.marketing.mobile'
             artifactId = rootProject.moduleName
