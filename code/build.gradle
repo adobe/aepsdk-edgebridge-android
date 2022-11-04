@@ -36,8 +36,8 @@ task clean(type: Delete) {
 ext {
     // android config
     minSdkVersion = 19
-    targetSdkVersion = 31
-    compileSdkVersion = 31
+    targetSdkVersion = 33
+    compileSdkVersion = 33
     versionCode = 1
 
     // java config
@@ -46,5 +46,5 @@ ext {
 
     // dependencies
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-    jacocoVersion = "0.8.5"
+    jacocoVersion = "0.8.6"
 }
