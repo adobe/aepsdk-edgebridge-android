@@ -15,12 +15,12 @@ spotless {
 android {
     namespace 'com.adobe.marketing.mobile.edge.bridge.testapp'
 
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdkVersion
 
     defaultConfig {
         applicationId "com.adobe.marketing.mobile.edge.bridge.testapp"
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdk rootProject.ext.minSdkVersion
+        targetSdk rootProject.ext.targetSdkVersion
         versionCode rootProject.ext.versionCode
         versionName project.property('moduleVersion') as String ?: "1.0.0 (Default)"
 

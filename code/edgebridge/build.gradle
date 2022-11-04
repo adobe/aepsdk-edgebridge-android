@@ -27,11 +27,11 @@ spotless {
 android {
     namespace 'com.adobe.marketing.mobile.edge.bridge'
     
-    compileSdkVersion rootProject.ext.compileSdkVersion
+    compileSdk rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        minSdkVersion rootProject.ext.minSdkVersion
-        targetSdkVersion rootProject.ext.targetSdkVersion
+        minSdk rootProject.ext.minSdkVersion
+        targetSdk rootProject.ext.targetSdkVersion
 
         testInstrumentationRunner rootProject.ext.testInstrumentationRunner
         consumerProguardFiles "consumer-rules.pro"
@@ -69,7 +69,7 @@ android {
 android.libraryVariants.all { variant ->
     tasks.withType(Javadoc) {
         source = [android.sourceSets.main.java.sourceFiles, android.sourceSets.phone.java.sourceFiles]
-        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdkVersion}/android.jar"
+        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdk}/android.jar"
 
         doFirst{classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)}
 
