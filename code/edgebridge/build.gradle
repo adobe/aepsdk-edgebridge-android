@@ -77,7 +77,7 @@ android.libraryVariants.all { variant ->
         exclude "**/R.java"
         options {
             links "https://developer.android.com/reference"
-            linksOffline "https://developer.android.com/reference", "file:///${android.sdkDirectory}/docs/reference"
+//            linksOffline "https://developer.android.com/reference", "file:///${android.sdkDirectory}/docs/reference"
         }
     }
 }
