@@ -179,9 +179,8 @@ task platformUnitTestJacocoReport(type: JacocoReport, dependsOn: "testPhoneDebug
     additionalClassDirs.setFrom files([debugTree])
     additionalSourceDirs.setFrom files(android.sourceSets.main.java.sourceFiles)
     sourceDirectories.setFrom files(android.sourceSets.phone.java.sourceFiles)
-//    executionData "$buildDir/jacoco/testPhoneDebugUnitTest.exec"
     executionData "$buildDir/outputs/unit_test_code_coverage/phoneDebugUnitTest/testPhoneDebugUnitTest.exec"
-//    /Users/timothyk/git/timkimadobe/aepsdk-edgebridge-android/code/edgebridge/build/outputs/unit_test_code_coverage/phoneDebugUnitTest
+
     reports {
         xml.required = true
         csv.required = false
