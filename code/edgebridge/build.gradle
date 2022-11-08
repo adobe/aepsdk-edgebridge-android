@@ -208,7 +208,8 @@ task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPh
 dependencies {
 
     // Adobe Mobile SDK Core
-    implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
+//    implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
+    implementation 'com.github.adobe.aepsdk-core-android:core:v2.0.0-alpha.3'
 
     testImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
