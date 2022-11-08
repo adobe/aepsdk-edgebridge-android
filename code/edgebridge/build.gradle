@@ -26,7 +26,7 @@ spotless {
 
 android {
     namespace 'com.adobe.marketing.mobile.edge.bridge'
-    
+
     compileSdk rootProject.ext.compileSdkVersion
 
     defaultConfig {
@@ -66,16 +66,15 @@ android {
     }
 }
 
-android.libraryVariants.all { variant ->
+afterEvaluate {
     tasks.withType(Javadoc) {
-        source = [android.sourceSets.main.java.sourceFiles, android.sourceSets.phone.java.sourceFiles]
-        ext.androidJar = "${android.sdkDirectory}/platforms/${android.compileSdk}/android.jar"
-
-        doFirst{classpath = files(variant.javaCompile.classpath.files) + files(ext.androidJar)}
-
-        exclude "**/BuildConfig.java"
-        exclude "**/R.java"
+        source = android.sourceSets.main.java.srcDirs
+        classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+        classpath += files(android.libraryVariants.collect { variant ->
+            variant.javaCompileProvider.get().classpath.files
+        })
         options {
+            source = "8"
             links "https://developer.android.com/reference"
         }
     }
