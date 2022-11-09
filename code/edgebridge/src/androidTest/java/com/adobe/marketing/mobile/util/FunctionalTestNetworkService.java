@@ -11,9 +11,8 @@
 
 package com.adobe.marketing.mobile.util;
 
-import com.adobe.marketing.mobile.LoggingMode;
-import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.HttpConnecting;
+import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.services.NetworkCallback;
 import com.adobe.marketing.mobile.services.NetworkRequest;
 import com.adobe.marketing.mobile.services.Networking;
@@ -28,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 public class FunctionalTestNetworkService implements Networking {
 
+	private static final String LOG_TAG = "EdgeBridge";
 	private static final String TAG = "FunctionalTestNetworkService";
 	private final Map<TestableNetworkRequest, List<TestableNetworkRequest>> receivedTestableNetworkRequests;
 	private final Map<TestableNetworkRequest, HttpConnecting> responseMatchers;
@@ -71,7 +71,7 @@ public class FunctionalTestNetworkService implements Networking {
 	}
 
 	public void reset() {
-		MobileCore.log(LoggingMode.VERBOSE, TAG, "Reset received and expected network requests.");
+		Log.trace(LOG_TAG, TAG, "Reset received and expected network requests.");
 		receivedTestableNetworkRequests.clear();
 		responseMatchers.clear();
 		expectedTestableNetworkRequests.clear();
@@ -127,8 +127,8 @@ public class FunctionalTestNetworkService implements Networking {
 
 	@Override
 	public void connectAsync(NetworkRequest networkRequest, NetworkCallback resultCallback) {
-		MobileCore.log(
-			LoggingMode.VERBOSE,
+		Log.trace(
+			LOG_TAG,
 			TAG,
 			"Received connectUrlAsync to URL '" +
 			networkRequest.getUrl() +

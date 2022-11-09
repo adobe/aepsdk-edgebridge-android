@@ -11,7 +11,6 @@
 
 package com.adobe.marketing.mobile.services;
 
-import android.content.Context;
 import com.adobe.marketing.mobile.LoggingMode;
 import com.adobe.marketing.mobile.MobileCore;
 import java.io.File;
@@ -25,12 +24,10 @@ public class ServiceProviderHelper {
 
 	/**
 	 * Reset the {@link ServiceProvider}.
-	 *
-	 * @param context the application context
 	 */
-	public static void resetServiceProvider(final Context context) {
-		ServiceProvider.getInstance().reset();
-		ServiceProvider.getInstance().setContext(context);
+	public static void resetServiceProvider() {
+		ServiceProvider.getInstance().resetServices();
+		ServiceProvider.getInstance().resetAppInstance();
 	}
 
 	/**

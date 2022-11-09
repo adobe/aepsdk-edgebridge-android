@@ -90,7 +90,8 @@ public class FunctionalTestHelper {
 						defaultApplication = Instrumentation.newApplication(CustomApplication.class, context);
 					}
 
-					MobileCoreHelper.setCore(null);
+					//					MobileCoreHelper.setCore(null);
+					MobileCoreHelper.resetSDK();
 					ServiceProvider.getInstance().setNetworkService(testNetworkService);
 					MobileCore.setLogLevel(LoggingMode.VERBOSE);
 					MobileCore.setApplication(defaultApplication);
@@ -110,10 +111,11 @@ public class FunctionalTestHelper {
 							"Finished '" + description.getMethodName() + "'"
 						);
 						waitForThreads(5000); // wait to allow thread to run after test execution
-						MobileCoreHelper.shutdownCore();
-						MobileCoreHelper.setCore(null);
+						//						MobileCoreHelper.shutdownCore();
+						//						MobileCoreHelper.setCore(null);
+						MobileCoreHelper.resetSDK();
 						resetTestExpectations();
-						resetServiceProvider(defaultApplication);
+						resetServiceProvider();
 					}
 				}
 			};
@@ -527,14 +529,11 @@ public class FunctionalTestHelper {
 
 	/**
 	 * Reset the {@link ServiceProvider} by clearing all files under the application cache folder,
-	 * instantiate new instances of each service provider, and setting the context
-	 * in {@link ServiceProvider#setContext(Context)}.
-	 *
-	 * @param context the application context
+	 * instantiate new instances of each service provider, and reset the app instance
 	 */
-	private static void resetServiceProvider(final Context context) {
+	private static void resetServiceProvider() {
 		ServiceProviderHelper.cleanCacheDir();
-		ServiceProviderHelper.resetServiceProvider(context);
+		ServiceProviderHelper.resetServiceProvider();
 	}
 
 	/**

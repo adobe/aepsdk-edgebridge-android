@@ -14,12 +14,11 @@ package com.adobe.marketing.mobile.edge.bridge;
 import static com.adobe.marketing.mobile.edge.bridge.EdgeBridgeConstants.LOG_TAG;
 
 import com.adobe.marketing.mobile.Event;
+import com.adobe.marketing.mobile.EventSource;
+import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.ExtensionApi;
-import com.adobe.marketing.mobile.ExtensionError;
-import com.adobe.marketing.mobile.ExtensionErrorCallback;
-import com.adobe.marketing.mobile.LoggingMode;
-import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.services.Log;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ import java.util.concurrent.Executors;
 
 class EdgeBridgeExtension extends Extension {
 
-	private final String SELF_LOG_TAG = "EdgeBridgeExtension";
+	private static final String CLASS_NAME = "EdgeBridgeExtension";
 	private ExecutorService executorService;
 	private final Object executorMutex = new Object();
 
@@ -45,30 +44,30 @@ class EdgeBridgeExtension extends Extension {
 
 	protected EdgeBridgeExtension(final ExtensionApi extensionApi) {
 		super(extensionApi);
-		ExtensionErrorCallback<ExtensionError> listenerErrorCallback = new ExtensionErrorCallback<ExtensionError>() {
-			@Override
-			public void error(final ExtensionError extensionError) {
-				MobileCore.log(
-					LoggingMode.ERROR,
-					LOG_TAG,
-					String.format("%s - Failed to register listener: %s", SELF_LOG_TAG, extensionError.getErrorName())
-				);
-			}
-		};
-
-		extensionApi.registerEventListener(
-			EdgeBridgeConstants.EventType.GENERIC_TRACK,
-			EdgeBridgeConstants.EventSource.REQUEST_CONTENT,
-			ListenerGenericTrackRequestContent.class,
-			listenerErrorCallback
-		);
-
-		extensionApi.registerEventListener(
-			EdgeBridgeConstants.EventType.RULES_ENGINE,
-			EdgeBridgeConstants.EventSource.RESPONSE_CONTENT,
-			ListenerRulesEngineResponseContent.class,
-			listenerErrorCallback
-		);
+		//		ExtensionErrorCallback<ExtensionError> listenerErrorCallback = new ExtensionErrorCallback<ExtensionError>() {
+		//			@Override
+		//			public void error(final ExtensionError extensionError) {
+		//				Log.error(
+		//					EdgeBridgeConstants.LOG_TAG,
+		//					CLASS_NAME,
+		//					"%s - Failed to register listener: %s", CLASS_NAME, extensionError.getErrorName()
+		//				);
+		//			}
+		//		};
+		//
+		//		extensionApi.registerEventListener(
+		//			EdgeBridgeConstants.EventType.GENERIC_TRACK,
+		//			EdgeBridgeConstants.EventSource.REQUEST_CONTENT,
+		//			ListenerGenericTrackRequestContent.class,
+		//			listenerErrorCallback
+		//		);
+		//
+		//		extensionApi.registerEventListener(
+		//			EdgeBridgeConstants.EventType.RULES_ENGINE,
+		//			EdgeBridgeConstants.EventSource.RESPONSE_CONTENT,
+		//			ListenerRulesEngineResponseContent.class,
+		//			listenerErrorCallback
+		//		);
 	}
 
 	@Override
@@ -79,6 +78,17 @@ class EdgeBridgeExtension extends Extension {
 	@Override
 	protected String getVersion() {
 		return EdgeBridgeConstants.EXTENSION_VERSION;
+	}
+
+	@Override
+	protected void onRegistered() {
+		getApi().registerEventListener(EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT, this::handleTrackRequest);
+		getApi()
+			.registerEventListener(
+				EventType.RULES_ENGINE,
+				EventSource.RESPONSE_CONTENT,
+				this::handleRulesEngineResponse
+			);
 	}
 
 	/**
@@ -105,25 +115,19 @@ class EdgeBridgeExtension extends Extension {
 	 */
 	void handleTrackRequest(final Event event) {
 		if (event == null) {
-			MobileCore.log(
-				LoggingMode.VERBOSE,
-				LOG_TAG,
-				String.format("%s - Unable to handle track request as event is null.", SELF_LOG_TAG)
-			);
+			Log.trace(LOG_TAG, CLASS_NAME, "%s - Unable to handle track request as event is null.", CLASS_NAME);
 			return;
 		}
 
 		final Map<String, Object> eventData = event.getEventData();
 
 		if (isNullOrEmpty(eventData)) {
-			MobileCore.log(
-				LoggingMode.VERBOSE,
+			Log.trace(
 				LOG_TAG,
-				String.format(
-					"%s - Unable to handle track request event with id '%s': event data is missing or empty.",
-					SELF_LOG_TAG,
-					event.getUniqueIdentifier()
-				)
+				CLASS_NAME,
+				"%s - Unable to handle track request event with id '%s': event data is missing or empty.",
+				CLASS_NAME,
+				event.getUniqueIdentifier()
 			);
 			return;
 		}
@@ -137,25 +141,19 @@ class EdgeBridgeExtension extends Extension {
 	 */
 	void handleRulesEngineResponse(final Event event) {
 		if (event == null) {
-			MobileCore.log(
-				LoggingMode.VERBOSE,
-				LOG_TAG,
-				String.format("%s - Ignoring Rules Engine response event as event is null.", SELF_LOG_TAG)
-			);
+			Log.trace(LOG_TAG, CLASS_NAME, "%s - Ignoring Rules Engine response event as event is null.", CLASS_NAME);
 			return;
 		}
 
 		final Map<String, Object> eventData = event.getEventData();
 
 		if (isNullOrEmpty(eventData)) {
-			MobileCore.log(
-				LoggingMode.VERBOSE,
+			Log.trace(
 				LOG_TAG,
-				String.format(
-					"%s - Ignoring Rules Engine response event with id '%s': event data is missing or empty.",
-					SELF_LOG_TAG,
-					event.getUniqueIdentifier()
-				)
+				CLASS_NAME,
+				"%s - Ignoring Rules Engine response event with id '%s': event data is missing or empty.",
+				CLASS_NAME,
+				event.getUniqueIdentifier()
 			);
 			return;
 		}
@@ -165,14 +163,12 @@ class EdgeBridgeExtension extends Extension {
 			final Map<String, Object> consequence = (Map<String, Object>) eventData.get("triggeredconsequence");
 
 			if (isNullOrEmpty(consequence)) {
-				MobileCore.log(
-					LoggingMode.VERBOSE,
+				Log.trace(
 					LOG_TAG,
-					String.format(
-						"%s - Ignoring Rule Engine response event with id '%s': consequence data is missing or empty.",
-						SELF_LOG_TAG,
-						event.getUniqueIdentifier()
-					)
+					CLASS_NAME,
+					"%s - Ignoring Rule Engine response event with id '%s': consequence data is missing or empty.",
+					CLASS_NAME,
+					event.getUniqueIdentifier()
 				);
 				return;
 			}
@@ -187,14 +183,12 @@ class EdgeBridgeExtension extends Extension {
 			final String id = (String) consequence.get("id");
 
 			if (isNullOrEmpty(id)) {
-				MobileCore.log(
-					LoggingMode.VERBOSE,
+				Log.trace(
 					LOG_TAG,
-					String.format(
-						"%s - Ignoring Rule Engine response event with id '%s': consequence id is missing or empty.",
-						SELF_LOG_TAG,
-						event.getUniqueIdentifier()
-					)
+					CLASS_NAME,
+					"%s - Ignoring Rule Engine response event with id '%s': consequence id is missing or empty.",
+					CLASS_NAME,
+					event.getUniqueIdentifier()
 				);
 				return;
 			}
@@ -203,29 +197,25 @@ class EdgeBridgeExtension extends Extension {
 			final Map<String, Object> detail = (Map<String, Object>) consequence.get("detail");
 
 			if (isNullOrEmpty(detail)) {
-				MobileCore.log(
-					LoggingMode.VERBOSE,
+				Log.trace(
 					LOG_TAG,
-					String.format(
-						"%s - Ignoring Rule Engine response event with id '%s': consequence detail is missing or empty.",
-						SELF_LOG_TAG,
-						event.getUniqueIdentifier()
-					)
+					CLASS_NAME,
+					"%s - Ignoring Rule Engine response event with id '%s': consequence detail is missing or empty.",
+					CLASS_NAME,
+					event.getUniqueIdentifier()
 				);
 				return;
 			}
 
 			dispatchTrackRequest(detail, event.getTimestamp());
 		} catch (ClassCastException e) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
-				LOG_TAG,
-				String.format(
-					"%s - Failed to parse Rules Engine response event with id '%s': %s",
-					SELF_LOG_TAG,
-					event.getUniqueIdentifier(),
-					e.getLocalizedMessage()
-				)
+			Log.debug(
+				EdgeBridgeConstants.LOG_TAG,
+				CLASS_NAME,
+				"%s - Failed to parse Rules Engine response event with id '%s': %s",
+				CLASS_NAME,
+				event.getUniqueIdentifier(),
+				e.getLocalizedMessage()
 			);
 		}
 	}
@@ -247,29 +237,25 @@ class EdgeBridgeExtension extends Extension {
 		final Event event = new Event.Builder(
 			EdgeBridgeConstants.EventNames.EDGE_BRIDGE_REQUEST,
 			EdgeBridgeConstants.EventType.EDGE,
-			EdgeBridgeConstants.EventSource.REQUEST_CONTENT
+			EventSource.REQUEST_CONTENT
 		)
 			.setEventData(eventData)
 			.build();
 
-		MobileCore.dispatchEvent(
-			event,
-			new ExtensionErrorCallback<ExtensionError>() {
-				@Override
-				public void error(ExtensionError extensionError) {
-					MobileCore.log(
-						LoggingMode.DEBUG,
-						LOG_TAG,
-						String.format(
-							"%s - Failed to dispatch Edge Bridge request event with id '%s': %s",
-							SELF_LOG_TAG,
-							event.getUniqueIdentifier(),
-							extensionError != null ? extensionError.getErrorName() : "unexpected"
-						)
-					);
-				}
-			}
-		);
+		//		MobileCore.dispatchEvent(
+		//			event,
+		//			new ExtensionErrorCallback<ExtensionError>() {
+		//				@Override
+		//				public void error(ExtensionError extensionError) {
+		//					Log.debug(
+		//						EdgeBridgeConstants.LOG_TAG,
+		//						CLASS_NAME,
+		//						"%s - Failed to dispatch Edge Bridge request event with id '%s': %s", CLASS_NAME, event.getUniqueIdentifier(), extensionError != null ? extensionError.getErrorName() : "unexpected"
+		//					);
+		//				}
+		//			}
+		//		);
+		getApi().dispatch(event);
 	}
 
 	private boolean isNullOrEmpty(final String str) {
