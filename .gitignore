@@ -5,6 +5,8 @@
 bin/
 build/
 ci/
+jacoco.exec
+local.properties
 
 # IntelliJ
 *.iml
