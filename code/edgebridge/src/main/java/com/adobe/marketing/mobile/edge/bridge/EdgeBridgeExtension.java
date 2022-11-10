@@ -44,30 +44,6 @@ class EdgeBridgeExtension extends Extension {
 
 	protected EdgeBridgeExtension(final ExtensionApi extensionApi) {
 		super(extensionApi);
-		//		ExtensionErrorCallback<ExtensionError> listenerErrorCallback = new ExtensionErrorCallback<ExtensionError>() {
-		//			@Override
-		//			public void error(final ExtensionError extensionError) {
-		//				Log.error(
-		//					EdgeBridgeConstants.LOG_TAG,
-		//					CLASS_NAME,
-		//					"%s - Failed to register listener: %s", CLASS_NAME, extensionError.getErrorName()
-		//				);
-		//			}
-		//		};
-		//
-		//		extensionApi.registerEventListener(
-		//			EdgeBridgeConstants.EventType.GENERIC_TRACK,
-		//			EdgeBridgeConstants.EventSource.REQUEST_CONTENT,
-		//			ListenerGenericTrackRequestContent.class,
-		//			listenerErrorCallback
-		//		);
-		//
-		//		extensionApi.registerEventListener(
-		//			EdgeBridgeConstants.EventType.RULES_ENGINE,
-		//			EdgeBridgeConstants.EventSource.RESPONSE_CONTENT,
-		//			ListenerRulesEngineResponseContent.class,
-		//			listenerErrorCallback
-		//		);
 	}
 
 	@Override
@@ -242,19 +218,6 @@ class EdgeBridgeExtension extends Extension {
 			.setEventData(eventData)
 			.build();
 
-		//		MobileCore.dispatchEvent(
-		//			event,
-		//			new ExtensionErrorCallback<ExtensionError>() {
-		//				@Override
-		//				public void error(ExtensionError extensionError) {
-		//					Log.debug(
-		//						EdgeBridgeConstants.LOG_TAG,
-		//						CLASS_NAME,
-		//						"%s - Failed to dispatch Edge Bridge request event with id '%s': %s", CLASS_NAME, event.getUniqueIdentifier(), extensionError != null ? extensionError.getErrorName() : "unexpected"
-		//					);
-		//				}
-		//			}
-		//		);
 		getApi().dispatch(event);
 	}
 
