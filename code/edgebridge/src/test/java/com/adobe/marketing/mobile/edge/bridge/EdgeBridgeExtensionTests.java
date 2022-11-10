@@ -47,6 +47,13 @@ import org.powermock.api.mockito.PowerMockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+// use simulate coming event to trigger desired behavior
+// need testable extension class
+// with the introduction of the new ExtensionApi -> dispatch API, unit tests can instead be self contained
+// within the extension itself without having to mock and capture MobileCore dispatch calls
+
+// so then the mockExtensionApi class will actually be the one capturing the events
+
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({ MobileCore.class, ExtensionApi.class, ExtensionErrorCallback.class, ExtensionError.class })
 public class EdgeBridgeExtensionTests {
@@ -62,18 +69,45 @@ public class EdgeBridgeExtensionTests {
 	@Mock
 	Context mockContext;
 
+	// note that in this setup for each test run the following are performed:
+	// 1. mobilecore mock is created
+	// * this mock is setup to return the application (deprecated)
+	// 2. mock application returns a mock app context
+	// 3. EdgeBridgeExtension to test is hooked up with a mock ExtenionApi instance
+
+	// after going over some test cases, it seems split into two main categories:
+	// 1. event based - testing event structure, values, number of dispatch or not (depending on case)
+	// 2. getter based - testing EdgeBridgeExtension's getter methods (adherence to Extension protocol)
+	// broadly, replace mobilecore dispatch with ExtensionApi dispatch
+	// refactor tautological tests with
+
+	// note: still not sure where mockApp or mockContext is used????? will apply this when encountered in a test case
 	@Before
 	public void setup() {
+		// creates a static mock (? does this mean that none of the methods actually do anything?) of all methods in the MobileCore class
+		// this can probably be replaced with the:
+		// try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+		// not sure if this means
 		PowerMockito.mockStatic(MobileCore.class);
+		// in case MobileCore is still needed, apply these same when->then to the mockito mock
 		Mockito.when(MobileCore.getApplication()).thenReturn(mockApplication);
 		Mockito.when(mockApplication.getApplicationContext()).thenReturn(mockContext);
 
+		// this extension is the ACTUAL EdgeBridgeExtension (the thing we want to test), hooked up to
+		// a mocked extensionApi; since ExtensionApi is not the class we want to test (that should be handled
+		// by Core) AND ExtensionApi has the new dispatch API that fulfills the role of the old MobileCore dispatch
 		extension = new EdgeBridgeExtension(mockExtensionApi);
 	}
 
 	// ========================================================================================
 	// constructor
 	// ========================================================================================
+
+	// TODO: Update this test to test against the NEW registerEventListener API on ExtensionApi which
+	// does not have the ExtensionErrorCallback (which is no longer supported)
+	// essence: testing the onRegistered method of EdgeBridgeExtension actually making the calls to register the required listeners
+	// note: this does not test listeners actually capture events etc. as that is outside the scope of the UNIT
+	// of onRegistered for EdgeBridgeExtension
 	@Test
 	public void test_listenerRegistration() {
 		final ArgumentCaptor<ExtensionErrorCallback> callbackCaptor = ArgumentCaptor.forClass(
@@ -108,6 +142,10 @@ public class EdgeBridgeExtensionTests {
 	// ========================================================================================
 	// getName
 	// ========================================================================================
+	// to avoid tautological tests, hardcode the values you're looking for
+	// if the test uses the exact same flow as the method itself, then that means you're just testing
+	// the language works at calling the same path, not that the value is what you expect
+	// apply the same logic for all the getter type tests below as well
 	@Test
 	public void test_getName() {
 		// test
@@ -122,6 +160,7 @@ public class EdgeBridgeExtensionTests {
 	// ========================================================================================
 	// getVersion
 	// ========================================================================================
+	// TODO: refactor tautological test
 	@Test
 	public void test_getVersion() {
 		// test
@@ -136,6 +175,8 @@ public class EdgeBridgeExtensionTests {
 	// ========================================================================================
 	// handleTrackRequest
 	// ========================================================================================
+	// TODO: refactor tautological test; event verification object should have hardcoded values?
+	// remove mobileCore.dispatch mock in favor of ExtensionApi dispatch capture
 	@Test
 	public void test_handleTrackRequest_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder(
@@ -205,6 +246,7 @@ public class EdgeBridgeExtensionTests {
 		assertEquals(expectedData, responseEvent.getEventData());
 	}
 
+	// TODO: replace mobilecore with extensionApi dispatch
 	@Test(expected = Test.None.class)
 	public void test_handleTrackRequest_withNullEvent_doesNotThrow() {
 		extension.handleTrackRequest(null);
