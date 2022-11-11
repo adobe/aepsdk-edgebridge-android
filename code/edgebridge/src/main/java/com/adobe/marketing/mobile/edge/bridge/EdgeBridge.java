@@ -57,6 +57,9 @@ public class EdgeBridge {
 			new ExtensionErrorCallback<ExtensionError>() {
 				@Override
 				public void error(ExtensionError extensionError) {
+					if (extensionError == null) {
+						return;
+					}
 					Log.error(
 						EdgeBridgeConstants.LOG_TAG,
 						CLASS_NAME,
