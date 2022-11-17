@@ -34,8 +34,6 @@ public class EdgeBridge {
 
 	private static final String CLASS_NAME = "EdgeBridge";
 
-	//	public static final Class<? extends Extension> EXTENSION = EdgeBridge.class;
-
 	private EdgeBridge() {}
 
 	/**
