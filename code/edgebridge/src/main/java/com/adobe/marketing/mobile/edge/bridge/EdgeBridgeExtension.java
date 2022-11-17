@@ -25,14 +25,10 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 
 class EdgeBridgeExtension extends Extension {
 
 	private static final String CLASS_NAME = "EdgeBridgeExtension";
-	private ExecutorService executorService;
-	private final Object executorMutex = new Object();
 
 	private static final SimpleDateFormat iso8601DateFormat;
 
@@ -65,24 +61,6 @@ class EdgeBridgeExtension extends Extension {
 				EventSource.RESPONSE_CONTENT,
 				this::handleRulesEngineResponse
 			);
-	}
-
-	/**
-	 * Called by listeners to retrieve an {@code ExecutorService}.
-	 * The {@code ExecutorService} is used to process events on a separate thread than the
-	 * {@code EventHub} thread on which they were received. Processing events on a separate
-	 * thread prevents blocking of the {@code EventHub}.
-	 *
-	 * @return this extension's instance of a single thread executor
-	 */
-	ExecutorService getExecutor() {
-		synchronized (executorMutex) {
-			if (executorService == null) {
-				executorService = Executors.newSingleThreadExecutor();
-			}
-
-			return executorService;
-		}
 	}
 
 	/**
