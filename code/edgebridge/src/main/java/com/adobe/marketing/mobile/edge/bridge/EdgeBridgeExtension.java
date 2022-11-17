@@ -29,6 +29,7 @@ import java.util.TimeZone;
 class EdgeBridgeExtension extends Extension {
 
 	private static final String CLASS_NAME = "EdgeBridgeExtension";
+	public static final Class<? extends Extension> EXTENSION = EdgeBridgeExtension.class;
 
 	private static final SimpleDateFormat iso8601DateFormat;
 
