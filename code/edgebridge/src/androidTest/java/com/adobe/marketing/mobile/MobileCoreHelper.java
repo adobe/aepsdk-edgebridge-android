@@ -21,20 +21,4 @@ public final class MobileCoreHelper {
 	public static void resetSDK() {
 		MobileCore.resetSDK();
 	}
-	//	public static void setCore(final Core core) {
-	//		MobileCore.setCore(core);
-	//	}
-	//
-	//	public static Core getCore() {
-	//		return MobileCore.getCore();
-	//	}
-	//
-	//	public static void shutdownCore() {
-	//		Core core = MobileCoreHelper.getCore();
-	//
-	//		if (core != null && core.eventHub != null) {
-	//			core.eventHub.shutdown();
-	//			core.eventHub = null;
-	//		}
-	//	}
 }
