@@ -133,7 +133,6 @@ class EdgeBridgeExtension extends Extension {
 			return;
 		}
 
-		//			final String type = (String) consequence.get("type");
 		final String type = DataReader.optString(consequence, "type", null);
 
 		if (!"an".equals(type)) {
