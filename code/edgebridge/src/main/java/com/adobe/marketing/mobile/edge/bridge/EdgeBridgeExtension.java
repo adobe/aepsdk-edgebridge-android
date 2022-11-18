@@ -19,6 +19,8 @@ import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.services.Log;
+import com.adobe.marketing.mobile.util.DataReader;
+import com.adobe.marketing.mobile.util.StringUtils;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -113,66 +115,66 @@ class EdgeBridgeExtension extends Extension {
 			return;
 		}
 
-		try {
-			@SuppressWarnings("unchecked")
-			final Map<String, Object> consequence = (Map<String, Object>) eventData.get("triggeredconsequence");
+		final Map<String, Object> consequence = DataReader.optTypedMap(
+			Object.class,
+			eventData,
+			"triggeredconsequence",
+			null
+		);
 
-			if (isNullOrEmpty(consequence)) {
-				Log.trace(
-					LOG_TAG,
-					CLASS_NAME,
-					"%s - Ignoring Rule Engine response event with id '%s': consequence data is missing or empty.",
-					CLASS_NAME,
-					event.getUniqueIdentifier()
-				);
-				return;
-			}
-
-			final String type = (String) consequence.get("type");
-
-			if (!"an".equals(type)) {
-				// Not an Analytics rules consequence
-				return;
-			}
-
-			final String id = (String) consequence.get("id");
-
-			if (isNullOrEmpty(id)) {
-				Log.trace(
-					LOG_TAG,
-					CLASS_NAME,
-					"%s - Ignoring Rule Engine response event with id '%s': consequence id is missing or empty.",
-					CLASS_NAME,
-					event.getUniqueIdentifier()
-				);
-				return;
-			}
-
-			@SuppressWarnings("unchecked")
-			final Map<String, Object> detail = (Map<String, Object>) consequence.get("detail");
-
-			if (isNullOrEmpty(detail)) {
-				Log.trace(
-					LOG_TAG,
-					CLASS_NAME,
-					"%s - Ignoring Rule Engine response event with id '%s': consequence detail is missing or empty.",
-					CLASS_NAME,
-					event.getUniqueIdentifier()
-				);
-				return;
-			}
-
-			dispatchTrackRequest(detail, event.getTimestamp());
-		} catch (ClassCastException e) {
-			Log.debug(
-				EdgeBridgeConstants.LOG_TAG,
+		if (isNullOrEmpty(consequence)) {
+			Log.trace(
+				LOG_TAG,
 				CLASS_NAME,
-				"%s - Failed to parse Rules Engine response event with id '%s': %s",
+				"%s - Ignoring Rule Engine response event with id '%s': consequence data is invalid or empty.",
 				CLASS_NAME,
-				event.getUniqueIdentifier(),
-				e.getLocalizedMessage()
+				event.getUniqueIdentifier()
 			);
+			return;
 		}
+
+		//			final String type = (String) consequence.get("type");
+		final String type = DataReader.optString(consequence, "type", null);
+
+		if (!"an".equals(type)) {
+			// Not an Analytics rules consequence
+			Log.trace(
+				LOG_TAG,
+				CLASS_NAME,
+				"%s - Ignoring Rule Engine response event with id '%s': consequence type is not Analytics or is empty.",
+				CLASS_NAME,
+				event.getUniqueIdentifier()
+			);
+			return;
+		}
+
+		final String id = DataReader.optString(consequence, "id", null);
+
+		if (StringUtils.isNullOrEmpty(id)) {
+			Log.trace(
+				LOG_TAG,
+				CLASS_NAME,
+				"%s - Ignoring Rule Engine response event with id '%s': consequence id is invalid or empty.",
+				CLASS_NAME,
+				event.getUniqueIdentifier()
+			);
+			return;
+		}
+
+		final Map<String, Object> detail = DataReader.optTypedMap(Object.class, consequence, "detail", null);
+
+		if (isNullOrEmpty(detail)) {
+			Log.trace(
+				LOG_TAG,
+				CLASS_NAME,
+				"%s - Ignoring Rule Engine response event with id '%s': consequence detail is invalid or empty.",
+				CLASS_NAME,
+				event.getUniqueIdentifier()
+			);
+			return;
+		}
+
+		dispatchTrackRequest(detail, event.getTimestamp());
 	}
 
 	/**
@@ -198,10 +200,6 @@ class EdgeBridgeExtension extends Extension {
 			.build();
 
 		getApi().dispatch(event);
-	}
-
-	private boolean isNullOrEmpty(final String str) {
-		return str == null || str.isEmpty();
 	}
 
 	private boolean isNullOrEmpty(final Map map) {
