@@ -30,7 +30,7 @@ import java.util.Map;
  */
 public class EdgeBridge {
 
-	private static final String CLASS_NAME = "EdgeBridge";
+	private static final String LOG_SOURCE = "EdgeBridge";
 
 	private EdgeBridge() {}
 
@@ -56,7 +56,7 @@ public class EdgeBridge {
 				}
 				Log.error(
 					EdgeBridgeConstants.LOG_TAG,
-					CLASS_NAME,
+					LOG_SOURCE,
 					"There was an error when registering the Edge Bridge extension: %s",
 					extensionError.getErrorName()
 				);

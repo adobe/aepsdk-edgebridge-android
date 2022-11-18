@@ -30,7 +30,7 @@ import java.util.TimeZone;
 
 class EdgeBridgeExtension extends Extension {
 
-	private static final String CLASS_NAME = "EdgeBridgeExtension";
+	private static final String LOG_SOURCE = "EdgeBridgeExtension";
 	public static final Class<? extends Extension> EXTENSION = EdgeBridgeExtension.class;
 
 	private static final SimpleDateFormat iso8601DateFormat;
@@ -72,7 +72,7 @@ class EdgeBridgeExtension extends Extension {
 	 */
 	void handleTrackRequest(final Event event) {
 		if (event == null) {
-			Log.trace(LOG_TAG, CLASS_NAME, "%s - Unable to handle track request as event is null.", CLASS_NAME);
+			Log.trace(LOG_TAG, LOG_SOURCE, "%s - Unable to handle track request as event is null.", LOG_SOURCE);
 			return;
 		}
 
@@ -81,9 +81,9 @@ class EdgeBridgeExtension extends Extension {
 		if (isNullOrEmpty(eventData)) {
 			Log.trace(
 				LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"%s - Unable to handle track request event with id '%s': event data is missing or empty.",
-				CLASS_NAME,
+				LOG_SOURCE,
 				event.getUniqueIdentifier()
 			);
 			return;
@@ -98,7 +98,7 @@ class EdgeBridgeExtension extends Extension {
 	 */
 	void handleRulesEngineResponse(final Event event) {
 		if (event == null) {
-			Log.trace(LOG_TAG, CLASS_NAME, "%s - Ignoring Rules Engine response event as event is null.", CLASS_NAME);
+			Log.trace(LOG_TAG, LOG_SOURCE, "%s - Ignoring Rules Engine response event as event is null.", LOG_SOURCE);
 			return;
 		}
 
@@ -107,9 +107,9 @@ class EdgeBridgeExtension extends Extension {
 		if (isNullOrEmpty(eventData)) {
 			Log.trace(
 				LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"%s - Ignoring Rules Engine response event with id '%s': event data is missing or empty.",
-				CLASS_NAME,
+				LOG_SOURCE,
 				event.getUniqueIdentifier()
 			);
 			return;
@@ -125,9 +125,9 @@ class EdgeBridgeExtension extends Extension {
 		if (isNullOrEmpty(consequence)) {
 			Log.trace(
 				LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"%s - Ignoring Rule Engine response event with id '%s': consequence data is invalid or empty.",
-				CLASS_NAME,
+				LOG_SOURCE,
 				event.getUniqueIdentifier()
 			);
 			return;
@@ -140,9 +140,9 @@ class EdgeBridgeExtension extends Extension {
 			// Not an Analytics rules consequence
 			Log.trace(
 				LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"%s - Ignoring Rule Engine response event with id '%s': consequence type is not Analytics or is empty.",
-				CLASS_NAME,
+				LOG_SOURCE,
 				event.getUniqueIdentifier()
 			);
 			return;
@@ -153,9 +153,9 @@ class EdgeBridgeExtension extends Extension {
 		if (StringUtils.isNullOrEmpty(id)) {
 			Log.trace(
 				LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"%s - Ignoring Rule Engine response event with id '%s': consequence id is invalid or empty.",
-				CLASS_NAME,
+				LOG_SOURCE,
 				event.getUniqueIdentifier()
 			);
 			return;
@@ -166,9 +166,9 @@ class EdgeBridgeExtension extends Extension {
 		if (isNullOrEmpty(detail)) {
 			Log.trace(
 				LOG_TAG,
-				CLASS_NAME,
+				LOG_SOURCE,
 				"%s - Ignoring Rule Engine response event with id '%s': consequence detail is invalid or empty.",
-				CLASS_NAME,
+				LOG_SOURCE,
 				event.getUniqueIdentifier()
 			);
 			return;
