@@ -12,8 +12,6 @@
 package com.adobe.marketing.mobile.edge.bridge;
 
 import com.adobe.marketing.mobile.AdobeCallback;
-import com.adobe.marketing.mobile.ExtensionError;
-import com.adobe.marketing.mobile.ExtensionErrorCallback;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.Log;
 import java.util.Map;
@@ -52,16 +50,16 @@ public class EdgeBridge {
 	public static void registerExtension() {
 		MobileCore.registerExtension(
 			EdgeBridgeExtension.class,
-			new ExtensionErrorCallback<ExtensionError>() {
-				@Override
-				public void error(ExtensionError extensionError) {
-					Log.error(
-						EdgeBridgeConstants.LOG_TAG,
-						CLASS_NAME,
-						"There was an error when registering the Edge Bridge extension: %s",
-						extensionError.getErrorName()
-					);
+			extensionError -> {
+				if (extensionError == null) {
+					return;
 				}
+				Log.error(
+					EdgeBridgeConstants.LOG_TAG,
+					CLASS_NAME,
+					"There was an error when registering the Edge Bridge extension: %s",
+					extensionError.getErrorName()
+				);
 			}
 		);
 	}
