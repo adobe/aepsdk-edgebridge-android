@@ -137,13 +137,15 @@ class EdgeBridgeExtension extends Extension {
 
 		if (!"an".equals(type)) {
 			// Not an Analytics rules consequence
-			Log.trace(
-				LOG_TAG,
-				LOG_SOURCE,
-				"%s - Ignoring Rule Engine response event with id '%s': consequence type is not Analytics or is empty.",
-				LOG_SOURCE,
-				event.getUniqueIdentifier()
-			);
+			if (type == null) {
+				Log.trace(
+					LOG_TAG,
+					LOG_SOURCE,
+					"%s - Ignoring Rule Engine response event with id '%s': consequence type is invalid.",
+					LOG_SOURCE,
+					event.getUniqueIdentifier()
+				);
+			}
 			return;
 		}
 
