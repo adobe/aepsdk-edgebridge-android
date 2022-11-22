@@ -90,7 +90,6 @@ public class FunctionalTestHelper {
 						defaultApplication = Instrumentation.newApplication(CustomApplication.class, context);
 					}
 
-					//					MobileCoreHelper.setCore(null);
 					MobileCoreHelper.resetSDK();
 					ServiceProvider.getInstance().setNetworkService(testNetworkService);
 					MobileCore.setLogLevel(LoggingMode.VERBOSE);
@@ -111,8 +110,6 @@ public class FunctionalTestHelper {
 							"Finished '" + description.getMethodName() + "'"
 						);
 						waitForThreads(5000); // wait to allow thread to run after test execution
-						//						MobileCoreHelper.shutdownCore();
-						//						MobileCoreHelper.setCore(null);
 						MobileCoreHelper.resetSDK();
 						resetTestExpectations();
 						resetServiceProvider();
