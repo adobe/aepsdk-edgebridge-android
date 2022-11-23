@@ -12,8 +12,10 @@
 package com.adobe.marketing.mobile.edge.bridge;
 
 import com.adobe.marketing.mobile.AdobeCallback;
+import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.Log;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -31,6 +33,7 @@ import java.util.Map;
 public class EdgeBridge {
 
 	private static final String LOG_SOURCE = "EdgeBridge";
+	public static final Class<? extends Extension> EXTENSION = EdgeBridgeExtension.class;
 
 	private EdgeBridge() {}
 
@@ -45,6 +48,8 @@ public class EdgeBridge {
 	/**
 	 * Registers the Edge Bridge extension with the Mobile Core.
 	 * This method should be called before calling {@link MobileCore#start(AdobeCallback)}.
+	 *
+	 * @deprecated Use {@link MobileCore#registerExtensions(List, AdobeCallback)} with {@link EdgeBridge#EXTENSION} instead.
 	 */
 	@Deprecated
 	public static void registerExtension() {
