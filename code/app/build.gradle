@@ -53,7 +53,8 @@ dependencies {
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
     implementation project(':edgebridge')
 
-    implementation 'com.github.adobe.aepsdk-core-android:core:v2.0.0-alpha.3'
+    // implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
+    implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
     implementation('com.adobe.marketing.mobile:edge:1+'){
         exclude group: 'com.adobe.marketing.mobile', module: 'core'
     }

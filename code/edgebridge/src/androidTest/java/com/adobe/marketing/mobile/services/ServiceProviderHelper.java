@@ -27,7 +27,6 @@ public class ServiceProviderHelper {
 	 */
 	public static void resetServiceProvider() {
 		ServiceProvider.getInstance().resetServices();
-		ServiceProvider.getInstance().resetAppInstance();
 	}
 
 	/**

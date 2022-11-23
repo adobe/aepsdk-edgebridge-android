@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class FunctionalTestNetworkService implements Networking {
 
 	private static final String LOG_TAG = "EdgeBridge";
-	private static final String TAG = "FunctionalTestNetworkService";
+	private static final String LOG_SOURCE = "FunctionalTestNetworkService";
 	private final Map<TestableNetworkRequest, List<TestableNetworkRequest>> receivedTestableNetworkRequests;
 	private final Map<TestableNetworkRequest, HttpConnecting> responseMatchers;
 	private final Map<TestableNetworkRequest, ADBCountDownLatch> expectedTestableNetworkRequests;
@@ -71,7 +71,7 @@ public class FunctionalTestNetworkService implements Networking {
 	}
 
 	public void reset() {
-		Log.trace(LOG_TAG, TAG, "Reset received and expected network requests.");
+		Log.trace(LOG_TAG, LOG_SOURCE, "Reset received and expected network requests.");
 		receivedTestableNetworkRequests.clear();
 		responseMatchers.clear();
 		expectedTestableNetworkRequests.clear();
@@ -129,7 +129,7 @@ public class FunctionalTestNetworkService implements Networking {
 	public void connectAsync(NetworkRequest networkRequest, NetworkCallback resultCallback) {
 		Log.trace(
 			LOG_TAG,
-			TAG,
+			LOG_SOURCE,
 			"Received connectUrlAsync to URL '" +
 			networkRequest.getUrl() +
 			"' and HttpMethod '" +
