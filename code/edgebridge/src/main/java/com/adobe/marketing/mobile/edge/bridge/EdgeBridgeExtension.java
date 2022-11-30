@@ -22,23 +22,13 @@ import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.util.DataReader;
 import com.adobe.marketing.mobile.util.StringUtils;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import com.adobe.marketing.mobile.util.TimeUtils;
 import java.util.HashMap;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 
 class EdgeBridgeExtension extends Extension {
 
 	private static final String LOG_SOURCE = "EdgeBridgeExtension";
-	private static final SimpleDateFormat iso8601DateFormat;
-
-	static {
-		final Locale posixLocale = new Locale(Locale.US.getLanguage(), Locale.US.getCountry(), "POSIX");
-		iso8601DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", posixLocale);
-		iso8601DateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
-	}
 
 	protected EdgeBridgeExtension(final ExtensionApi extensionApi) {
 		super(extensionApi);
@@ -166,7 +156,7 @@ class EdgeBridgeExtension extends Extension {
 	private void dispatchTrackRequest(final Map<String, Object> data, final long timestamp) {
 		Map<String, Object> xdmData = new HashMap<>();
 		xdmData.put("eventType", EdgeBridgeConstants.JsonValues.EVENT_TYPE);
-		xdmData.put("timestamp", iso8601DateFormat.format(new Date(timestamp)));
+		xdmData.put("timestamp", TimeUtils.getIso8601DateTimeZoneISO8601());
 
 		Map<String, Object> eventData = new HashMap<>();
 		eventData.put("xdm", xdmData);
