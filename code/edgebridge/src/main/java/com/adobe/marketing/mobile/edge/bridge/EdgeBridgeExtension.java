@@ -42,6 +42,11 @@ class EdgeBridgeExtension extends Extension {
 	}
 
 	@Override
+	protected String getFriendlyName() {
+		return EdgeBridgeConstants.FRIENDLY_NAME;
+	}
+
+	@Override
 	protected String getVersion() {
 		return EdgeBridgeConstants.EXTENSION_VERSION;
 	}
@@ -62,11 +67,6 @@ class EdgeBridgeExtension extends Extension {
 	 * @param event the generic track request event
 	 */
 	void handleTrackRequest(@NonNull final Event event) {
-		if (event == null) {
-			Log.trace(LOG_TAG, LOG_SOURCE, "Unable to handle track request as event is null.");
-			return;
-		}
-
 		final Map<String, Object> eventData = event.getEventData();
 
 		if (isNullOrEmpty(eventData)) {
@@ -87,11 +87,6 @@ class EdgeBridgeExtension extends Extension {
 	 * @param event the rules engine response event
 	 */
 	void handleRulesEngineResponse(@NonNull final Event event) {
-		if (event == null) {
-			Log.trace(LOG_TAG, LOG_SOURCE, "Ignoring Rules Engine response event as event is null.");
-			return;
-		}
-
 		final Map<String, Object> eventData = event.getEventData();
 
 		if (isNullOrEmpty(eventData)) {
@@ -125,14 +120,6 @@ class EdgeBridgeExtension extends Extension {
 
 		if (!"an".equals(type)) {
 			// Not an Analytics rules consequence
-			if (type == null) {
-				Log.trace(
-					LOG_TAG,
-					LOG_SOURCE,
-					"Ignoring Rule Engine response event with id '%s': consequence type is invalid.",
-					event.getUniqueIdentifier()
-				);
-			}
 			return;
 		}
 
