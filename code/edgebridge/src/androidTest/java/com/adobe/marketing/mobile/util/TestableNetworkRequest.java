@@ -11,9 +11,8 @@
 
 package com.adobe.marketing.mobile.util;
 
-import com.adobe.marketing.mobile.LoggingMode;
-import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.services.HttpMethod;
+import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.services.NetworkRequest;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -26,7 +25,8 @@ import java.util.Objects;
  */
 public class TestableNetworkRequest extends NetworkRequest {
 
-	private static final String TAG = "TestableNetworkRequest";
+	private static final String LOG_TAG = "FunctionalTestUtils";
+	private static final String LOG_SOURCE = "TestableNetworkRequest";
 	private final Map<String, String> queryParamMap;
 
 	public TestableNetworkRequest(String url, HttpMethod command) {
@@ -119,7 +119,7 @@ public class TestableNetworkRequest extends NetworkRequest {
 				}
 			}
 		} catch (MalformedURLException e) {
-			MobileCore.log(LoggingMode.WARNING, TAG, "Failed to decode Network Request URL '" + url + "'");
+			Log.warning(LOG_TAG, LOG_SOURCE, "Failed to decode Network Request URL '" + url + "'");
 		}
 
 		return queryParamMap;
