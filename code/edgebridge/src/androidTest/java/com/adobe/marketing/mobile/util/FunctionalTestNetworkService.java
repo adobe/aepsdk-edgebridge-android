@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 
 public class FunctionalTestNetworkService implements Networking {
 
-	private static final String LOG_TAG = "EdgeBridge";
+	private static final String LOG_TAG = "FunctionalTestUtils";
 	private static final String LOG_SOURCE = "FunctionalTestNetworkService";
 	private final Map<TestableNetworkRequest, List<TestableNetworkRequest>> receivedTestableNetworkRequests;
 	private final Map<TestableNetworkRequest, HttpConnecting> responseMatchers;
