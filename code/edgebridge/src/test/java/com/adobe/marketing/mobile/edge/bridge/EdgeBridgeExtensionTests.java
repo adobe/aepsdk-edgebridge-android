@@ -238,13 +238,6 @@ public class EdgeBridgeExtensionTests {
 		assertEquals(expectedData, responseEvent.getEventData());
 	}
 
-	@Test(expected = Test.None.class)
-	public void test_handleTrackRequest_withNullEvent_doesNotThrow() {
-		extension.handleTrackRequest(null);
-
-		verify(mockExtensionApi, never()).dispatch(any(Event.class));
-	}
-
 	@Test
 	public void test_handleTrackRequest_withNullEventData_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
@@ -362,13 +355,6 @@ public class EdgeBridgeExtensionTests {
 		};
 
 		assertEquals(expectedData, responseEvent.getEventData());
-	}
-
-	@Test(expected = Test.None.class)
-	public void test_handleRulesEngineResponse_withNullEvent_doesNotThrow() {
-		extension.handleRulesEngineResponse(null);
-
-		verify(mockExtensionApi, never()).dispatch(any(Event.class));
 	}
 
 	@Test
@@ -832,7 +818,7 @@ public class EdgeBridgeExtensionTests {
 	static {
 		final Locale posixLocale = new Locale(Locale.US.getLanguage(), Locale.US.getCountry(), "POSIX");
 		iso8601DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", posixLocale);
-		iso8601DateFormat.setTimeZone(TimeZone.getTimeZone("GMT"));
+		iso8601DateFormat.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
 	}
 
 	static String formatDateIso8601(final long timestamp) {
