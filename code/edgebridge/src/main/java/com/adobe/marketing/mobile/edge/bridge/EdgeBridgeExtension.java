@@ -50,6 +50,11 @@ class EdgeBridgeExtension extends Extension {
 	}
 
 	@Override
+	protected String getFriendlyName() {
+		return EdgeBridgeConstants.FRIENDLY_NAME;
+	}
+
+	@Override
 	protected String getVersion() {
 		return EdgeBridgeConstants.EXTENSION_VERSION;
 	}
