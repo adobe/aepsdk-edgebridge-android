@@ -19,6 +19,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
 import com.adobe.marketing.mobile.Event;
+import com.adobe.marketing.mobile.EventSource;
+import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.ExtensionError;
 import com.adobe.marketing.mobile.ExtensionErrorCallback;
@@ -126,13 +128,13 @@ public class EdgeBridgeExtensionTests {
 		List<ExtensionEventListener> extensionEventListenerList = extensionEventListenerArgumentCaptor.getAllValues();
 
 		// Verify: 1st Edge Bridge event listener
-		assertEquals(EdgeBridgeTestConstants.EventType.GENERIC_TRACK, eventTypes.get(0));
-		assertEquals(EdgeBridgeTestConstants.EventSource.REQUEST_CONTENT, eventSources.get(0));
+		assertEquals(EventType.GENERIC_TRACK, eventTypes.get(0));
+		assertEquals(EventSource.REQUEST_CONTENT, eventSources.get(0));
 		assertNotNull(extensionEventListenerList.get(0));
 
 		// Verify: 2nd Edge Bridge event listener
-		assertEquals(EdgeBridgeTestConstants.EventType.RULES_ENGINE, eventTypes.get(1));
-		assertEquals(EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT, eventSources.get(1));
+		assertEquals(EventType.RULES_ENGINE, eventTypes.get(1));
+		assertEquals(EventSource.RESPONSE_CONTENT, eventSources.get(1));
 		assertNotNull(extensionEventListenerList.get(1));
 	}
 
@@ -169,11 +171,7 @@ public class EdgeBridgeExtensionTests {
 	// ========================================================================================
 	@Test
 	public void test_handleTrackRequest_dispatchesEdgeRequestEvent() {
-		final Event event = new Event.Builder(
-			"Test Track Event",
-			EdgeBridgeTestConstants.EventType.GENERIC_TRACK,
-			EdgeBridgeTestConstants.EventSource.REQUEST_CONTENT
-		)
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
 					{
@@ -198,8 +196,8 @@ public class EdgeBridgeExtensionTests {
 		verify(mockExtensionApi, times(1)).dispatch(dispatchedEventCaptor.capture());
 
 		Event responseEvent = dispatchedEventCaptor.getAllValues().get(0);
-		assertEquals(EdgeBridgeTestConstants.EventType.EDGE, responseEvent.getType());
-		assertEquals(EdgeBridgeTestConstants.EventSource.REQUEST_CONTENT, responseEvent.getSource());
+		assertEquals(EventType.EDGE, responseEvent.getType());
+		assertEquals(EventSource.REQUEST_CONTENT, responseEvent.getSource());
 		assertEquals(EdgeBridgeTestConstants.EventNames.EDGE_BRIDGE_REQUEST, responseEvent.getName());
 
 		Map<String, Object> expectedData = new HashMap<String, Object>() {
@@ -237,11 +235,7 @@ public class EdgeBridgeExtensionTests {
 
 	@Test
 	public void test_handleTrackRequest_withNullEventData_doesNotDispatchEvent() {
-		final Event event = new Event.Builder(
-			"Test Track Event",
-			EdgeBridgeTestConstants.EventType.GENERIC_TRACK,
-			EdgeBridgeTestConstants.EventSource.REQUEST_CONTENT
-		)
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(null)
 			.build();
 
@@ -252,11 +246,7 @@ public class EdgeBridgeExtensionTests {
 
 	@Test
 	public void test_handleTrackRequest_withEmptyEventData_doesNotDispatchEvent() {
-		final Event event = new Event.Builder(
-			"Test Track Event",
-			EdgeBridgeTestConstants.EventType.GENERIC_TRACK,
-			EdgeBridgeTestConstants.EventSource.REQUEST_CONTENT
-		)
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(Collections.<String, Object>emptyMap())
 			.build();
 
@@ -273,8 +263,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -317,8 +307,8 @@ public class EdgeBridgeExtensionTests {
 		verify(mockExtensionApi, times(1)).dispatch(dispatchedEventCaptor.capture());
 
 		Event responseEvent = dispatchedEventCaptor.getAllValues().get(0);
-		assertEquals(EdgeBridgeTestConstants.EventType.EDGE, responseEvent.getType());
-		assertEquals(EdgeBridgeTestConstants.EventSource.REQUEST_CONTENT, responseEvent.getSource());
+		assertEquals(EventType.EDGE, responseEvent.getType());
+		assertEquals(EventSource.REQUEST_CONTENT, responseEvent.getSource());
 		assertEquals(EdgeBridgeTestConstants.EventNames.EDGE_BRIDGE_REQUEST, responseEvent.getName());
 
 		Map<String, Object> expectedData = new HashMap<String, Object>() {
@@ -358,8 +348,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withNullEventData_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(null)
 			.build();
@@ -373,8 +363,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withEmptyEventData_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(Collections.<String, Object>emptyMap())
 			.build();
@@ -388,8 +378,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withoutTriggerConsequence_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -433,8 +423,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withTriggerConsequenceWrongType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -454,8 +444,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withoutConsequenceId_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -498,8 +488,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withConsequenceIdWrongType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -550,8 +540,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withWrongConsequenceType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -595,8 +585,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withoutConsequenceType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -639,8 +629,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withConsequenceTypeWrongType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -691,8 +681,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withoutConsequenceDetail_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -720,8 +710,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withNullConsequenceDetail_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -750,8 +740,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withEmptyConsequenceDetail_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -780,8 +770,8 @@ public class EdgeBridgeExtensionTests {
 	public void test_handleRulesEngineResponse_withConsequenceDetailWrongType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
-			EdgeBridgeTestConstants.EventType.RULES_ENGINE,
-			EdgeBridgeTestConstants.EventSource.RESPONSE_CONTENT
+			EventType.RULES_ENGINE,
+			EventSource.RESPONSE_CONTENT
 		)
 			.setEventData(
 				new HashMap<String, Object>() {
