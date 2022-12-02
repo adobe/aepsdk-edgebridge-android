@@ -207,7 +207,9 @@ task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPh
 dependencies {
 
     // Adobe Mobile SDK Core
-    implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
+    // implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
+    implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
+    implementation 'androidx.annotation:annotation:1.5.0'
 
     testImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
     testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoCoreVersion}"
@@ -215,7 +217,9 @@ dependencies {
     testImplementation 'org.powermock:powermock-module-junit4:2.0.0'
 
     // Adobe Mobile dependencies for testing
-    androidTestImplementation "com.adobe.marketing.mobile:edge:1.+"
+    implementation('com.adobe.marketing.mobile:edge:1+'){
+        exclude group: 'com.adobe.marketing.mobile', module: 'core'
+    }
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
