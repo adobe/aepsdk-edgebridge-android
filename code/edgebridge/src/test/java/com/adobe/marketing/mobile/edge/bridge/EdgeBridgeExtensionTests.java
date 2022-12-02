@@ -167,9 +167,6 @@ public class EdgeBridgeExtensionTests {
 	// ========================================================================================
 	// handleTrackRequest
 	// ========================================================================================
-	// remove mobileCore.dispatch mock in favor of ExtensionApi dispatch capture
-	// the "deprecated" way cannot be tested unless function/integration test because ExtensionApi itself is mocked
-	// and dispatching events goes through the ExtensionApi now instead of MobileCore
 	@Test
 	public void test_handleTrackRequest_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder(
