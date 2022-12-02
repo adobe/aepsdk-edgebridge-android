@@ -17,30 +17,14 @@ final class EdgeBridgeConstants {
 
 	static final String LOG_TAG = "EdgeBridge";
 	static final String EXTENSION_NAME = "com.adobe.edge.bridge";
-	static final String EXTENSION_VERSION = "1.0.0";
+	static final String FRIENDLY_NAME = "Edge Bridge";
+	static final String EXTENSION_VERSION = "2.0.0";
 
 	final class EventNames {
 
 		static final String EDGE_BRIDGE_REQUEST = "Edge Bridge Request";
 
 		private EventNames() {}
-	}
-
-	final class EventSource {
-
-		static final String REQUEST_CONTENT = "com.adobe.eventSource.requestContent";
-		static final String RESPONSE_CONTENT = "com.adobe.eventSource.responseContent";
-
-		private EventSource() {}
-	}
-
-	final class EventType {
-
-		static final String GENERIC_TRACK = "com.adobe.eventType.generic.track";
-		static final String RULES_ENGINE = "com.adobe.eventType.rulesEngine";
-		static final String EDGE = "com.adobe.eventType.edge";
-
-		private EventType() {}
 	}
 
 	final class JsonValues {

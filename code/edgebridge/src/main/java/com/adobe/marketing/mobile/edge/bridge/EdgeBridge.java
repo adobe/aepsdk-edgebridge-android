@@ -12,10 +12,10 @@
 package com.adobe.marketing.mobile.edge.bridge;
 
 import com.adobe.marketing.mobile.AdobeCallback;
-import com.adobe.marketing.mobile.ExtensionError;
-import com.adobe.marketing.mobile.ExtensionErrorCallback;
-import com.adobe.marketing.mobile.LoggingMode;
+import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.services.Log;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -32,6 +32,9 @@ import java.util.Map;
  */
 public class EdgeBridge {
 
+	public static final Class<? extends Extension> EXTENSION = EdgeBridgeExtension.class;
+	private static final String LOG_SOURCE = "EdgeBridge";
+
 	private EdgeBridge() {}
 
 	/**
@@ -45,19 +48,23 @@ public class EdgeBridge {
 	/**
 	 * Registers the Edge Bridge extension with the Mobile Core.
 	 * This method should be called before calling {@link MobileCore#start(AdobeCallback)}.
+	 *
+	 * @deprecated Use {@link MobileCore#registerExtensions(List, AdobeCallback)} with {@link EdgeBridge#EXTENSION} instead.
 	 */
+	@Deprecated
 	public static void registerExtension() {
 		MobileCore.registerExtension(
 			EdgeBridgeExtension.class,
-			new ExtensionErrorCallback<ExtensionError>() {
-				@Override
-				public void error(ExtensionError extensionError) {
-					MobileCore.log(
-						LoggingMode.ERROR,
-						EdgeBridgeConstants.LOG_TAG,
-						"There was an error registering the Edge Bridge extension: " + extensionError.getErrorName()
-					);
+			extensionError -> {
+				if (extensionError == null) {
+					return;
 				}
+				Log.error(
+					EdgeBridgeConstants.LOG_TAG,
+					LOG_SOURCE,
+					"There was an error when registering the Edge Bridge extension: %s",
+					extensionError.getErrorName()
+				);
 			}
 		);
 	}
