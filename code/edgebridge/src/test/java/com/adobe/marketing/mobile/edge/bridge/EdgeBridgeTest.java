@@ -30,13 +30,11 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.powermock.api.mockito.PowerMockito;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
-@RunWith(PowerMockRunner.class)
-@PrepareForTest({ MobileCore.class })
+@RunWith(MockitoJUnitRunner.class)
 public class EdgeBridgeTest {
 
 	@Mock
@@ -47,17 +45,20 @@ public class EdgeBridgeTest {
 
 	@Before
 	public void setup() {
-		PowerMockito.mockStatic(MobileCore.class);
-		Mockito.when(MobileCore.getApplication()).thenReturn(mockApplication);
-		Mockito.when(mockApplication.getApplicationContext()).thenReturn(mockContext);
+		Mockito.reset(mockApplication);
+		Mockito.reset(mockContext);
 	}
 
 	@Test
-	public void testRegisterExtension() {
-		EdgeBridge.registerExtension();
-
-		PowerMockito.verifyStatic(MobileCore.class, times(1));
-		MobileCore.registerExtension((Class<? extends Extension>) any(), any(ExtensionErrorCallback.class));
+	public void testRegisterExtension_deprecated() {
+		try (MockedStatic<MobileCore> mobileCoreMockedStatic = Mockito.mockStatic(MobileCore.class)) {
+			EdgeBridge.registerExtension();
+			mobileCoreMockedStatic.verify(
+				() ->
+					MobileCore.registerExtension((Class<? extends Extension>) any(), any(ExtensionErrorCallback.class)),
+				times(1)
+			);
+		}
 	}
 
 	@Test
