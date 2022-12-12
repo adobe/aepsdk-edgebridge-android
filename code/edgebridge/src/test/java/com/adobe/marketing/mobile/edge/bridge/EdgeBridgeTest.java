@@ -14,6 +14,7 @@ package com.adobe.marketing.mobile.edge.bridge;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 
@@ -26,7 +27,11 @@ import com.adobe.marketing.mobile.MobileCore;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -49,6 +54,20 @@ public class EdgeBridgeTest {
 	public void setup() {
 		Mockito.reset(mockApplication);
 		Mockito.reset(mockContext);
+	}
+
+	// ========================================================================================
+	// registerExtension(s)
+	// ========================================================================================
+	@Test
+	public void test_registerExtension() throws InterruptedException {
+		MobileCore.setApplication(mockApplication);
+
+		final CountDownLatch latch = new CountDownLatch(1);
+		List<Class<? extends Extension>> extensions = new ArrayList<>();
+		extensions.add(EdgeBridge.EXTENSION);
+		MobileCore.registerExtensions(extensions, o -> latch.countDown());
+		assertTrue(latch.await(1000, TimeUnit.MILLISECONDS));
 	}
 
 	@Test
@@ -103,6 +122,18 @@ public class EdgeBridgeTest {
 			// Verify: captured error callback does not throw NPE when passed null ExtensionError
 			callbackCaptor.getValue().error(null);
 		}
+	}
+
+	// ========================================================================================
+	// publicExtensionConstants
+	// ========================================================================================
+	@Test
+	public void test_publicExtensionConstants() {
+		assertEquals(EdgeBridgeExtension.class, EdgeBridge.EXTENSION);
+		List<Class<? extends Extension>> extensions = new ArrayList<>();
+		extensions.add(EdgeBridge.EXTENSION);
+		// Should not throw exceptions
+		MobileCore.registerExtensions(extensions, null);
 	}
 
 	@Test

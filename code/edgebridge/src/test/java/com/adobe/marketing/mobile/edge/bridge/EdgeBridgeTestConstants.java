@@ -25,23 +25,6 @@ public class EdgeBridgeTestConstants {
 		private EventNames() {}
 	}
 
-	final class EventSource {
-
-		static final String REQUEST_CONTENT = "com.adobe.eventSource.requestContent";
-		static final String RESPONSE_CONTENT = "com.adobe.eventSource.responseContent";
-
-		private EventSource() {}
-	}
-
-	final class EventType {
-
-		static final String GENERIC_TRACK = "com.adobe.eventType.generic.track";
-		static final String RULES_ENGINE = "com.adobe.eventType.rulesEngine";
-		static final String EDGE = "com.adobe.eventType.edge";
-
-		private EventType() {}
-	}
-
 	final class JsonValues {
 
 		static final String EVENT_TYPE = "analytics.track";
