@@ -207,7 +207,8 @@ task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPh
 dependencies {
 
     // Adobe Mobile SDK Core
-    // implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
+//    implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
+    // TODO: replace this with the production dependency above when available
     implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
     implementation 'androidx.annotation:annotation:1.5.0'
 
@@ -217,9 +218,12 @@ dependencies {
     testImplementation 'org.powermock:powermock-module-junit4:2.0.0'
 
     // Adobe Mobile dependencies for testing
-    implementation('com.adobe.marketing.mobile:edge:1+'){
-        exclude group: 'com.adobe.marketing.mobile', module: 'core'
-    }
+//    implementation('com.adobe.marketing.mobile:edge:1+'){
+//        exclude group: 'com.adobe.marketing.mobile', module: 'core'
+//    }
+    // TODO: replace these with the actual 2.0 Edge dependency when available
+    implementation fileTree(dir: 'libs', include: ['edge-release-2.0.0.aar', 'edgeidentity-release-2.0.0.aar'])
+
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
