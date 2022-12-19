@@ -34,9 +34,6 @@ public class EdgeBridge {
 
 	public static final Class<? extends Extension> EXTENSION = EdgeBridgeExtension.class;
 	private static final String LOG_SOURCE = "EdgeBridge";
-	public static final Class<? extends Extension> EXTENSION = EdgeBridgeExtension.class;
-	private static final String LOG_SOURCE = "EdgeBridge";
-	public static final Class<? extends Extension> EXTENSION = EdgeBridgeExtension.class;
 
 	private EdgeBridge() {}
 
