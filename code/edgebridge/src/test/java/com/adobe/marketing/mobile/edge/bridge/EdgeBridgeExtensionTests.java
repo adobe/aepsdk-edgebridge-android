@@ -23,15 +23,13 @@ import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.ExtensionEventListener;
-import java.text.SimpleDateFormat;
+import com.adobe.marketing.mobile.util.TimeUtils;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.TimeZone;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -191,7 +189,10 @@ public class EdgeBridgeExtensionTests {
 					new HashMap<String, Object>() {
 						{
 							put("eventType", EdgeBridgeTestConstants.JsonValues.EVENT_TYPE);
-							put("timestamp", formatDateIso8601(event.getTimestamp()));
+							put(
+								"timestamp",
+								TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(event.getTimestamp()))
+							);
 						}
 					}
 				);
@@ -302,7 +303,10 @@ public class EdgeBridgeExtensionTests {
 					new HashMap<String, Object>() {
 						{
 							put("eventType", EdgeBridgeTestConstants.JsonValues.EVENT_TYPE);
-							put("timestamp", formatDateIso8601(event.getTimestamp()));
+							put(
+								"timestamp",
+								TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(event.getTimestamp()))
+							);
 						}
 					}
 				);
@@ -762,21 +766,5 @@ public class EdgeBridgeExtensionTests {
 		extension.handleRulesEngineResponse(event);
 
 		verify(mockExtensionApi, never()).dispatch(any(Event.class));
-	}
-
-	// ========================================================================================
-	// Utility methods
-	// ========================================================================================
-
-	private static final SimpleDateFormat iso8601DateFormat;
-
-	static {
-		final Locale posixLocale = new Locale(Locale.US.getLanguage(), Locale.US.getCountry(), "POSIX");
-		iso8601DateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", posixLocale);
-		iso8601DateFormat.setTimeZone(TimeZone.getTimeZone("Etc/UTC"));
-	}
-
-	static String formatDateIso8601(final long timestamp) {
-		return iso8601DateFormat.format(new Date(timestamp));
 	}
 }
