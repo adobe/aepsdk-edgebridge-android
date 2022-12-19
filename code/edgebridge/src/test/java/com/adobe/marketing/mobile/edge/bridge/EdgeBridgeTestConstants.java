@@ -16,6 +16,7 @@ public class EdgeBridgeTestConstants {
 	private EdgeBridgeTestConstants() {}
 
 	static final String EXTENSION_NAME = "com.adobe.edge.bridge";
+	static final String EXTENSION_FRIENDLY_NAME = "Edge Bridge";
 	static final String EXTENSION_VERSION = "2.0.0";
 
 	final class EventNames {

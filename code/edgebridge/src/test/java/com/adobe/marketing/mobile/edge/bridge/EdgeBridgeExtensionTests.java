@@ -121,6 +121,20 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	// ========================================================================================
+	// getFriendlyName
+	// ========================================================================================
+	@Test
+	public void test_getFriendlyName() {
+		// Test
+		String moduleFriendlyName = extension.getFriendlyName();
+		assertEquals(
+			"getFriendlyName should return the correct module friendly name",
+			EdgeBridgeTestConstants.EXTENSION_FRIENDLY_NAME,
+			moduleFriendlyName
+		);
+	}
+
+	// ========================================================================================
 	// handleTrackRequest
 	// ========================================================================================
 	@Test
