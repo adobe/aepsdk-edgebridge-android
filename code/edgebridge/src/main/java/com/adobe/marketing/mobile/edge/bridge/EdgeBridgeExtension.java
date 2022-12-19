@@ -26,7 +26,6 @@ import com.adobe.marketing.mobile.util.TimeUtils;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.TimeZone;
 
 class EdgeBridgeExtension extends Extension {
 
@@ -158,14 +157,7 @@ class EdgeBridgeExtension extends Extension {
 	private void dispatchTrackRequest(final Map<String, Object> data, final long timestamp) {
 		Map<String, Object> xdmData = new HashMap<>();
 		xdmData.put("eventType", EdgeBridgeConstants.JsonValues.EVENT_TYPE);
-		xdmData.put(
-			"timestamp",
-			TimeUtils.getIso8601Date(
-				new Date(timestamp),
-				"yyyy-MM-dd'T'HH:mm:ss.SSS'Z'",
-				TimeZone.getTimeZone("Etc/UTC")
-			)
-		);
+		xdmData.put("timestamp", TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(timestamp)));
 
 		Map<String, Object> eventData = new HashMap<>();
 		eventData.put("xdm", xdmData);
