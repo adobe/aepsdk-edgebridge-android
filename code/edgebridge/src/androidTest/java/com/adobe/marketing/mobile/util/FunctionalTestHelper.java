@@ -82,6 +82,8 @@ public class FunctionalTestHelper {
 	 */
 	public static class SetupCoreRule implements TestRule {
 
+		private final String LOG_SOURCE = "SetupCoreRule";
+
 		@Override
 		public Statement apply(final Statement base, final Description description) {
 			return new Statement() {
@@ -97,16 +99,16 @@ public class FunctionalTestHelper {
 					MobileCore.setLogLevel(LoggingMode.VERBOSE);
 					MobileCore.setApplication(defaultApplication);
 					clearAllDatastores();
-					Log.debug(LOG_TAG, "SetupCoreRule", "Execute '" + description.getMethodName() + "'");
+					Log.debug(LOG_TAG, LOG_SOURCE, "Execute '" + description.getMethodName() + "'");
 
 					try {
 						base.evaluate();
 					} catch (Throwable e) {
-						Log.debug(LOG_TAG, "SetupCoreRule", "Wait after test failure.");
+						Log.debug(LOG_TAG, LOG_SOURCE, "Wait after test failure.");
 						throw e; // rethrow test failure
 					} finally {
 						// After test execution
-						Log.debug(LOG_TAG, "SetupCoreRule", "Finished '" + description.getMethodName() + "'");
+						Log.debug(LOG_TAG, LOG_SOURCE, "Finished '" + description.getMethodName() + "'");
 						waitForThreads(5000); // wait to allow thread to run after test execution
 						MobileCoreHelper.resetSDK();
 						resetTestExpectations();

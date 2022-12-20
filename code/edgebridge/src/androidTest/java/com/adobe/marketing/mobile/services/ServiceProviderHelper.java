@@ -18,7 +18,7 @@ import java.io.File;
  */
 public class ServiceProviderHelper {
 
-	private static final String LOG_TAG = "FunctionalTestHelpers";
+	private static final String LOG_TAG = "FunctionalTestUtils";
 	private static final String LOG_SOURCE = "ServiceProviderHelper";
 
 	/**
