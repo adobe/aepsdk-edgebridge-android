@@ -96,11 +96,11 @@ public class EdgeBridgeExtensionTests {
 	@Test
 	public void test_getName() {
 		// test
-		String moduleName = extension.getName();
+		String extensionName = extension.getName();
 		assertEquals(
-			"getName should return the correct module name",
+			"getName should return the correct extension name",
 			EdgeBridgeTestConstants.EXTENSION_NAME,
-			moduleName
+			extensionName
 		);
 	}
 
@@ -110,11 +110,11 @@ public class EdgeBridgeExtensionTests {
 	@Test
 	public void test_getVersion() {
 		// test
-		String moduleVersion = extension.getVersion();
+		String extensionVersion = extension.getVersion();
 		assertEquals(
-			"getVersion should return the correct module version",
+			"getVersion should return the correct extension version",
 			EdgeBridgeTestConstants.EXTENSION_VERSION,
-			moduleVersion
+			extensionVersion
 		);
 	}
 
@@ -124,11 +124,11 @@ public class EdgeBridgeExtensionTests {
 	@Test
 	public void test_getFriendlyName() {
 		// Test
-		String moduleFriendlyName = extension.getFriendlyName();
+		String extensionFriendlyName = extension.getFriendlyName();
 		assertEquals(
-			"getFriendlyName should return the correct module friendly name",
+			"getFriendlyName should return the correct extension friendly name",
 			EdgeBridgeTestConstants.EXTENSION_FRIENDLY_NAME,
-			moduleFriendlyName
+			extensionFriendlyName
 		);
 	}
 
