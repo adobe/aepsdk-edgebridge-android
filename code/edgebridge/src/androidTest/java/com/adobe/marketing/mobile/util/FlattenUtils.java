@@ -11,8 +11,7 @@
 
 package com.adobe.marketing.mobile.util;
 
-import com.adobe.marketing.mobile.LoggingMode;
-import com.adobe.marketing.mobile.MobileCore;
+import com.adobe.marketing.mobile.services.Log;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -26,6 +25,9 @@ import java.util.Map;
 import org.json.JSONObject;
 
 public final class FlattenUtils {
+
+	private static final String LOG_TAG = "FunctionalTestUtils";
+	private static final String LOG_SOURCE = "FlattenUtils";
 
 	private FlattenUtils() {}
 
@@ -47,7 +49,7 @@ public final class FlattenUtils {
 			addKeys("", new ObjectMapper().readTree(jsonObject.toString()), payloadMap);
 			return payloadMap;
 		} catch (IOException e) {
-			MobileCore.log(LoggingMode.ERROR, "FunctionalTestUtils", "Failed to parse JSON object to tree structure.");
+			Log.error(LOG_TAG, LOG_SOURCE, "Failed to parse JSON object to tree structure.");
 		}
 
 		return Collections.<String, String>emptyMap();
@@ -71,7 +73,7 @@ public final class FlattenUtils {
 			addKeys("", new ObjectMapper().readTree(bytes), payloadMap);
 			return payloadMap;
 		} catch (IOException e) {
-			MobileCore.log(LoggingMode.ERROR, "FunctionalTestUtils", "Failed to parse JSON payload to tree structure.");
+			Log.error(LOG_TAG, LOG_SOURCE, "Failed to parse JSON payload to tree structure.");
 			return Collections.<String, String>emptyMap();
 		}
 	}

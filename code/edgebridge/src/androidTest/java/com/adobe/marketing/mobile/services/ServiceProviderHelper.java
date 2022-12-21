@@ -11,8 +11,6 @@
 
 package com.adobe.marketing.mobile.services;
 
-import com.adobe.marketing.mobile.LoggingMode;
-import com.adobe.marketing.mobile.MobileCore;
 import java.io.File;
 
 /**
@@ -20,7 +18,8 @@ import java.io.File;
  */
 public class ServiceProviderHelper {
 
-	private static String TAG = "ServiceProviderHelper";
+	private static final String LOG_TAG = "FunctionalTestUtils";
+	private static final String LOG_SOURCE = "ServiceProviderHelper";
 
 	/**
 	 * Reset the {@link ServiceProvider}.
@@ -54,7 +53,7 @@ public class ServiceProviderHelper {
 
 			boolean wasDeleted = f.delete();
 			String msg = wasDeleted ? "Successfully deleted cache file/folder " : "Unable to delete cache file/folder ";
-			MobileCore.log(LoggingMode.DEBUG, TAG, msg + "'" + f.getName() + "'");
+			Log.debug(LOG_TAG, LOG_SOURCE, msg + "'" + f.getName() + "'");
 		}
 	}
 }
