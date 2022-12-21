@@ -64,9 +64,4 @@ dependencies {
     // TODO: replace these with the actual 2.0 Edge dependency when available
     implementation fileTree(dir: 'libs', include: ['edge-release-2.0.0.aar', 'edgeidentity-release-2.0.0.aar'])
     implementation project(':edgebridge')
-
-    testImplementation 'junit:junit:4.13.2'
-
-    androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 }
