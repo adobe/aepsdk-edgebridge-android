@@ -222,7 +222,7 @@ dependencies {
 //        exclude group: 'com.adobe.marketing.mobile', module: 'core'
 //    }
     // TODO: replace these with the actual 2.0 Edge dependency when available
-    implementation fileTree(dir: 'libs', include: ['edge-release-2.0.0.aar', 'edgeidentity-release-2.0.0.aar'])
+    androidTestImplementation fileTree(dir: 'libs', include: ['edge-release-2.0.0.aar', 'edgeidentity-release-2.0.0.aar'])
 
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
