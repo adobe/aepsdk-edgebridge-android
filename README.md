@@ -3,14 +3,7 @@
 
 ## About this project
 
-The AEP Edge Bridge mobile extension enables forwarding of Analytics track events to Adobe Edge Network when using the [Adobe Experience Platform SDK](https://aep-sdks.gitbook.io/docs/) and the Edge Network extension. The configured Data Collection datastream for the mobile application can define a mapping of the track event's contextdata to an XDM schema using [Data Prep for Data Collection](https://experienceleague.adobe.com/docs/platform-learn/data-collection/edge-network/data-prep.html).
-
-### Prerequisites
-
-The Edge Bridge extension has the following peer dependencies, which must be installed prior to installing the Edge Bridge Extension:
-- [Mobile Core](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core)
-- [Edge Network](https://aep-sdks.gitbook.io/docs/foundation-extensions/experience-platform-extension)
-- [Identity for Edge Network](https://aep-sdks.gitbook.io/docs/foundation-extensions/identity-for-edge-network) (a dependency for Edge Network)
+The AEP Edge Bridge mobile extension enables forwarding of Analytics track events to Adobe Edge Network when using the [Adobe Experience Platform SDK](https://developer.adobe.com/client-sdks) and the Edge Network extension. The configured Data Collection datastream for the mobile application can define a mapping of the track event's contextdata to an XDM schema using [Data Prep for Data Collection](https://experienceleague.adobe.com/docs/platform-learn/data-collection/edge-network/data-prep.html).
 
 ### Installation
 
@@ -58,9 +51,9 @@ make init
 ## Related Projects
 
 | Project                                                      | Description                                                  |
-| ------------------------------------------------------------ | ------------------------------------------------------------ | 
-| [AEP Edge Extension](https://aep-sdks.gitbook.io/docs/foundation-extensions/experience-platform-extension) | The AEP Edge extension allows you to send data to the Adobe Experience Platform (AEP) from a mobile application. |
-| [AEP SDK Sample App for Android](https://github.com/adobe/aepsdk-sample-app-android) | Contains Android sample app for the AEP SDK.                 |
+| ------------------------------------------------------------ | ------------------------------------------------------------ |
+| [AEP Edge extension](https://github.com/adobe/aepsdk-edge-android) | The AEP Edge extension allows you to send data to the Adobe Experience Platform from a mobile application. |
+| [AEP SDK sample app for Android](https://github.com/adobe/aepsdk-sample-app-android) | Contains Android sample app for the AEP SDK.                 |
 
 ## Contributing
 
