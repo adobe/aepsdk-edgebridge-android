@@ -1,17 +1,18 @@
 # Adobe Experience Platform Edge Bridge for Android
-The AEP Edge Bridge mobile extension provides seamless routing of data to the Adobe Experience Platform Edge Network for existing SDK implementations. For applications which already make use of the [`MobileCore.trackAction`](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/mobile-core-api-reference#trackaction) and/or [`MobileCore.trackState`](https://aep-sdks.gitbook.io/docs/foundation-extensions/mobile-core/mobile-core-api-reference#trackstate) APIs to send data to Adobe Analytics, this extension will automatically route those API calls to the Edge Network, making the data available for mapping to a user's XDM schema using the [Data Prep for Data Collection](https://experienceleague.adobe.com/docs/experience-platform/data-prep/home.html).
+The AEP Edge Bridge mobile extension provides seamless routing of data to the Adobe Experience Platform Edge Network for existing SDK implementations. For applications which already make use of the `MobileCore.trackAction` and/or `MobileCore.trackState` APIs to send data to Adobe Analytics, this extension will automatically route those API calls to the Edge Network, making the data available for mapping to a user's XDM schema using the [Data Prep for Data Collection](https://experienceleague.adobe.com/docs/experience-platform/data-prep/home.html).
 
 > **Note**
-> It is recommended to send well formatted XDM data directly from an application using the [Edge.sendEvent](https://aep-sdks.gitbook.io/docs/foundation-extensions/experience-platform-extension/edge-network-api-reference#sendevent) API instead of using the `trackState` and `trackAction` APIs with the Edge Bridge extension. However, in cases where it is not feasible to refactor the application, the Edge Bridge extension is available as a drop-in solution to send `trackState` and `trackAction` data to the Edge Network.
+> It is recommended to send well formatted XDM data directly from an application using the `Edge.sendEvent` API instead of using the `MobileCore.trackState` and `MobileCore.trackAction` APIs with the Edge Bridge extension. However, in cases where it is not feasible to refactor the application, the Edge Bridge extension is available as a drop-in solution to send `trackState` and `trackAction` data to the Edge Network.
 >
->  For new implementations of the SDK, it it highly recommended to send XDM data directly using the [`Edge.sendEvent`](https://aep-sdks.gitbook.io/docs/foundation-extensions/experience-platform-extension/edge-network-api-reference#sendevent) API.
+>  For new implementations of the SDK, it it highly recommended to send XDM data directly using the `Edge.sendEvent` API.
 >
 
 ## Before starting
 
-### Install AEP Edge extension
-
-The Adobe Experience Platform Edge Bridge extension requires the Adobe Experience Platform Edge Network extension in order to operate. As a first step install and configure the [AEP Edge](https://aep-sdks.gitbook.io/docs/foundation-extensions/experience-platform-extension) extension, then continue with the steps below.
+The Edge Bridge extension has the following peer dependencies, which must be installed prior to installing the Edge Bridge Extension:
+- [Mobile Core](https://github.com/adobe/aepsdk-core-android#readme) (installed by default)
+- [Edge Network](https://github.com/adobe/aepsdk-edge-android#readme)
+- [Identity for Edge Network](https://github.com/adobe/aepsdk-edgeidentity-android#readme) (a dependency for Edge Network)
 
 ## Add the AEP Edge Bridge extension to an app
 
