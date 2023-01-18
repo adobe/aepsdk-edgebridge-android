@@ -18,25 +18,25 @@ import com.adobe.marketing.mobile.LoggingMode
 import com.adobe.marketing.mobile.MobileCore
 import com.adobe.marketing.mobile.edge.bridge.EdgeBridge
 import com.adobe.marketing.mobile.edge.identity.Identity
+import com.adobe.marketing.mobile.services.Log
 
 class EdgeBridgeApplication : Application() {
+    private val LOG_TAG = "EdgeBridgeTestApplication"
+    private val LOG_SOURCE = "EdgeBridgeApplication"
+
     // Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
     private var ENVIRONMENT_FILE_ID: String = ""
 
     override fun onCreate() {
         super.onCreate()
 
-        // register AEP SDK extensions
         MobileCore.setApplication(this)
         MobileCore.setLogLevel(LoggingMode.VERBOSE)
+        MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID)
 
-        EdgeBridge.registerExtension()
-        Identity.registerExtension()
-        Edge.registerExtension()
-        Assurance.registerExtension()
-
-        MobileCore.start {
-            MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID)
-        }
+        // Register AEP SDK extensions
+        MobileCore.registerExtensions(
+            arrayListOf(Assurance.EXTENSION, Edge.EXTENSION, EdgeBridge.EXTENSION, Identity.EXTENSION)
+        ) { Log.debug(LOG_TAG, LOG_SOURCE, "Mobile SDK was initialized.") }
     }
 }
