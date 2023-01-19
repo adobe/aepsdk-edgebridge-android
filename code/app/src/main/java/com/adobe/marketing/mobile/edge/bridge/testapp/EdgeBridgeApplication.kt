@@ -34,7 +34,7 @@ class EdgeBridgeApplication : Application() {
         MobileCore.setLogLevel(LoggingMode.VERBOSE)
         MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID)
 
-        // Register AEP SDK extensions
+        // Register Adobe extensions
         MobileCore.registerExtensions(
             arrayListOf(Assurance.EXTENSION, Edge.EXTENSION, EdgeBridge.EXTENSION, Identity.EXTENSION)
         ) {
