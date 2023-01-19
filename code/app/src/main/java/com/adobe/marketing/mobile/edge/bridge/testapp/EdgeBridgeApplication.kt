@@ -21,7 +21,7 @@ import com.adobe.marketing.mobile.edge.identity.Identity
 import com.adobe.marketing.mobile.services.Log
 
 class EdgeBridgeApplication : Application() {
-    private val LOG_TAG = "EdgeBridgeTestApplication"
+    private val LOG_TAG = "EdgeBridgeTestApp"
     private val LOG_SOURCE = "EdgeBridgeApplication"
 
     // Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
