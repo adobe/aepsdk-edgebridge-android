@@ -49,19 +49,15 @@ dependencies {
     implementation 'com.google.android.material:material:1.6.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.3'
 
-    //    implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
-    // TODO: replace this with the production dependency above when available
-    implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
-//    implementation('com.adobe.marketing.mobile:assurance:1+'){
-//        exclude group: 'com.adobe.marketing.mobile', module: 'core'
-//    }
-    implementation ('com.github.adobe:aepsdk-assurance-android:v2.0.0-alpha.1') {
+    implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
+    implementation ('com.adobe.marketing.mobile:assurance:2.0.0-SNAPSHOT') {
         transitive = false
     }
-//    implementation('com.adobe.marketing.mobile:edge:1+'){
-//        exclude group: 'com.adobe.marketing.mobile', module: 'core'
-//    }
-    // TODO: replace these with the actual 2.0 Edge dependency when available
-    implementation fileTree(dir: 'libs', include: ['edge-release-2.0.0.aar', 'edgeidentity-release-2.0.0.aar'])
+    implementation ("com.adobe.marketing.mobile:edge:2.0.0-SNAPSHOT") {
+        transitive = false
+    }
+    implementation ("com.adobe.marketing.mobile:edgeidentity:2.0.0-SNAPSHOT") {
+        transitive = false
+    }
     implementation project(':edgebridge')
 }

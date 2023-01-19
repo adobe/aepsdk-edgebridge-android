@@ -207,9 +207,7 @@ task platformFunctionalTestJacocoReport(type: JacocoReport, dependsOn: "createPh
 dependencies {
 
     // Adobe Mobile SDK Core
-//    implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
-    // TODO: replace this with the production dependency above when available
-    implementation 'com.github.adobe.aepsdk-core-android:core:dev-v2.0.0-SNAPSHOT'
+    implementation "com.adobe.marketing.mobile:core:${rootProject.mavenCoreVersion}"
     implementation 'androidx.annotation:annotation:1.5.0'
 
     testImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
@@ -217,12 +215,13 @@ dependencies {
     testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoVersion}"
 
     // Adobe Mobile dependencies for testing
-//    implementation('com.adobe.marketing.mobile:edge:1+'){
-//        exclude group: 'com.adobe.marketing.mobile', module: 'core'
-//    }
     // TODO: replace these with the actual 2.0 Edge dependency when available
-    androidTestImplementation fileTree(dir: 'libs', include: ['edge-release-2.0.0.aar', 'edgeidentity-release-2.0.0.aar'])
-
+    androidTestImplementation ("com.adobe.marketing.mobile:edge:2.0.0-SNAPSHOT") {
+        transitive = false
+    }
+    androidTestImplementation ("com.adobe.marketing.mobile:edgeidentity:2.0.0-SNAPSHOT") {
+        transitive = false
+    }
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'

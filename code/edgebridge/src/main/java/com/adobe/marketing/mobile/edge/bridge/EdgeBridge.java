@@ -11,6 +11,7 @@
 
 package com.adobe.marketing.mobile.edge.bridge;
 
+import androidx.annotation.NonNull;
 import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.MobileCore;
@@ -41,6 +42,7 @@ public class EdgeBridge {
 	 * Returns the version of the Edge Bridge extension.
 	 * @return the version of the Edge Bridge extension
 	 */
+	@NonNull
 	public static String extensionVersion() {
 		return EdgeBridgeConstants.EXTENSION_VERSION;
 	}
