@@ -28,44 +28,67 @@ The Edge Bridge extension has the following peer dependencies, which must be ins
 1. Add the Mobile Core and Edge extensions to your project using the app's Gradle file.
 
 ```java
-implementation 'com.adobe.marketing.mobile:core:1.+'
-implementation 'com.adobe.marketing.mobile:edge:1.+'
-implementation 'com.adobe.marketing.mobile:edgebridge:1.+'
-implementation 'com.adobe.marketing.mobile:edgeidentity:1.+'
+implementation 'com.adobe.marketing.mobile:core:2.+'
+implementation 'com.adobe.marketing.mobile:edge:2.+'
+implementation 'com.adobe.marketing.mobile:edgebridge:2.+'
+implementation 'com.adobe.marketing.mobile:edgeidentity:2.+'
 ```
 
 2. Import the Mobile Core and Edge extensions in your Application class.
 
 ```java
-import com.adobe.marketing.mobile.MobileCore;
+import android.app.Application;
 import com.adobe.marketing.mobile.Edge;
+import com.adobe.marketing.mobile.LoggingMode;
+import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.edge.bridge.EdgeBridge;
 import com.adobe.marketing.mobile.edge.identity.Identity;
+import com.adobe.marketing.mobile.services.Log;
+import java.util.Arrays; // Only required for Java example
 ```
 
 3. Register the Edge Bridge and Identity for Edge Extension with MobileCore:
-
+#### Java
 ```java
 public class MobileApp extends Application {
+  // Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
+  private final String ENVIRONMENT_FILE_ID = "";
 
-    @Override
-    public void onCreate() {
-      super.onCreate();
-      MobileCore.setApplication(this);
-      try {
-        Edge.registerExtension();
-        EdgeBridge.registerExtension();
-        Identity.registerExtension();
-        // register other extensions
-        MobileCore.start(new AdobeCallback () {
-            @Override
-            public void call(Object o) {
-                MobileCore.configureWithAppID("yourEnvironmentFileID");
-            }
-        });      
-      } catch (Exception e) {
-        ...
+  @Override
+  public void onCreate() {
+  	super.onCreate();
+  	MobileCore.setApplication(this);
+
+  	MobileCore.setLogLevel(LoggingMode.VERBOSE);
+  	MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID);
+
+  	// Register Adobe extensions
+  	MobileCore.registerExtensions(
+  		Arrays.asList(Edge.EXTENSION, EdgeBridge.EXTENSION, Identity.EXTENSION),
+  		o -> Log.debug("MobileApp", "MobileApp", "Mobile SDK was initialized")
+  	);
+  }
+}
+```
+#### Kotlin
+```kotlin
+class MobileApp : Application() {
+  // Set up the preferred Environment File ID from your mobile property configured in Data Collection UI
+  private var ENVIRONMENT_FILE_ID: String = ""
+
+  override fun onCreate() {
+      super.onCreate()
+
+      MobileCore.setApplication(this)
+      MobileCore.setLogLevel(LoggingMode.VERBOSE)
+      MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID)
+
+      // Register Adobe extensions
+      MobileCore.registerExtensions(
+          arrayListOf(Edge.EXTENSION, EdgeBridge.EXTENSION, Identity.EXTENSION)
+      ) {
+          Log.debug("MobileApp", "MobileApp", "Mobile SDK was initialized.")
       }
-    }
+  }
 }
 ```

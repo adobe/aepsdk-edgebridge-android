@@ -41,6 +41,9 @@ val extensionVersion = EdgeBridge.extensionVersion()
 ### registerExtension
 Registers the Edge Bridge extension with the Mobile Core extension.
 
+> **Warning**  
+> Deprecated as of 2.0.0. Use [MobileCore.registerExtensions API](https://github.com/adobe/aepsdk-core-android/blob/main/docs/Usage/MobileCore.md#registering-extensions-and-starting-the-sdk) instead.
+
 #### Java
 
 ##### Syntax
