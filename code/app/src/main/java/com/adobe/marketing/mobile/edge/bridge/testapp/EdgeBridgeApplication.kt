@@ -37,6 +37,8 @@ class EdgeBridgeApplication : Application() {
         // Register AEP SDK extensions
         MobileCore.registerExtensions(
             arrayListOf(Assurance.EXTENSION, Edge.EXTENSION, EdgeBridge.EXTENSION, Identity.EXTENSION)
-        ) { Log.debug(LOG_TAG, LOG_SOURCE, "Mobile SDK was initialized.") }
+        ) {
+            Log.debug(LOG_TAG, LOG_SOURCE, "Mobile SDK was initialized.")
+        }
     }
 }
