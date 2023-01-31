@@ -5,11 +5,14 @@
 The test app needs to be configured with a Data Collection mobile property with the following extensions before it can be used:
 
 * [Mobile Core](https://github.com/adobe/aepsdk-core-android) (installed by default)
-* Edge Network (this extension)
+* [Edge Network](https://github.com/adobe/aepsdk-edge-android)
 * [Identity for Edge Network](https://github.com/adobe/aepsdk-edgeidentity-android)
 * [Assurance](https://github.com/adobe/aepsdk-assurance-android)
 
-See [Configure the Edge Network extension in Data Collection UI](getting-started.md#configure-the-edge-network-extension-in-data-collection-ui) for instructions on setting up a mobile property.
+> **Note**  
+> Experience Platform Edge Bridge does not have a corresponding extension card in the Data Collection UI; no changes to a Data Collection mobile property are required to use Edge Bridge.
+
+See [Configure the Edge Network extension in Data Collection UI](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/getting-started.md) for instructions on setting up a mobile property.
 
 ## Run test application
 
