@@ -3,17 +3,11 @@
 
 ## About this project
 
-The AEP Edge Bridge mobile extension enables forwarding of Analytics track events to Adobe Edge Network when using the [Adobe Experience Platform SDK](https://developer.adobe.com/client-sdks) and the Edge Network extension. The configured Data Collection datastream for the mobile application can define a mapping of the track event's contextdata to an XDM schema using [Data Prep for Data Collection](https://experienceleague.adobe.com/docs/platform-learn/data-collection/edge-network/data-prep.html).
+The Adobe Experience Platform Edge Bridge mobile extension enables forwarding of Analytics track events to Experience Platform Edge Network when using the [Experience Platform Mobile SDK](https://developer.adobe.com/client-sdks) and the Edge Network extension. Once forwarded, the track event data is in a generic data format that can be converted into an Experience Data Model (XDM) format, which is a standard experience-driven data schema for Adobe and partner solutions. This conversion mapping can be set in the Data Collection datastream associated with the application's mobile property using [Data Prep for Data Collection](https://experienceleague.adobe.com/docs/platform-learn/data-collection/edge-network/data-prep.html).
 
 ### Installation
 
-Integrate the Edge Bridge extension into your app by including the following in your gradle file's `dependencies`:
-
-```
-implementation 'com.adobe.marketing.mobile:core:1.+'
-implementation 'com.adobe.marketing.mobile:edge:1.+'
-implementation 'com.adobe.marketing.mobile:edgebridge:1.+'
-```
+Integrate the Edge Network mobile extension into your app by following the [getting started guide](Documentation/getting-started.md).
 
 ### Development
 
@@ -23,7 +17,7 @@ To open and run the project, open the `code/settings.gradle` file in Android Stu
 
 **Run demo application**
 
-Once you opened the project in Android Studio (see above), select the `app` runnable and your favorite simulator and run the program.
+To configure and run the test app for this project, follow the [getting started guide for the test app](Documentation/getting-started-test-app.md).
 
 **View the platform events with Assurance**
 
@@ -52,8 +46,8 @@ make init
 
 | Project                                                      | Description                                                  |
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| [AEP Edge extension](https://github.com/adobe/aepsdk-edge-android) | The AEP Edge extension allows you to send data to the Adobe Experience Platform from a mobile application. |
-| [AEP SDK sample app for Android](https://github.com/adobe/aepsdk-sample-app-android) | Contains Android sample app for the AEP SDK.                 |
+| [Edge Network extension](https://github.com/adobe/aepsdk-edge-android) | The Edge Network extension allows you to send data to the Adobe Edge Network from a mobile application. |
+| [Adobe Experience Platform sample app for Android](https://github.com/adobe/aepsdk-sample-app-android) | Contains a fully implemented Android sample app using the Experience Platform SDKs.                 |
 
 ## Contributing
 
