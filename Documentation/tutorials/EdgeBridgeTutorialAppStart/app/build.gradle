@@ -1,5 +1,6 @@
 plugins {
     id 'com.android.application'
+    id 'com.diffplug.spotless'
 }
 
 android {
@@ -30,6 +31,18 @@ android {
     }
 }
 
+spotless {
+    java {
+        toggleOffOn("format:off", "format:on")
+        target "src/*/java/**/*.java"
+        removeUnusedImports()
+        prettier(['prettier': '2.7.1', 'prettier-plugin-java': '1.6.2'])
+                .config(['parser': 'java', 'tabWidth': 4, 'useTabs': true, 'printWidth': 120])
+        endWithNewline()
+        licenseHeaderFile "../../../../config/formatter/adobe.header.txt"
+    }
+}
+
 dependencies {
 
     implementation 'androidx.appcompat:appcompat:1.5.1'
@@ -41,20 +54,21 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
-    // Add dependencies on AEP Mobile extensions
-    implementation 'com.adobe.marketing.mobile:assurance:1.0.4'
-    implementation 'com.adobe.marketing.mobile:core:1.11.4'
-    implementation 'com.adobe.marketing.mobile:lifecycle:1.1.1'
-    implementation 'com.adobe.marketing.mobile:edge:1.3.2'
-    implementation 'com.adobe.marketing.mobile:edgeconsent:1.0.1'
-    implementation 'com.adobe.marketing.mobile:edgeidentity:1.1.0'
+    // Add dependencies on Adobe Experience Platform Mobile extensions
+    implementation 'com.adobe.marketing.mobile:assurance:2.0.0'
+    implementation 'com.adobe.marketing.mobile:core:2.0.0'
+    implementation 'com.adobe.marketing.mobile:lifecycle:2.0.0'
+    implementation 'com.adobe.marketing.mobile:edge:2.0.0'
+    implementation 'com.adobe.marketing.mobile:edgeconsent:2.0.0'
+    implementation 'com.adobe.marketing.mobile:edgeidentity:2.0.0'
+
 
     /* Edge Bridge Tutorial - code section (1/2)
-    implementation 'com.adobe.marketing.mobile:edgebridge:1.0.0'
+    implementation 'com.adobe.marketing.mobile:edgebridge:2.0.0'
     // Edge Bridge Tutorial - code section (1/2) */
 
     //* Edge Bridge Tutorial - remove section (2/2)
-    implementation 'com.adobe.marketing.mobile:analytics:1.+'
-    implementation 'com.adobe.marketing.mobile:identity:1.+'
+    implementation 'com.adobe.marketing.mobile:analytics:2.0.0'
+    implementation 'com.adobe.marketing.mobile:identity:2.0.0'
     // Edge Bridge Tutorial - remove section (2/2) */
 }
