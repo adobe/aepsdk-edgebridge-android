@@ -214,10 +214,8 @@ dependencies {
     testImplementation "org.mockito:mockito-inline:${rootProject.ext.mockitoVersion}"
 
     // Adobe Mobile dependencies for testing
-    androidTestImplementation ("com.adobe.marketing.mobile:edge:2.+") {
-        transitive = false
-    }
-    androidTestImplementation "com.adobe.marketing.mobile:edgeidentity:2.+"
+    androidTestImplementation 'com.adobe.marketing.mobile:edge:2.+'
+    androidTestImplementation 'com.adobe.marketing.mobile:edgeidentity:2.+'
 
     androidTestImplementation "androidx.test.ext:junit:${rootProject.ext.junitVersion}"
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
