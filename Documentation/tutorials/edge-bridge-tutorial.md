@@ -16,7 +16,7 @@
 - [Initial validation with Assurance](#initial-validation-with-assurance)
   - [1. Set up the Assurance session](#1-set-up-the-assurance-session)
   - [2. Connect the app to the Assurance session](#2-connect-the-app-to-the-assurance-session)
-  - [3. Event transactions view - check for EdgeBridge events](#3-event-transactions-view---check-for-edgebridge-events)
+  - [3. Event transactions view - check for Edge Bridge events](#3-event-transactions-view---check-for-edge-bridge-events)
 - [Data Prep mapping](#data-prep-mapping)
 - [Final validation using Assurance](#final-validation-using-assurance)
 
@@ -37,17 +37,17 @@ graph LR;
 - Android Studio version which supports Gradle plugin 7.2 and a working Android simulator.
 
 ### Prerequisites
-- The tutorial app for this exercise already includes the Edge extensions. If you want to learn more about this, check out the [Edge tutorial](https://github.com/adobe/aepsdk-edge-ios/tree/main/Documentation/Tutorials).
+- The tutorial app for this exercise already includes the Edge extensions. If you want to learn more about this, check out the [Edge tutorial](https://github.com/adobe/aepsdk-edge-android/tree/main/Documentation/Tutorials).
 - A timestamp enabled report suite is configured for mobile data collection.
 - A tag (also known as mobile property) is configured in Data Collection UI which has Adobe Analytics extension installed and configured.
 
 ## Adobe Experience Platform setup
-Before any app changes we need to set up some configuration items on the Adobe Experience Platform (AEP) side. The end goal of this section is to create a mobile property that controls the configuration settings for the various AEP extensions used in this tutorial.
+Before any app changes we need to set up some configuration items on the Adobe Experience Platform side. The end goal of this section is to create a mobile property that controls the configuration settings for the various Experience Platform extensions used in this tutorial.
 
-### 1. Set up mobile property  
-If you don't have an existing mobile property, see the [instructions on how to set up a new property](https://github.com/adobe/aepsdk-edge-ios/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#1-create-a-schema).
+### 1. Set up mobile property
+If you don't have an existing mobile property, see the [instructions on how to set up a new property](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#1-create-a-schema).
 
-The following AEP extension configurations should be installed:  
+The following Adobe Experience Platform extension configurations should be installed:  
 
 <details>
   <summary> Adobe Analytics </summary><p>
@@ -63,7 +63,7 @@ In the extension configuration settings window, set the report suite ID (**1**) 
 </p></details>
 
 <details>
-  <summary> AEP Assurance </summary><p>
+  <summary> Adobe Experience Platform Assurance </summary><p>
 
 Open the **Catalog** and install the `AEP Assurance` extension configuration.
 
@@ -110,10 +110,10 @@ The following cards should be visible after all the extensions are installed:
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/mobile-property-all-extensions.png" alt="All installed extensions" width="1100"/>  
 
-### 2. Configure a Rule to forward PII events to Edge Network 
+### 2. Configure a Rule to forward PII events to Edge Network
 The collectPII API for Analytics does not send events to the Edge Network by default, and needs a rule to be configured in order to forward these events.
 
-#### Create a rule <!-- omit in toc -->
+#### Create a rule<!-- omit in toc -->
 1. On the Rules tab, select **Create New Rule**.
    - If your property already has rules, the button will be in the top right of the screen.
 2. Give your rule an easily recognizable name (**1**) in your list of rules. In this example, the rule is named "Forward PII events to Edge Network".
@@ -121,7 +121,7 @@ The collectPII API for Analytics does not send events to the Edge Network by def
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/analytics-rule-1.png" alt="Analytics rule 1" width="1100"/>  
 
-#### Define the event <!-- omit in toc -->
+#### Define the event<!-- omit in toc -->
 
 1. From the **Extension** dropdown list (**1**), select **Mobile Core**.
 2. From the **Event Type** dropdown list (**2**), select **Collect PII**.
@@ -129,7 +129,7 @@ The collectPII API for Analytics does not send events to the Edge Network by def
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/analytics-rule-2.png" alt="Analytics rule 2" width="1100"/>  
 
-#### Define the action <!-- omit in toc -->
+#### Define the action<!-- omit in toc -->
 1. Under the Actions section, select **+ Add** (**1**).
 
 2. From the **Extension** dropdown list (**1**), select **Adobe Analytics**.
@@ -140,7 +140,7 @@ The collectPII API for Analytics does not send events to the Edge Network by def
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/analytics-rule-3.png" alt="Analytics rule 3" width="1100"/>  
 
-#### Save the rule and rebuild your property <!-- omit in toc -->
+#### Save the rule and rebuild your property<!-- omit in toc -->
 1. After you complete your configuration, verify that your rule looks like the following:
 2. Select **Save** (**1**).
 
@@ -187,13 +187,13 @@ To:
 
 With the block uncommented, you should see a blue ribbon appear at the top of the code view window, with text like: "Gradle files have changed since last project sync. A project sync may be necessary for the IDE to work properly."
 
-1. Click ***Sync Now***.
+1. Click **Sync Now**.
 
 Gradle will use the configuration settings we just activated to install all of the Edge Bridge extensions we want for our tutorial app, and allow us to use their features within the app's code.
 
 > **Warning**  
 > After this step, there are no Adobe Experience Cloud Solution extensions in the app. At this point, the import and registration for the Identity extension can also be removed since the Identity for Edge Network extension takes care of the identity functionality for the Edge extensions.
-> If your application still uses Adobe Experience Cloud Solution extensions, such as Adobe Target, Adobe Campaign, etc. (find the full list [here](https://aep-sdks.gitbook.io/docs/)) you should ignore the steps below for removing AEPIdentity and continue to use the extension.
+> If your application still uses Adobe Experience Cloud Solution extensions, such as Adobe Target, Adobe Campaign, etc. (find the full list [here](https://developer.adobe.com/client-sdks/documentation/)) you should ignore the steps below for removing Identity and continue to use the extension.
 
 ### 3. Update tutorial app code to enable Edge Bridge functionality
 There is one file that needs to be updated to enable the Edge Bridge extension:
@@ -201,9 +201,9 @@ There is one file that needs to be updated to enable the Edge Bridge extension:
 1. Click dropdown chevrons to expand the folders: **java** -> **com.adobe.marketing.mobile** (the first one which should not be highlighted in green) -> **tutorial**.
 2. Double click to open the **MainApp** file, which should be under the **tutorial** folder.
 3. First update the `ENVIRONMENT_FILE_ID` value to the mobile property ID published in the first section.
-   - See how to get your mobile property ID in the instructions for [getting the mobile property ID](https://github.com/adobe/aepsdk-edge-ios/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#getting-the-mobile-property-id-).
+   - See how to get your mobile property ID in the instructions for [getting the mobile property ID](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#getting-the-mobile-property-id).
 
-#### Add the Edge Bridge extension <!-- omit in toc -->
+#### Add the Edge Bridge extension<!-- omit in toc -->
 Inside you will see code blocks for this tutorial that are greyed out, because they are commented out. They are marked by the header and footer `Edge Bridge Tutorial - code section n/m` (where `n` is the current section and `m` is the total number of sections in the file).
 
 To uncomment the section and activate the code, simply add a forward slash at the front of the header:
@@ -216,8 +216,8 @@ To:
 ```
 Find the next `Edge Bridge Tutorial - code section (2/2)` and uncomment by adding a forward slash to register the Edge Bridge extension with the Mobile SDK.
 
-#### Remove Analytics and Identity <!-- omit in toc -->
-Inside you will see code blocks for this tutorial marked by a header and footer `EdgeBridge Tutorial - remove section (n/m)` (where `n` is the current section and `m` is the total number of sections in the file).
+#### Remove Analytics and Identity<!-- omit in toc -->
+Inside you will see code blocks for this tutorial marked by a header and footer `Edge Bridge Tutorial - remove section (n/m)` (where `n` is the current section and `m` is the total number of sections in the file).
 
 Simply delete everything between the header and footer.
 
@@ -225,7 +225,7 @@ The first `Edge Bridge Tutorial - remove section (3/4)`, removes the import stat
 
 For details on the various Edge extensions used, see the [table of related projects](../../README.md#related-projects).
 
-### 4. Run app   
+### 4. Run app
 In Android Studio
 1. Set the app target (1) to **app** (if not already).
 2. Choose which destination device (2) to run it on.
@@ -238,21 +238,21 @@ You should see your application running on the device you selected, with logs be
 > View -> Tool Windows -> Logcat
 
 
-### 5. `trackAction`/`trackState` implementation examples   
+### 5. `trackAction`/`trackState` implementation examples
 With Edge Bridge extension successfully installed and registered, you can make the regular Analytics `trackAction` and `trackState` calls, which will be captured by Edge Bridge extension and sent to the Edge Network.
 
 Check `ContentView.swift` for implementation examples of both APIs. You can see the data payloads that are to be sent with the calls.
 
 ## Initial validation with Assurance
-Assurance is the AEP tool for inspecting all events that Adobe extensions send out, in real time. It will allow us to see the flow of events, including the EdgeBridge conversion of `trackAction`/`trackState`.
+Assurance is the Adobe Experience Platform tool for inspecting all events that Adobe extensions send out, in real time. It will allow us to see the flow of events, including the Edge Bridge conversion of `trackAction`/`trackState`.
 
-### 1. Set up the Assurance session 
-To create a new Assurance session and connect to it, see the instructions on [setting up an Assurance session](https://github.com/adobe/aepsdk-edge-ios/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#1-set-up-the-assurance-session), using the base URL value:
+### 1. Set up the Assurance session
+To create a new Assurance session and connect to it, see the instructions on [setting up an Assurance session](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#1-set-up-the-assurance-session), using the base URL value:
 ```
 edgebridgetutorialapp://main
 ```
 
-### 2. Connect the app to the Assurance session  
+### 2. Connect the app to the Assurance session
 To connect to Assurance, we will use the session link method:
 
 1. Copy the session link; you can click the icon of a double overlapping box to the right of the link to copy it.
@@ -270,9 +270,9 @@ To connect to Assurance, we will use the session link method:
 <img src="../assets/edge-bridge-tutorial/assurance-validation/android-app-assurance-pin.png" alt="Android Assurance PIN" width="400"/>
 
 
-### 3. Event transactions view - check for EdgeBridge events  
-#### `trackAction`/`trackState` events <!-- omit in toc -->
-In order to see EdgeBridge events, in the connected app instance:
+### 3. Event transactions view - check for Edge Bridge events
+#### `trackAction`/`trackState` events<!-- omit in toc -->
+In order to see Edge Bridge events, in the connected app instance:
 1. Trigger a `trackAction` and/or `trackState` within the app which the Edge Bridge extension will convert into Edge events. This event will be captured by the Assurance extension and shown in the web session viewer.
 
 <img src="../assets/edge-bridge-tutorial/assurance-validation/android-app-track-buttons.png" alt="Simulator track buttons" width="400"/>
@@ -296,7 +296,7 @@ The top level EventType is converted from a `generic.track` to `edge` (that is, 
 > **Note**
 > The two new top level properties `xdm` and `data` are standard Edge event properties that are part of the Edge platform's XDM schema-based system for event data organization that enables powerful, customizable data processing. However, because the `contextdata` is not yet mapped to an XDM schema, it is not in a usable form for the Edge platform. We will solve this issue by mapping the event data to an XDM schema in the next section.
 
-#### Trigger rule-based `trackAction` events <!-- omit in toc -->
+#### Trigger rule-based `trackAction` events<!-- omit in toc -->
 Rules-based trackAction/trackState events are also converted to Edge events by the Edge Bridge extension. Select the **Trigger Rule** button (**1**) to trigger a rule that creates a trackAction event.
 
 <img src="../assets/edge-bridge-tutorial/assurance-validation/android-app-trigger-rule-button.png" alt="Simulator trigger rule button" width="400"/>

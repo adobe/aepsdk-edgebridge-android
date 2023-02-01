@@ -24,7 +24,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import androidx.test.ext.junit.runners.AndroidJUnit4;
-import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.Edge;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.edge.identity.Identity;
@@ -34,6 +33,7 @@ import com.adobe.marketing.mobile.util.TestableNetworkRequest;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -67,18 +67,10 @@ public class EdgeBridgeFunctionalTests {
 		};
 		MobileCore.updateConfiguration(config);
 
-		EdgeBridge.registerExtension();
-		Edge.registerExtension();
-		Identity.registerExtension();
-
 		final CountDownLatch latch = new CountDownLatch(1);
-		MobileCore.start(
-			new AdobeCallback() {
-				@Override
-				public void call(Object o) {
-					latch.countDown();
-				}
-			}
+		MobileCore.registerExtensions(
+			Arrays.asList(Edge.EXTENSION, Identity.EXTENSION, EdgeBridge.EXTENSION),
+			o -> latch.countDown()
 		);
 
 		latch.await();

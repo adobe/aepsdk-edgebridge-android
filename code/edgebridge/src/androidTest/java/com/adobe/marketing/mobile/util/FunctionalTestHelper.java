@@ -26,6 +26,7 @@ import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.MobileCoreHelper;
 import com.adobe.marketing.mobile.services.HttpConnecting;
 import com.adobe.marketing.mobile.services.HttpMethod;
+import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.services.ServiceProvider;
 import com.adobe.marketing.mobile.services.ServiceProviderHelper;
 import java.io.BufferedReader;
@@ -46,7 +47,8 @@ import org.junit.runners.model.Statement;
 
 public class FunctionalTestHelper {
 
-	private static final String TAG = "FunctionalTestHelper";
+	private static final String LOG_TAG = "FunctionalTestUtils";
+	private static final String LOG_SOURCE = "FunctionalTestHelper";
 
 	private static final FunctionalTestNetworkService testNetworkService = new FunctionalTestNetworkService();
 	private static Application defaultApplication;
@@ -80,6 +82,8 @@ public class FunctionalTestHelper {
 	 */
 	public static class SetupCoreRule implements TestRule {
 
+		private final String LOG_SOURCE = "SetupCoreRule";
+
 		@Override
 		public Statement apply(final Statement base, final Description description) {
 			return new Statement() {
@@ -90,30 +94,25 @@ public class FunctionalTestHelper {
 						defaultApplication = Instrumentation.newApplication(CustomApplication.class, context);
 					}
 
-					MobileCoreHelper.setCore(null);
+					MobileCoreHelper.resetSDK();
 					ServiceProvider.getInstance().setNetworkService(testNetworkService);
 					MobileCore.setLogLevel(LoggingMode.VERBOSE);
 					MobileCore.setApplication(defaultApplication);
 					clearAllDatastores();
-					MobileCore.log(LoggingMode.DEBUG, "SetupCoreRule", "Execute '" + description.getMethodName() + "'");
+					Log.debug(LOG_TAG, LOG_SOURCE, "Execute '" + description.getMethodName() + "'");
 
 					try {
 						base.evaluate();
 					} catch (Throwable e) {
-						MobileCore.log(LoggingMode.DEBUG, "SetupCoreRule", "Wait after test failure.");
+						Log.debug(LOG_TAG, LOG_SOURCE, "Wait after test failure.");
 						throw e; // rethrow test failure
 					} finally {
 						// After test execution
-						MobileCore.log(
-							LoggingMode.DEBUG,
-							"SetupCoreRule",
-							"Finished '" + description.getMethodName() + "'"
-						);
+						Log.debug(LOG_TAG, LOG_SOURCE, "Finished '" + description.getMethodName() + "'");
 						waitForThreads(5000); // wait to allow thread to run after test execution
-						MobileCoreHelper.shutdownCore();
-						MobileCoreHelper.setCore(null);
+						MobileCoreHelper.resetSDK();
 						resetTestExpectations();
-						resetServiceProvider(defaultApplication);
+						resetServiceProvider();
 					}
 				}
 			};
@@ -189,16 +188,12 @@ public class FunctionalTestHelper {
 		Set<Thread> threadSet = getEligibleThreads();
 
 		while (threadSet.size() > 0 && ((System.currentTimeMillis() - startTime) < timeoutTestMillis)) {
-			MobileCore.log(
-				LoggingMode.DEBUG,
-				TAG,
-				"waitForThreads - Still waiting for " + threadSet.size() + " thread(s)"
-			);
+			Log.debug(LOG_TAG, LOG_SOURCE, "waitForThreads - Still waiting for " + threadSet.size() + " thread(s)");
 
 			for (Thread t : threadSet) {
-				MobileCore.log(
-					LoggingMode.DEBUG,
-					TAG,
+				Log.debug(
+					LOG_TAG,
+					LOG_SOURCE,
 					"waitForThreads - Waiting for thread " + t.getName() + " (" + t.getId() + ")"
 				);
 				boolean done = false;
@@ -221,15 +216,15 @@ public class FunctionalTestHelper {
 				}
 
 				if (timedOut) {
-					MobileCore.log(
-						LoggingMode.DEBUG,
-						TAG,
+					Log.debug(
+						LOG_TAG,
+						LOG_SOURCE,
 						"waitForThreads - Timeout out waiting for thread " + t.getName() + " (" + t.getId() + ")"
 					);
 				} else {
-					MobileCore.log(
-						LoggingMode.DEBUG,
-						TAG,
+					Log.debug(
+						LOG_TAG,
+						LOG_SOURCE,
 						"waitForThreads - Done waiting for thread " + t.getName() + " (" + t.getId() + ")"
 					);
 				}
@@ -238,7 +233,7 @@ public class FunctionalTestHelper {
 			threadSet = getEligibleThreads();
 		}
 
-		MobileCore.log(LoggingMode.DEBUG, TAG, "waitForThreads - All known SDK threads are terminated.");
+		Log.debug(LOG_TAG, LOG_SOURCE, "waitForThreads - All known SDK threads are terminated.");
 	}
 
 	/**
@@ -288,11 +283,7 @@ public class FunctionalTestHelper {
 	 * Resets the network and event test expectations.
 	 */
 	public static void resetTestExpectations() {
-		MobileCore.log(
-			LoggingMode.DEBUG,
-			TAG,
-			"Resetting functional test expectations for events and network requests"
-		);
+		Log.debug(LOG_TAG, LOG_SOURCE, "Resetting functional test expectations for events and network requests");
 		testNetworkService.reset();
 	}
 
@@ -527,14 +518,11 @@ public class FunctionalTestHelper {
 
 	/**
 	 * Reset the {@link ServiceProvider} by clearing all files under the application cache folder,
-	 * instantiate new instances of each service provider, and setting the context
-	 * in {@link ServiceProvider#setContext(Context)}.
-	 *
-	 * @param context the application context
+	 * instantiate new instances of each service provider, and reset the app instance
 	 */
-	private static void resetServiceProvider(final Context context) {
+	private static void resetServiceProvider() {
 		ServiceProviderHelper.cleanCacheDir();
-		ServiceProviderHelper.resetServiceProvider(context);
+		ServiceProviderHelper.resetServiceProvider();
 	}
 
 	/**
