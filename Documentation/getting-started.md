@@ -2,41 +2,35 @@
 
 The Adobe Experience Platform Edge Bridge mobile extension provides seamless routing of data to the Experience Platform Edge Network for existing Adobe Analytics mobile SDK implementations. Applications using the `MobileCore.trackAction` and/or `MobileCore.trackState` APIs to send data to Adobe Analytics can use Edge Bridge to automatically route those events to the Edge Network, which makes the data available for mapping to an Experience Data Model (XDM) schema using the [Data Prep for Data Collection](https://experienceleague.adobe.com/docs/experience-platform/data-prep/home.html).
 
-> **Note**
-> It is recommended to send well formatted XDM data directly from an application using the `Edge.sendEvent` API instead of using the `MobileCore.trackState` and `MobileCore.trackAction` APIs with the Edge Bridge extension. However, in cases where it is not feasible to refactor the application, the Edge Bridge extension is available as a drop-in solution to send `trackState` and `trackAction` data to the Edge Network.
->
->  For new implementations of the SDK, it it highly recommended to send XDM data directly using the `Edge.sendEvent` API.
->
+> **Note**  
+> For new implementations of the Adobe Experience Platform SDK, it's highly recommended to send event data that is already XDM formatted using the `Edge.sendEvent` API instead of converting events from the `MobileCore.trackState` and `MobileCore.trackAction` APIs using Edge Bridge. 
+> 
+> However, in cases where it is not easy to refactor an existing application, the Edge Bridge extension exists as a drop-in solution to send converted `trackState` and `trackAction` events to the Edge Network.
 
-## Before starting
+## Add Edge Bridge to your app
 
-The Edge Bridge extension has the following peer dependencies, which must be installed prior to installing the Edge Bridge Extension:
+Edge Bridge has the following peer dependencies, which must be installed with it:
 - [Mobile Core](https://github.com/adobe/aepsdk-core-android#readme) (installed by default)
 - [Edge Network](https://github.com/adobe/aepsdk-edge-android#readme)
 - [Identity for Edge Network](https://github.com/adobe/aepsdk-edgeidentity-android#readme) (a dependency for Edge Network)
 
-## Add the AEP Edge Bridge extension to an app
-
-### Download and import the Edge Bridge extension
-
-> **Note**
-> The AEP Edge Bridge extension does not have a corresponding extension in the Data Collection UI. No changes to a Data Collection mobile property are required to use the AEP Edge Bridge extension.
-
-### Install extension
-
-### Java
+> **Note**  
+> Experience Platform Edge Bridge does not have a corresponding extension card in the Data Collection UI; no changes to a Data Collection mobile property are required to use Edge Bridge.
 
 1. Add the Mobile Core and Edge extensions to your project using the app's Gradle file.
 
-```java
+```gradle
 implementation 'com.adobe.marketing.mobile:core:2.+'
 implementation 'com.adobe.marketing.mobile:edge:2.+'
 implementation 'com.adobe.marketing.mobile:edgebridge:2.+'
 implementation 'com.adobe.marketing.mobile:edgeidentity:2.+'
 ```
 
-2. Import the Mobile Core and Edge extensions in your Application class.
+> **Warning**  
+> Using dynamic dependency versions is not recommended for production apps. Refer to this [page](https://github.com/adobe/aepsdk-core-android/blob/main/Documentation/MobileCore/gradle-dependencies.md) for managing Gradle dependencies.
 
+2. Import the libraries:
+#### Java
 ```java
 import android.app.Application;
 import com.adobe.marketing.mobile.Edge;
@@ -45,10 +39,22 @@ import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.edge.bridge.EdgeBridge;
 import com.adobe.marketing.mobile.edge.identity.Identity;
 import com.adobe.marketing.mobile.services.Log;
-import java.util.Arrays; // Only required for Java example
+import java.util.Arrays; 
 ```
 
-3. Register the Edge Bridge and Identity for Edge Extension with MobileCore:
+#### Kotlin
+```kotlin
+import android.app.Application
+import com.adobe.marketing.mobile.Edge
+import com.adobe.marketing.mobile.LoggingMode
+import com.adobe.marketing.mobile.MobileCore
+import com.adobe.marketing.mobile.edge.bridge.EdgeBridge
+import com.adobe.marketing.mobile.edge.identity.Identity
+import com.adobe.marketing.mobile.services.Log
+```
+
+3. Register the Edge Bridge and Edge extensions with Mobile Core:
+
 #### Java
 ```java
 public class MobileApp extends Application {
@@ -60,17 +66,17 @@ public class MobileApp extends Application {
   	super.onCreate();
   	MobileCore.setApplication(this);
 
-  	MobileCore.setLogLevel(LoggingMode.VERBOSE);
   	MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID);
 
-  	// Register Adobe extensions
+  	// Register Adobe Experience Platform extensions
   	MobileCore.registerExtensions(
   		Arrays.asList(Edge.EXTENSION, EdgeBridge.EXTENSION, Identity.EXTENSION),
-  		o -> Log.debug("MobileApp", "MobileApp", "Mobile SDK was initialized")
+  		o -> Log.debug("MobileApp", "MobileApp", "Adobe Experience Platform Mobile SDK was initialized")
   	);
   }
 }
 ```
+
 #### Kotlin
 ```kotlin
 class MobileApp : Application() {
@@ -81,14 +87,13 @@ class MobileApp : Application() {
       super.onCreate()
 
       MobileCore.setApplication(this)
-      MobileCore.setLogLevel(LoggingMode.VERBOSE)
       MobileCore.configureWithAppID(ENVIRONMENT_FILE_ID)
 
-      // Register Adobe extensions
+      // Register Adobe Experience Platform extensions
       MobileCore.registerExtensions(
           arrayListOf(Edge.EXTENSION, EdgeBridge.EXTENSION, Identity.EXTENSION)
       ) {
-          Log.debug("MobileApp", "MobileApp", "Mobile SDK was initialized.")
+          Log.debug("MobileApp", "MobileApp", "Adobe Experience Platform Mobile SDK was initialized.")
       }
   }
 }
