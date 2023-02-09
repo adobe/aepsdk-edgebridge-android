@@ -26,11 +26,6 @@ String extensionVersion = EdgeBridge.extensionVersion();
 
 #### Kotlin
 
-##### Syntax
-```kotlin
-fun extensionVersion(): String
-```
-
 ##### Examples
 ```kotlin
 val extensionVersion = EdgeBridge.extensionVersion()
@@ -61,11 +56,6 @@ EdgeBridge.registerExtension();
 ```
 
 #### Kotlin
-
-##### Syntax
-```kotlin
-fun registerExtension()
-```
 
 ##### Examples
 ```kotlin
