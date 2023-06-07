@@ -81,7 +81,7 @@ class EdgeBridgeExtension extends Extension {
 			return;
 		}
 
-		dispatchTrackRequest(eventData, event.getTimestamp());
+		dispatchTrackRequest(eventData, event.getTimestamp(), event);
 	}
 
 	/**
@@ -149,15 +149,16 @@ class EdgeBridgeExtension extends Extension {
 			return;
 		}
 
-		dispatchTrackRequest(detail, event.getTimestamp());
+		dispatchTrackRequest(detail, event.getTimestamp(), event);
 	}
 
 	/**
 	 * Helper to create and dispatch an experience event.
 	 * @param data map containing free-form data to send to Edge Network
 	 * @param timestamp timestamp of Event
+	 * @param event the parent event that triggered this request
 	 */
-	private void dispatchTrackRequest(final Map<String, Object> data, final long timestamp) {
+	private void dispatchTrackRequest(final Map<String, Object> data, final long timestamp, Event event) {
 		Map<String, Object> xdmData = new HashMap<>();
 		xdmData.put("eventType", EdgeBridgeConstants.JsonValues.EVENT_TYPE);
 		xdmData.put("timestamp", TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(timestamp)));
@@ -166,15 +167,16 @@ class EdgeBridgeExtension extends Extension {
 		eventData.put("xdm", xdmData);
 		eventData.put("data", data);
 
-		final Event event = new Event.Builder(
+		final Event xdmEvent = new Event.Builder(
 			EdgeBridgeConstants.EventNames.EDGE_BRIDGE_REQUEST,
 			EventType.EDGE,
 			EventSource.REQUEST_CONTENT
 		)
+			.chainToParentEvent(event)
 			.setEventData(eventData)
 			.build();
 
-		getApi().dispatch(event);
+		getApi().dispatch(xdmEvent);
 	}
 
 	private boolean isNullOrEmpty(final Map map) {
