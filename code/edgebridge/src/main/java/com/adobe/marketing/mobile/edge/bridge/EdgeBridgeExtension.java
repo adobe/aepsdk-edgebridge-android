@@ -156,9 +156,9 @@ class EdgeBridgeExtension extends Extension {
 	 * Helper to create and dispatch an experience event.
 	 * @param data map containing free-form data to send to Edge Network
 	 * @param timestamp timestamp of Event
-	 * @param event the parent event that triggered this request
+	 * @param parentEvent the parent event that triggered this request
 	 */
-	private void dispatchTrackRequest(final Map<String, Object> data, final long timestamp, Event event) {
+	private void dispatchTrackRequest(final Map<String, Object> data, final long timestamp, final Event parentEvent) {
 		Map<String, Object> xdmData = new HashMap<>();
 		xdmData.put("eventType", EdgeBridgeConstants.JsonValues.EVENT_TYPE);
 		xdmData.put("timestamp", TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(timestamp)));
@@ -167,16 +167,16 @@ class EdgeBridgeExtension extends Extension {
 		eventData.put("xdm", xdmData);
 		eventData.put("data", data);
 
-		final Event xdmEvent = new Event.Builder(
+		final Event event = new Event.Builder(
 			EdgeBridgeConstants.EventNames.EDGE_BRIDGE_REQUEST,
 			EventType.EDGE,
 			EventSource.REQUEST_CONTENT
 		)
-			.chainToParentEvent(event)
+			.chainToParentEvent(parentEvent)
 			.setEventData(eventData)
 			.build();
 
-		getApi().dispatch(xdmEvent);
+		getApi().dispatch(event);
 	}
 
 	private boolean isNullOrEmpty(final Map map) {
