@@ -155,7 +155,7 @@ class EdgeBridgeExtension extends Extension {
 	/**
 	 * Helper to create and dispatch an experience event.
 	 * @param data map containing free-form data to send to Edge Network
-	 * @param parentEvent the parent event that triggered this request
+	 * @param parentEvent the triggering parent event used for event chaining; its timestamp is set as xdm.timestamp
 	 */
 	private void dispatchTrackRequest(final Map<String, Object> data, final Event parentEvent) {
 		Map<String, Object> xdmData = new HashMap<>();
