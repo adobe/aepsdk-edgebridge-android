@@ -200,6 +200,7 @@ public class EdgeBridgeExtensionTests {
 		};
 
 		assertEquals(expectedData, responseEvent.getEventData());
+		assertEquals(event.getUniqueIdentifier(), responseEvent.getParentID());
 	}
 
 	@Test
@@ -314,6 +315,7 @@ public class EdgeBridgeExtensionTests {
 		};
 
 		assertEquals(expectedData, responseEvent.getEventData());
+		assertEquals(event.getUniqueIdentifier(), responseEvent.getParentID());
 	}
 
 	@Test
