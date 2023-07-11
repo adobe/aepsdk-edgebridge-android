@@ -76,7 +76,7 @@ ci-publish-main: clean build-release
 # usage: update-version VERSION=9.9.9 
 update-version:
 	@echo "Updating version to $(VERSION), Core version to $(CORE-VERSION)"
-	sed -i '' "s/\(EXTENSION_VERSION = \"\)[0-9]*\.[0-9]*\.[0-9]/$(VERSION)/g" ./code/edgebridge/src/main/java/com/adobe/marketing/mobile/edge/bridge/EdgeBridgeConstants.java
+	sed -i '' "s/[0-9]*\.[0-9]*\.[0-9]/$(VERSION)/g" ./code/edgebridge/src/main/java/com/adobe/marketing/mobile/edge/bridge/EdgeBridgeConstants.java
 	sed -i '' "s/\(moduleVersion=\)[0-9]*\.[0-9]*\.[0-9]/\1$(VERSION)/g" ./code/gradle.properties
 	@if [ -z "$(CORE-VERSION)" ]; then \
 		echo "CORE-VERSION was not provided, skipping"; \
