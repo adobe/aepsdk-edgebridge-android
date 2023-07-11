@@ -113,7 +113,7 @@ public class EdgeBridgeExtensionTests {
 		String extensionVersion = extension.getVersion();
 		assertEquals(
 			"getVersion should return the correct extension version",
-			EdgeBridgeTestConstants.EXTENSION_VERSION,
+			EdgeBridgeConstants.EXTENSION_VERSION,
 			extensionVersion
 		);
 	}
