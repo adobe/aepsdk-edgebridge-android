@@ -113,7 +113,7 @@ public class EdgeBridgeExtensionTests {
 		String extensionVersion = extension.getVersion();
 		assertEquals(
 			"getVersion should return the correct extension version",
-			EdgeBridgeTestConstants.EXTENSION_VERSION,
+			EdgeBridgeConstants.EXTENSION_VERSION,
 			extensionVersion
 		);
 	}
@@ -200,6 +200,7 @@ public class EdgeBridgeExtensionTests {
 		};
 
 		assertEquals(expectedData, responseEvent.getEventData());
+		assertEquals(event.getUniqueIdentifier(), responseEvent.getParentID());
 	}
 
 	@Test
@@ -314,6 +315,7 @@ public class EdgeBridgeExtensionTests {
 		};
 
 		assertEquals(expectedData, responseEvent.getEventData());
+		assertEquals(event.getUniqueIdentifier(), responseEvent.getParentID());
 	}
 
 	@Test
