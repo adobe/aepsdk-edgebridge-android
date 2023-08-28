@@ -25,6 +25,6 @@ ext {
     jacocoVersion = "0.8.8"
 }
 
-task clean(type: Delete) {
+tasks.register('clean', Delete) {
     delete rootProject.buildDir
 }
