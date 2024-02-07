@@ -1,6 +1,8 @@
 version: 2.1
 orbs:
-  android: circleci/android@1.0
+  # Use the circleci android orb version that supports OpenJDK17 required by AGP 8.2+
+  android: circleci/android@2.4.0
+  codecov: codecov/codecov@4.0.1
 
 # Workflows orchestrate a set of jobs to be run;
 workflows:
@@ -17,101 +19,94 @@ workflows:
  
 jobs:
   validate-code:
-    working_directory: ~/code
     docker:
-      - image: circleci/android:api-29-node
-    environment:
-      JVM_OPTS: -Xmx3200m
+      - image: cimg/android:2024.01
     steps:
       - checkout
 
       - run:
-          name: Check Code Format
-          command: make format-check
+          name: Check code format
+          command: make checkformat
+      
+      - run:
+          name: Run lint
+          command: make lint
 
   build-and-unit-test:
-    working_directory: ~/code
     docker:
-      - image: circleci/android:api-29-node
-    environment:
-      JVM_OPTS: -Xmx3200m
+      - image: cimg/android:2024.01
     steps:
       - checkout
 
       - run:
-          name: Javadoc
-          command: make ci-javadoc
-      - store_artifacts:
-          path: ci/javadoc/build/reports
-
-      - run:
-          name: Build
-          command: make ci-build
-
-      - run:
-          name: Build App
-          command: make ci-build-app
-
-      - run:
-          name: UnitTests
-          command: make ci-unit-test
-
-      # code coverage
-      - run:
-          name: Upload Code Coverage Report
+          name: Build java doc
           command: |
-            curl -s https://codecov.io/bash > codecov;
-            VERSION=$(grep 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
-            SHAVERSION=$(shasum -v);
-            echo "Using CodeCov version '$VERSION'"
-            echo "Using shasum '$SHAVERSION'"
-            for i in 1 256 512
-            do
-              shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") ||
-              shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM" | grep -w "codecov")
-            done
-            bash ./codecov -v -X s3 -c -D "./ci/unit-test/build/reports" -F unit-tests
+            make javadoc
 
+      # Save Javadoc results
       - store_artifacts:
-          path: ci/unit-test/build/reports
+          path: code/edgebridge/build/docs/javadoc
+
+      - run:
+          name: Assemble phone
+          command: make ci-assemble-phone
+
+      - run:
+          name: Build test app
+          command: make assemble-app
+
+      # - run:
+      #     name: Run unit tests
+      #     command: make unit-test
+
+      - run:
+          name: Run unit tests and create code coverage report
+          command: |
+            make unit-test-coverage
 
       - store_test_results:
-          path: ci/unit-test/build/test-results
+          path: code/edgebridge/build/test-results/testPhoneDebugUnitTest
+
+      # Upload code coverage report to Codecov
+      - codecov/upload:
+          file: code/edgebridge/build/reports/coverage/test/phone/debug/report.xml
+          flags: unit-tests
 
   functional-test:
     executor:
       name: android/android-machine
       resource-class: large
+      tag: 2024.01.1
     steps:
       - checkout
-      - android/start-emulator-and-run-tests:
-          #   It should match the name seen in the "sdkmanager --list" output
+      - android/create-avd:
+          avd-name: myavd
+          install: true
           system-image: system-images;android-29;default;x86
-          #   The command to be run, while waiting for emulator startup
-          post-emulator-launch-assemble-command: make ci-build
-          #   The test command
-          test-command: make ci-functional-test
-      
-      # code coverage
+
+      - android/start-emulator:
+          avd-name: myavd
+          no-window: true
+          post-emulator-launch-assemble-command: ""
+          restore-gradle-cache-prefix: v1a
+
       - run:
-          name: Upload Code Coverage Report
+          name: Run Functional tests
           command: |
-            curl -s https://codecov.io/bash > codecov;
-            VERSION=$(grep 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
-            SHAVERSION=$(shasum -v);
-            echo "Using CodeCov version '$VERSION'"
-            echo "Using shasum '$SHAVERSION'"
-            for i in 1 256 512
-            do
-              shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") ||
-              shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM" | grep -w "codecov")
-            done
-            bash ./codecov -v -X s3 -c -D "./ci/functional-test/build/reports" -F functional-tests
+            make functional-test-coverage
+      
+      # Upload code coverage report to Codecov
+      - codecov/upload:
+          file: code/edgebridge/build/reports/coverage/androidTest/phone/connected/debug/report.xml
+          flags: functional-tests
+
+      - android/save-gradle-cache:
+          cache-prefix: v1a
 
       - store_artifacts:
-          path: ci/functional-test/build/reports
+          path: code/edgebridge/build/reports/androidTests
 
       - store_test_results:
-          path: ci/functional-test/build/outputs/androidTest-results
+          path: code/edgebridge/build/outputs/androidTest-results
           
     
