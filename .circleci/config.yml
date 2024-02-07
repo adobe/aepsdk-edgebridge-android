@@ -25,6 +25,7 @@ jobs:
     steps:
       - checkout
 
+      # TODO: Re-enable these steps once formatting and linting issues are resolved
       # - run:
       #     name: Check code format
       #     command: make checkformat
@@ -41,7 +42,7 @@ jobs:
       - checkout
 
       - run:
-          name: Build java doc
+          name: Build Javadoc
           command: |
             make javadoc
 
@@ -56,10 +57,6 @@ jobs:
       - run:
           name: Build test app
           command: make assemble-app
-
-      # - run:
-      #     name: Run unit tests
-      #     command: make unit-test
 
       - run:
           name: Run unit tests and create code coverage report
@@ -81,6 +78,7 @@ jobs:
       tag: 2024.01.1
     steps:
       - checkout
+
       - android/create-avd:
           avd-name: myavd
           install: true
