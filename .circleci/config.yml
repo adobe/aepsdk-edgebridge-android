@@ -51,7 +51,7 @@ jobs:
 
       - run:
           name: Assemble phone
-          command: make ci-assemble-phone
+          command: make assemble-phone
 
       - run:
           name: Build test app
