@@ -58,7 +58,6 @@ jobs:
       - run:
           name: Build Javadoc
           command: make javadoc
-            
 
       # Save Javadoc results
       - store_artifacts:
@@ -76,10 +75,9 @@ jobs:
           name: Build test app
           command: make assemble-app
 
-      - run:
-          name: Run unit tests and create code coverage report
-          command: |
-            make unit-test-coverage
+      # Run unit tests and create code coverage report, with auto retry from run-tests command
+      - android/run-tests:
+          test-command: make unit-test-coverage
 
       - store_test_results:
           path: code/edgebridge/build/test-results/testPhoneDebugUnitTest
