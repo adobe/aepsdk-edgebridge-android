@@ -24,16 +24,15 @@ dependencies {
     implementation("com.adobe.marketing.mobile:core:$mavenCoreVersion")
     implementation("androidx.annotation:annotation:$androidxAnnotationVersion")
 
-    testImplementation(BuildConstants.Dependencies.ANDROIDX_TEST_EXT_JUNIT)
-    testImplementation(BuildConstants.Dependencies.MOCKITO_CORE)
-    testImplementation(BuildConstants.Dependencies.MOCKITO_INLINE)
+    // testImplementation dependencies provided by aep-library:
+    // MOCKITO_CORE, MOCKITO_INLINE
 
     // TODO: Use 3.x versions for testing
     // TODO: change these to set version numbers for reliable testing
     androidTestImplementation("com.adobe.marketing.mobile:edge:2.+")
     androidTestImplementation("com.adobe.marketing.mobile:edgeidentity:2.+")
 
-    androidTestImplementation(BuildConstants.Dependencies.ANDROIDX_TEST_EXT_JUNIT)
-    androidTestImplementation(BuildConstants.Dependencies.ESPRESSO_CORE)
+    // androidTestImplementation dependencies provided by aep-library:
+    // ANDROIDX_TEST_EXT_JUNIT, ESPRESSO_CORE
     androidTestImplementation("com.fasterxml.jackson.core:jackson-databind:2.12.7")
 }
