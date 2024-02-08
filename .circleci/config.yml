@@ -19,10 +19,9 @@ workflows:
  
 jobs:
   validate-code:
-    executor:
-      name: android/android-machine
-      resource-class: large
-      tag: 2024.01.1
+    docker:
+      - image: cimg/android:2024.01-node
+    resource_class: medium
     steps:
       - checkout
 
@@ -36,10 +35,9 @@ jobs:
       #     command: make lint
 
   build-and-unit-test:
-    executor:
-      name: android/android-machine
-      resource-class: large
-      tag: 2024.01.1
+    docker:
+      - image: cimg/android:2024.01-node
+    resource_class: medium
     steps:
       - checkout
 
