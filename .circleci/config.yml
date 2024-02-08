@@ -26,6 +26,10 @@ jobs:
     steps:
       - checkout
 
+      - android/restore-gradle-cache
+
+      - android/restore-build-cache
+
       # TODO: Re-enable these steps once formatting and linting issues are resolved
       # - run:
       #     name: Check code format
@@ -35,6 +39,10 @@ jobs:
       #     name: Run lint
       #     command: make lint
 
+      - android/save-gradle-cache
+
+      - android/save-build-cache
+
   build-and-unit-test:
     executor:
       name: android/android-docker
@@ -42,6 +50,10 @@ jobs:
       tag: 2024.01.1
     steps:
       - checkout
+
+      - android/restore-gradle-cache
+
+      - android/restore-build-cache
 
       - run:
           name: Build Javadoc
@@ -72,6 +84,10 @@ jobs:
       - codecov/upload:
           file: code/edgebridge/build/reports/coverage/test/phone/debug/report.xml
           flags: unit-tests
+      
+      - android/save-gradle-cache
+
+      - android/save-build-cache
 
   functional-test:
     executor:
@@ -80,6 +96,8 @@ jobs:
       tag: 2024.01.1
     steps:
       - checkout
+
+      - android/restore-build-cache
 
       - android/create-avd:
           avd-name: myavd
