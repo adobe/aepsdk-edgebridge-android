@@ -108,7 +108,6 @@ jobs:
           avd-name: myavd
           no-window: true
           post-emulator-launch-assemble-command: ""
-          restore-gradle-cache-prefix: v1a
 
       - run:
           name: Run Functional tests
@@ -120,8 +119,7 @@ jobs:
           file: code/edgebridge/build/reports/coverage/androidTest/phone/connected/debug/report.xml
           flags: functional-tests
 
-      - android/save-gradle-cache:
-          cache-prefix: v1a
+      - android/save-gradle-cache
 
       - store_artifacts:
           path: code/edgebridge/build/reports/androidTests
