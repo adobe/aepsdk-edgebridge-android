@@ -27,13 +27,13 @@ jobs:
       - checkout
 
       # TODO: Re-enable these steps once formatting and linting issues are resolved
-      # - run:
-      #     name: Check code format
-      #     command: make checkformat
+      - run:
+          name: Check code format
+          command: make checkformat
       
-      # - run:
-      #     name: Run lint
-      #     command: make lint
+      - run:
+          name: Run lint
+          command: make lint
 
   build-and-unit-test:
     executor:
