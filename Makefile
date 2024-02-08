@@ -28,10 +28,6 @@ checkformat:
 lint:
 	(./code/gradlew -p code/$(EXTENSION-LIBRARY-FOLDER-NAME) lint)
 
-ci-assemble-phone:
-	(./code/gradlew -p code/$(EXTENSION-LIBRARY-FOLDER-NAME) assemblePhone)
-	(mv $(AAR_FILE_DIR)/$(EXTENSION-LIBRARY-FOLDER-NAME)-phone-release.aar  $(AAR_FILE_DIR)/$(MODULE_NAME)-release-$(LIB_VERSION).aar)
-
 assemble-app:
 	(./code/gradlew -p code/$(TEST-APP-FOLDER-NAME) assemble)
 
