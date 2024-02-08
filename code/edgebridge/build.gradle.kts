@@ -5,7 +5,6 @@ plugins {
 }
 
 val mavenCoreVersion: String by project
-val androidxAnnotationVersion: String by project
 
 aepLibrary {
     namespace = "com.adobe.marketing.mobile.edge.bridge"
@@ -23,7 +22,6 @@ dependencies {
     // TODO: Use 3.x versions for testing
     // TODO: Remove -SNAPSHOT suffix after Core 3.0.0 is published
     implementation("com.adobe.marketing.mobile:core:$mavenCoreVersion-SNAPSHOT")
-    implementation("androidx.annotation:annotation:$androidxAnnotationVersion")
 
     // testImplementation dependencies provided by aep-library:
     // MOCKITO_CORE, MOCKITO_INLINE
