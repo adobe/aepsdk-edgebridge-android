@@ -21,7 +21,8 @@ aepLibrary {
 
 dependencies {
     // TODO: Use 3.x versions for testing
-    implementation("com.adobe.marketing.mobile:core:$mavenCoreVersion")
+    // TODO: Remove -SNAPSHOT suffix after Core 3.0.0 is published
+    implementation("com.adobe.marketing.mobile:core:$mavenCoreVersion-SNAPSHOT")
     implementation("androidx.annotation:annotation:$androidxAnnotationVersion")
 
     // testImplementation dependencies provided by aep-library:
