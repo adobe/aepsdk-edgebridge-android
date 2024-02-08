@@ -10,5 +10,3 @@ buildscript {
         classpath("com.github.adobe:aepsdk-commons:ce2a07254d")
     }
 }
-
-// testing changing the signature
