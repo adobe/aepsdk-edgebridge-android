@@ -57,8 +57,8 @@ jobs:
 
       - run:
           name: Build Javadoc
-          command: |
-            make javadoc
+          command: make javadoc
+            
 
       # Save Javadoc results
       - store_artifacts:
@@ -67,6 +67,10 @@ jobs:
       - run:
           name: Assemble phone
           command: make assemble-phone
+
+      - run:
+          name: Assemble for Jitpack
+          command: make ci-publish-maven-local-jitpack
 
       - run:
           name: Build test app
