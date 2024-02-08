@@ -53,8 +53,7 @@ dependencies {
     implementation("com.adobe.marketing.mobile:edge:2.+")
     implementation("com.adobe.marketing.mobile:edgeidentity:2.+")
 
-    // implementation dependencies provided by aep-library:
-    // ANDROIDX_APPCOMPAT
+    implementation("androidx.appcompat:appcompat:1.4.1")
     implementation("com.google.android.material:material:1.6.0")
     implementation("androidx.constraintlayout:constraintlayout:2.1.3")
 }
