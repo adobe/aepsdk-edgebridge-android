@@ -9,8 +9,8 @@ plugins {
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin {
         target("src/*/java/**/*.kt")
-        ktlint("0.41.0")
-        licenseHeaderFile("../../config/formatter/adobe.header.txt")
+        ktlint(BuildConstants.Versions.KTLINT)
+        licenseHeader(BuildConstants.ADOBE_LICENSE_HEADER)
     }
 }
 
