@@ -30,18 +30,13 @@ jobs:
 
       - android/restore-build-cache
 
-      # TODO: Re-enable these steps once formatting and linting issues are resolved
-      # - run:
-      #     name: Check Format
-      #     command: make checkformat
+      - run:
+          name: Check code format
+          command: make checkformat
       
-      # - run:
-      #     name: Lint
-      #     command: make lint
-      
-      # Store Lint report 
-      - store_artifacts:
-          path: code/edgebridge/build/reports
+      - run:
+          name: Run lint
+          command: make lint
 
       - android/save-gradle-cache
 
