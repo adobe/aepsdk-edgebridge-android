@@ -15,6 +15,9 @@ checkformat:
 	(./code/gradlew -p code/$(EXTENSION-LIBRARY-FOLDER-NAME) spotlessCheck)
 	(./code/gradlew -p code/$(TEST-APP-FOLDER-NAME) spotlessCheck)
 
+format-license:
+	(./code/gradlew -p code licenseFormat)
+
 lint:
 	(./code/gradlew -p code/$(EXTENSION-LIBRARY-FOLDER-NAME) lint)
 
