@@ -1,3 +1,4 @@
+apply(plugin = "aep-license")
 buildscript {
     repositories {
         gradlePluginPortal()
@@ -7,6 +8,6 @@ buildscript {
         mavenLocal()
     }
     dependencies {
-        classpath("com.github.adobe:aepsdk-commons:9deb721db7")
+        classpath("com.github.adobe:aepsdk-commons:884c937705")
     }
 }
