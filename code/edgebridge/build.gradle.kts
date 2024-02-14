@@ -1,5 +1,3 @@
-import com.adobe.marketing.mobile.gradle.BuildConstants
-
 plugins {
     id("aep-library")
 }
