@@ -18,7 +18,7 @@ final class EdgeBridgeConstants {
 	static final String LOG_TAG = "EdgeBridge";
 	static final String EXTENSION_NAME = "com.adobe.edge.bridge";
 	static final String FRIENDLY_NAME = "Edge Bridge";
-	static final String EXTENSION_VERSION = "2.1.0";
+	static final String EXTENSION_VERSION = "3.0.0";
 
 	final class EventNames {
 

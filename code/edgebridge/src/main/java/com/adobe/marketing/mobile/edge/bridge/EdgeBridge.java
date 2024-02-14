@@ -12,11 +12,8 @@
 package com.adobe.marketing.mobile.edge.bridge;
 
 import androidx.annotation.NonNull;
-import com.adobe.marketing.mobile.AdobeCallback;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.MobileCore;
-import com.adobe.marketing.mobile.services.Log;
-import java.util.List;
 import java.util.Map;
 
 /**
@@ -42,32 +39,7 @@ public class EdgeBridge {
 	 * Returns the version of the Edge Bridge extension.
 	 * @return the version of the Edge Bridge extension
 	 */
-	@NonNull
-	public static String extensionVersion() {
+	@NonNull public static String extensionVersion() {
 		return EdgeBridgeConstants.EXTENSION_VERSION;
-	}
-
-	/**
-	 * Registers the Edge Bridge extension with the Mobile Core.
-	 * This method should be called before calling {@link MobileCore#start(AdobeCallback)}.
-	 *
-	 * @deprecated Use {@link MobileCore#registerExtensions(List, AdobeCallback)} with {@link EdgeBridge#EXTENSION} instead.
-	 */
-	@Deprecated
-	public static void registerExtension() {
-		MobileCore.registerExtension(
-			EdgeBridgeExtension.class,
-			extensionError -> {
-				if (extensionError == null) {
-					return;
-				}
-				Log.error(
-					EdgeBridgeConstants.LOG_TAG,
-					LOG_SOURCE,
-					"There was an error when registering the Edge Bridge extension: %s",
-					extensionError.getErrorName()
-				);
-			}
-		);
 	}
 }

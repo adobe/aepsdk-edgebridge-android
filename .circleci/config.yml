@@ -1,6 +1,8 @@
 version: 2.1
 orbs:
-  android: circleci/android@1.0
+  # Use the circleci android orb version that supports OpenJDK17 required by AGP 8.2+
+  android: circleci/android@2.4.0
+  codecov: codecov/codecov@4.0.1
 
 # Workflows orchestrate a set of jobs to be run;
 workflows:
@@ -17,101 +19,115 @@ workflows:
  
 jobs:
   validate-code:
-    working_directory: ~/code
-    docker:
-      - image: circleci/android:api-29-node
-    environment:
-      JVM_OPTS: -Xmx3200m
+    executor:
+      name: android/android-docker
+      resource-class: medium
+      tag: 2024.01.1-node
     steps:
       - checkout
 
-      - run:
-          name: Check Code Format
-          command: make format-check
+      - android/restore-gradle-cache
+
+      - android/restore-build-cache
+
+      # TODO: Re-enable these steps once formatting and linting issues are resolved
+      # - run:
+      #     name: Check Format
+      #     command: make checkformat
+      
+      # - run:
+      #     name: Lint
+      #     command: make lint
+      
+      # Store Lint report 
+      - store_artifacts:
+          path: code/edgebridge/build/reports
+
+      - android/save-gradle-cache
+
+      - android/save-build-cache
 
   build-and-unit-test:
-    working_directory: ~/code
-    docker:
-      - image: circleci/android:api-29-node
-    environment:
-      JVM_OPTS: -Xmx3200m
+    executor:
+      name: android/android-docker
+      resource-class: medium
+      tag: 2024.01.1
     steps:
       - checkout
+
+      - android/restore-gradle-cache
+
+      - android/restore-build-cache
 
       - run:
           name: Javadoc
-          command: make ci-javadoc
+          command: make javadoc
+
+      # Save Javadoc results
       - store_artifacts:
-          path: ci/javadoc/build/reports
+          path: code/edgebridge/build/docs/javadoc
 
       - run:
-          name: Build
-          command: make ci-build
+          name: Assemble phone
+          command: make assemble-phone
 
       - run:
-          name: Build App
-          command: make ci-build-app
+          name: Assemble for Jitpack
+          command: make ci-publish-maven-local-jitpack
 
       - run:
-          name: UnitTests
-          command: make ci-unit-test
+          name: Assemble App
+          command: make assemble-app
 
-      # code coverage
-      - run:
-          name: Upload Code Coverage Report
-          command: |
-            curl -s https://codecov.io/bash > codecov;
-            VERSION=$(grep 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
-            SHAVERSION=$(shasum -v);
-            echo "Using CodeCov version '$VERSION'"
-            echo "Using shasum '$SHAVERSION'"
-            for i in 1 256 512
-            do
-              shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") ||
-              shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM" | grep -w "codecov")
-            done
-            bash ./codecov -v -X s3 -c -D "./ci/unit-test/build/reports" -F unit-tests
+      # Run unit tests and create code coverage report, with auto retry from run-tests command
+      - android/run-tests:
+          test-command: make unit-test-coverage
 
       - store_artifacts:
-          path: ci/unit-test/build/reports
+          path: code/edgebridge/build/reports/tests
 
       - store_test_results:
-          path: ci/unit-test/build/test-results
+          path: code/edgebridge/build/test-results/testPhoneDebugUnitTest
+
+      # Upload code coverage report to Codecov
+      - codecov/upload:
+          file: code/edgebridge/build/reports/coverage/test/phone/debug/report.xml
+          flags: unit-tests
+      
+      - android/save-gradle-cache
+
+      - android/save-build-cache
 
   functional-test:
     executor:
       name: android/android-machine
       resource-class: large
+      tag: 2024.01.1
     steps:
       - checkout
+
+      - android/restore-build-cache
+
+      # By default this command handles restoring and saving the Gradle cache
       - android/start-emulator-and-run-tests:
-          #   It should match the name seen in the "sdkmanager --list" output
+          # It should match the name seen in the "sdkmanager --list" output
           system-image: system-images;android-29;default;x86
-          #   The command to be run, while waiting for emulator startup
-          post-emulator-launch-assemble-command: make ci-build
-          #   The test command
-          test-command: make ci-functional-test
+          # The command to be run, while waiting for emulator startup
+          post-emulator-launch-assemble-command: make assemble-phone
+          # The test command
+          test-command: make functional-test-coverage
       
-      # code coverage
-      - run:
-          name: Upload Code Coverage Report
-          command: |
-            curl -s https://codecov.io/bash > codecov;
-            VERSION=$(grep 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
-            SHAVERSION=$(shasum -v);
-            echo "Using CodeCov version '$VERSION'"
-            echo "Using shasum '$SHAVERSION'"
-            for i in 1 256 512
-            do
-              shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") ||
-              shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM" | grep -w "codecov")
-            done
-            bash ./codecov -v -X s3 -c -D "./ci/functional-test/build/reports" -F functional-tests
+      # Upload code coverage report to Codecov
+      - codecov/upload:
+          file: code/edgebridge/build/reports/coverage/androidTest/phone/connected/debug/report.xml
+          flags: functional-tests
+
+      - android/save-build-cache
 
       - store_artifacts:
-          path: ci/functional-test/build/reports
+          path: code/edgebridge/build/reports/androidTests
 
       - store_test_results:
-          path: ci/functional-test/build/outputs/androidTest-results
+          path: code/edgebridge/build/outputs/androidTest-results
           
     

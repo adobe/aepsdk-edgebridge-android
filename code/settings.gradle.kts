@@ -3,6 +3,7 @@ pluginManagement {
         gradlePluginPortal()
         google()
         mavenCentral()
+        mavenLocal()
     }
 }
 
@@ -11,10 +12,14 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
-        maven { url "https://oss.sonatype.org/content/repositories/snapshots/" }
+        mavenLocal()
+        maven { url = uri("https://oss.sonatype.org/content/repositories/snapshots/") }
+        maven { url = uri("https://jitpack.io") }
     }
 }
 
 rootProject.name = "edgebridge-sdk"
-include ':app'
-include ':edgebridge'
+include (
+    ":edgebridge",
+    ":app"
+)

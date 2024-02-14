@@ -1,0 +1,12 @@
+buildscript {
+    repositories {
+        gradlePluginPortal()
+        google()
+        mavenCentral()
+        maven { url = uri("https://jitpack.io") }
+        mavenLocal()
+    }
+    dependencies {
+        classpath("com.github.adobe:aepsdk-commons:9deb721db7")
+    }
+}
