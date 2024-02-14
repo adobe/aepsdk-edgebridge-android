@@ -76,12 +76,15 @@ jobs:
           command: make ci-publish-maven-local-jitpack
 
       - run:
-          name: Build test app
+          name: Assemble App
           command: make assemble-app
 
       # Run unit tests and create code coverage report, with auto retry from run-tests command
       - android/run-tests:
           test-command: make unit-test-coverage
+
+      - store_artifacts:
+          path: code/edgebridge/build/reports/tests
 
       - store_test_results:
           path: code/edgebridge/build/test-results/testPhoneDebugUnitTest
