@@ -60,7 +60,7 @@ jobs:
       - android/restore-build-cache
 
       - run:
-          name: Build Javadoc
+          name: Javadoc
           command: make javadoc
 
       # Save Javadoc results
