@@ -46,7 +46,6 @@ assemble-phone-release:
 assemble-app:
 	(./code/gradlew -p code/$(TEST-APP-FOLDER-NAME) assemble)
 
-# Note: The assemblePhone task dependency for the rules below are handled by the `aep-library` Gradle plugin
 ci-publish-maven-local-jitpack:
 	(./code/gradlew -p code/$(EXTENSION-LIBRARY-FOLDER-NAME) publishReleasePublicationToMavenLocal -Pjitpack  -x signReleasePublication)
 
