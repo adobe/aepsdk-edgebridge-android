@@ -22,7 +22,7 @@ jobs:
     executor:
       name: android/android-docker
       resource-class: medium
-      tag: 2024.01.1
+      tag: 2024.01.1-node
     steps:
       - checkout
 
@@ -32,12 +32,16 @@ jobs:
 
       # TODO: Re-enable these steps once formatting and linting issues are resolved
       # - run:
-      #     name: Check code format
+      #     name: Check Format
       #     command: make checkformat
       
       # - run:
-      #     name: Run lint
+      #     name: Lint
       #     command: make lint
+      
+      # Store Lint report 
+      - store_artifacts:
+          path: code/edgebridge/build/reports
 
       - android/save-gradle-cache
 
