@@ -16,7 +16,7 @@ jobs:
 
     steps:    
     - name: Checkout
-      uses: actions/checkout@v3.1.0
+      uses: actions/checkout@v3
     
     - name: Update Edge Bridge version
       run: (./scripts/version.sh -u -v ${{ github.event.inputs.version }} -d "Core ${{ github.event.inputs.core-dependency }}")
