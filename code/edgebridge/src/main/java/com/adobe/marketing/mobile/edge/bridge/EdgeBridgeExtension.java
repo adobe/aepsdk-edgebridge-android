@@ -12,6 +12,7 @@
 package com.adobe.marketing.mobile.edge.bridge;
 
 import static com.adobe.marketing.mobile.edge.bridge.EdgeBridgeConstants.LOG_TAG;
+import static com.adobe.marketing.mobile.util.MapUtils.isNullOrEmpty;
 
 import androidx.annotation.NonNull;
 import com.adobe.marketing.mobile.Event;
@@ -20,7 +21,9 @@ import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.services.Log;
+import com.adobe.marketing.mobile.util.CloneFailedException;
 import com.adobe.marketing.mobile.util.DataReader;
+import com.adobe.marketing.mobile.util.EventDataUtils;
 import com.adobe.marketing.mobile.util.StringUtils;
 import com.adobe.marketing.mobile.util.TimeUtils;
 import java.util.Date;
@@ -164,7 +167,7 @@ class EdgeBridgeExtension extends Extension {
 
 		Map<String, Object> eventData = new HashMap<>();
 		eventData.put("xdm", xdmData);
-		eventData.put("data", data);
+		eventData.put("data", formatData(data));
 
 		final Event event = new Event.Builder(
 			EdgeBridgeConstants.EventNames.EDGE_BRIDGE_REQUEST,
@@ -178,7 +181,93 @@ class EdgeBridgeExtension extends Extension {
 		getApi().dispatch(event);
 	}
 
-	private boolean isNullOrEmpty(final Map map) {
-		return map == null || map.isEmpty();
+	private Map<String, Object> formatData(Map<String, Object> data) {
+		// Create a mutable copy of data
+		Map<String, Object> mutableData = deepCopy(data);
+		// __adobe.analytics data container
+		Map<String, Object> analyticsData = new HashMap<>();
+
+		// Process contextData
+		final Map<String, Object> contextData = DataReader.optTypedMap(
+			Object.class,
+			mutableData,
+			EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA,
+			null
+		);
+		mutableData.remove(EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA);
+		if (!isNullOrEmpty(contextData)) {
+			Map<String, Object> prefixedData = new HashMap<>();
+			Map<String, Object> nonPrefixedData = new HashMap<>();
+
+			for (Map.Entry<String, Object> entry : contextData.entrySet()) {
+				String key = entry.getKey();
+				Object value = entry.getValue();
+
+				// Check if the key starts with the specified prefix
+				if (key.startsWith(EdgeBridgeConstants.EdgeValues.PREFIX)) {
+					// Remove prefix and add to prefixedData map
+					String newKey = key.substring(EdgeBridgeConstants.EdgeValues.PREFIX.length());
+					prefixedData.put(newKey, value);
+				} else {
+					// Add to nonPrefixedData map
+					nonPrefixedData.put(key, value);
+				}
+			}
+
+			// If there are prefixed data entries, add them to analyticsData
+			if (!prefixedData.isEmpty()) {
+				analyticsData.putAll(prefixedData);
+			}
+
+			// If there are non-prefixed data entries, add them under the contextData key
+			if (!nonPrefixedData.isEmpty()) {
+				analyticsData.put(EdgeBridgeConstants.EdgeKeys.CONTEXT_DATA, nonPrefixedData);
+			}
+		}
+
+		// Process action
+		Object actionValue = mutableData.remove(EdgeBridgeConstants.AnalyticsKeys.ACTION);
+		if (actionValue instanceof String) { // Validates non-null and correct type
+			String action = (String) actionValue;
+			analyticsData.put(EdgeBridgeConstants.EdgeKeys.LINK_NAME, action);
+			analyticsData.put(EdgeBridgeConstants.EdgeKeys.LINK_TYPE, EdgeBridgeConstants.EdgeValues.OTHER);
+		}
+
+		// Process state
+		Object stateValue = mutableData.remove(EdgeBridgeConstants.AnalyticsKeys.STATE);
+		if (stateValue instanceof String) { // Validates non-null and correct type
+			String state = (String) stateValue;
+			analyticsData.put(EdgeBridgeConstants.EdgeKeys.PAGE_NAME, state);
+		}
+
+		// If analyticsData is not empty, add it to mutableData under __adobe.analytics
+		if (!analyticsData.isEmpty()) {
+			Map<String, Object> adobeAnalytics = new HashMap<>();
+			adobeAnalytics.put(EdgeBridgeConstants.EdgeKeys.ANALYTICS, analyticsData);
+			mutableData.put(EdgeBridgeConstants.EdgeKeys.ADOBE, adobeAnalytics);
+		}
+
+		return mutableData;
+	}
+
+	/**
+	 * Creates a deep copy of the provided {@link Map}.
+	 *
+	 * @param map to be copied
+	 * @return {@link Map} containing a deep copy of all the elements in {@code map}
+	 */
+	Map<String, Object> deepCopy(final Map<String, Object> map) {
+		try {
+			return EventDataUtils.clone(map);
+		} catch (CloneFailedException e) {
+			Log.debug(
+				LOG_TAG,
+				LOG_SOURCE,
+				"Unable to deep copy map. CloneFailedException: %s",
+				e.getLocalizedMessage()
+			);
+		}
+
+		return null;
 	}
 }
