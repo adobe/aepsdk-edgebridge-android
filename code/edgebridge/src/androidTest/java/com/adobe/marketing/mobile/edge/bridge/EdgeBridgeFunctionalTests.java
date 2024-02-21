@@ -77,14 +77,15 @@ public class EdgeBridgeFunctionalTests {
 	}
 
 	@Test
-	public void testTrackStateSendsEdgeExperienceEvent() throws InterruptedException {
+	public void test_trackState_sendsEdgeExperienceEvent() throws InterruptedException {
 		setExpectationNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
 
 		MobileCore.trackState(
-			"Test State",
+			"state name",
 			new HashMap<String, String>() {
 				{
-					put("testKey", "testValue");
+					put("key1", "value1");
+					put("&&c1", "propValue1");
 				}
 			}
 		);
@@ -96,19 +97,21 @@ public class EdgeBridgeFunctionalTests {
 		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
 		assertNotNull(requestData.get("events[0].xdm.timestamp"));
 		assertNotNull(requestData.get("events[0].xdm._id"));
-		assertEquals("Test State", requestData.get("events[0].data.state"));
-		assertEquals("testValue", requestData.get("events[0].data.contextdata.testKey"));
+		assertEquals("state name", requestData.get("events[0].data.__adobe.analytics.pageName"));
+		assertEquals("propValue1", requestData.get("events[0].data.__adobe.analytics.c1"));
+		assertEquals("value1", requestData.get("events[0].data.__adobe.analytics.contextData.key1"));
 	}
 
 	@Test
-	public void testTrackActionSendsEdgeExperienceEvent() throws InterruptedException {
+	public void test_trackAction_sendsEdgeExperienceEvent() throws InterruptedException {
 		setExpectationNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
 
-		MobileCore.trackState(
-			"Test Action",
+		MobileCore.trackAction(
+			"action name",
 			new HashMap<String, String>() {
 				{
-					put("testKey", "testValue");
+					put("key1", "value1");
+					put("&&c1", "propValue1");
 				}
 			}
 		);
@@ -120,8 +123,10 @@ public class EdgeBridgeFunctionalTests {
 		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
 		assertNotNull(requestData.get("events[0].xdm.timestamp"));
 		assertNotNull(requestData.get("events[0].xdm._id"));
-		assertEquals("Test Action", requestData.get("events[0].data.state"));
-		assertEquals("testValue", requestData.get("events[0].data.contextdata.testKey"));
+		assertEquals("action name", requestData.get("events[0].data.__adobe.analytics.linkName"));
+		assertEquals("other", requestData.get("events[0].data.__adobe.analytics.linkType"));
+		assertEquals("propValue1", requestData.get("events[0].data.__adobe.analytics.c1"));
+		assertEquals("value1", requestData.get("events[0].data.__adobe.analytics.contextData.key1"));
 	}
 
 	@Test
@@ -147,10 +152,11 @@ public class EdgeBridgeFunctionalTests {
 		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
 		assertNotNull(requestData.get("events[0].xdm.timestamp"));
 		assertNotNull(requestData.get("events[0].xdm._id"));
-		// data is defined in the rule, not from the dispatched PII event
-		assertEquals("Rule Action", requestData.get("events[0].data.action"));
-		assertEquals("Rule State", requestData.get("events[0].data.state"));
-		assertEquals("testValue", requestData.get("events[0].data.contextdata.testKey"));
+		assertEquals("Rule Action", requestData.get("events[0].data.__adobe.analytics.linkName"));
+		assertEquals("other", requestData.get("events[0].data.__adobe.analytics.linkType"));
+		assertEquals("Rule State", requestData.get("events[0].data.__adobe.analytics.pageName"));
+		// Data is defined in the rule, not from the dispatched PII event
+		assertEquals("testValue", requestData.get("events[0].data.__adobe.analytics.contextData.testKey"));
 	}
 
 	/**
