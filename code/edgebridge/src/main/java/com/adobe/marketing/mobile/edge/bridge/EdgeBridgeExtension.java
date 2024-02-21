@@ -181,13 +181,56 @@ class EdgeBridgeExtension extends Extension {
 		getApi().dispatch(event);
 	}
 
+	/**
+	 * Formats track event data to the required Analytics Edge translator format under the `data.__adobe.analytics` object.
+	 *
+	 * The following is the mapping logic:
+	 * - The "action" field is mapped to "data.__adobe.analytics.linkName", and "data.__adobe.analytics.linkType" is set to "other".
+	 * - The "state" field is mapped to "data.__adobe.analytics.pageName".
+	 * - Any "contextData" keys that start with the "&&" prefix are mapped to "data.__adobe.analytics" with the prefix removed.
+	 * - Any "contextData" keys without the "&&" prefix are mapped to "data.__adobe.analytics.contextData".
+	 * - Any additional fields are passed through and left directly under the "data" object.
+	 *
+	 * As an example, the following track event data:
+	 * ```
+	 * {
+	 *    "action": "action name",
+	 *    "contextData": {
+	 *       "&&c1": "propValue1",
+	 *       "key1": "value1"
+	 *    },
+	 *    "key2": "value2"
+	 * }
+	 * ```
+	 * Is mapped to:
+	 * ```
+	 * {
+	 *   "data": {
+	 *     "__adobe": {
+	 *       "analytics": {
+	 *         "linkName": "action name",
+	 *         "linkType": "other",
+	 *         "c1": "propValue1",
+	 *         "contextData": {
+	 *           "key1": "value1"
+	 *         }
+	 *       }
+	 *     },
+	 *     "key2": "value2"
+	 *   }
+	 * }
+	 * ```
+	 *
+	 * @param data track event data
+	 * @return data formatted for the Analytics Edge translator.
+	 */
 	private Map<String, Object> formatData(Map<String, Object> data) {
 		// Create a mutable copy of data
 		Map<String, Object> mutableData = deepCopy(data);
 		// __adobe.analytics data container
 		Map<String, Object> analyticsData = new HashMap<>();
 
-		// Process contextData
+		// Extract contextData
 		final Map<String, Object> contextData = DataReader.optTypedMap(
 			Object.class,
 			mutableData,
@@ -203,13 +246,11 @@ class EdgeBridgeExtension extends Extension {
 				String key = entry.getKey();
 				Object value = entry.getValue();
 
-				// Check if the key starts with the specified prefix
+				// Check if the key starts with the specified prefix and add to corresponding map
 				if (key.startsWith(EdgeBridgeConstants.EdgeValues.PREFIX)) {
-					// Remove prefix and add to prefixedData map
 					String newKey = key.substring(EdgeBridgeConstants.EdgeValues.PREFIX.length());
 					prefixedData.put(newKey, value);
 				} else {
-					// Add to nonPrefixedData map
 					nonPrefixedData.put(key, value);
 				}
 			}
