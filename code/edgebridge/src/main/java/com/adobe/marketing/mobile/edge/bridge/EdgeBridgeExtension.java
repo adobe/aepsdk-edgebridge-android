@@ -15,6 +15,7 @@ import static com.adobe.marketing.mobile.edge.bridge.EdgeBridgeConstants.LOG_TAG
 import static com.adobe.marketing.mobile.util.MapUtils.isNullOrEmpty;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
@@ -227,6 +228,9 @@ class EdgeBridgeExtension extends Extension {
 	private Map<String, Object> formatData(final Map<String, Object> data) {
 		// Create a mutable copy of data
 		Map<String, Object> mutableData = deepCopy(data);
+		if (mutableData == null) {
+			return data;
+		}
 		// __adobe.analytics data container
 		Map<String, Object> analyticsData = new HashMap<>();
 
@@ -297,7 +301,8 @@ class EdgeBridgeExtension extends Extension {
 	 * @param map to be copied
 	 * @return {@link Map} containing a deep copy of all the elements in {@code map}
 	 */
-	Map<String, Object> deepCopy(final Map<String, Object> map) {
+	@VisibleForTesting
+	public Map<String, Object> deepCopy(final Map<String, Object> map) {
 		try {
 			return EventDataUtils.clone(map);
 		} catch (CloneFailedException e) {
