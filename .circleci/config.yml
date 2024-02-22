@@ -89,10 +89,6 @@ jobs:
           command: make assemble-phone
 
       - run:
-          name: Assemble for Jitpack
-          command: make ci-publish-maven-local-jitpack
-
-      - run:
           name: Assemble App
           command: make assemble-app
 
@@ -151,5 +147,3 @@ jobs:
 
       - store_test_results:
           path: << pipeline.parameters.build-path >>/outputs/androidTest-results
-          
-    
