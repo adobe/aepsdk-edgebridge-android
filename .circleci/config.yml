@@ -60,7 +60,7 @@ jobs:
 
       # Store Lint report
       - store_artifacts:
-          path: code/edgebridge/build/reports
+          path: << pipeline.parameters.build-path >>/reports
 
   build-and-unit-test:
     executor:
@@ -82,7 +82,7 @@ jobs:
 
       # Save Javadoc results
       - store_artifacts:
-          path: code/edgebridge/build/docs/javadoc
+          path: << pipeline.parameters.build-path >>/docs/javadoc
 
       - run:
           name: Assemble Phone
@@ -101,10 +101,10 @@ jobs:
           test-command: make unit-test-coverage
 
       - store_artifacts:
-          path: code/edgebridge/build/reports/tests
+          path: << pipeline.parameters.build-path >>/reports/tests
 
       - store_test_results:
-          path: code/edgebridge/build/test-results/testPhoneDebugUnitTest
+          path: << pipeline.parameters.build-path >>/test-results/testPhoneDebugUnitTest
 
       - android/save-gradle-cache
           cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
@@ -114,7 +114,7 @@ jobs:
 
       # Upload code coverage report to Codecov
       - codecov/upload:
-          file: code/edgebridge/build/reports/coverage/test/phone/debug/report.xml
+          file: << pipeline.parameters.build-path >>/reports/coverage/test/phone/debug/report.xml
           flags: unit-tests
 
   functional-test:
@@ -140,16 +140,16 @@ jobs:
       
       # Upload code coverage report to Codecov
       - codecov/upload:
-          file: code/edgebridge/build/reports/coverage/androidTest/phone/debug/connected/report.xml
+          file: << pipeline.parameters.build-path >>/reports/coverage/androidTest/phone/debug/connected/report.xml
           flags: functional-tests
 
       - android/save-build-cache
           cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       - store_artifacts:
-          path: code/edgebridge/build/reports/androidTests
+          path: << pipeline.parameters.build-path >>/reports/androidTests
 
       - store_test_results:
-          path: code/edgebridge/build/outputs/androidTest-results
+          path: << pipeline.parameters.build-path >>/outputs/androidTest-results
           
     
