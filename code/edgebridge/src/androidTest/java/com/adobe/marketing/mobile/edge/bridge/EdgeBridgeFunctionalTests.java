@@ -77,7 +77,7 @@ public class EdgeBridgeFunctionalTests {
 	}
 
 	@Test
-	public void test_trackState_sendsEdgeExperienceEvent() throws InterruptedException {
+	public void testTrackState_sendsEdgeExperienceEvent() throws InterruptedException {
 		setExpectationNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
 
 		MobileCore.trackState(
@@ -104,7 +104,7 @@ public class EdgeBridgeFunctionalTests {
 	}
 
 	@Test
-	public void test_trackAction_sendsEdgeExperienceEvent() throws InterruptedException {
+	public void testTrackAction_sendsCorrectRequestEvent() throws InterruptedException {
 		setExpectationNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
 
 		MobileCore.trackAction(
@@ -132,7 +132,7 @@ public class EdgeBridgeFunctionalTests {
 	}
 
 	@Test
-	public void testRulesEngineResponseSendsEdgeExperienceEvent() throws InterruptedException, IOException {
+	public void testRulesEngineResponse_sendsCorrectRequestEvent() throws InterruptedException, IOException {
 		updateConfigurationWithRules("rules_analytics");
 		resetTestExpectations();
 
