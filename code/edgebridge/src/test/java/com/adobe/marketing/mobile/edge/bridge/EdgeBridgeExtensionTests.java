@@ -136,7 +136,7 @@ public class EdgeBridgeExtensionTests {
 	// handleTrackRequest
 	// ========================================================================================
 	@Test
-	public void test_handleTrackEvent_withActionField_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_withActionField_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -203,7 +203,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleTrackEvent_withStateField_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_withStateField_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -269,7 +269,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleTrackEvent_withContextDataFieldUsingReservedPrefix_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_withContextDataFieldUsingReservedPrefix_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -342,7 +342,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleTrackEvent_withContextDataNotUsingReservedPrefix_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_withContextDataNotUsingReservedPrefix_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -422,7 +422,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleTrackEvent_withDataField_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_withDataField_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -474,7 +474,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleTrackEvent_trackAction_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_trackAction_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -573,7 +573,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleTrackEvent_trackState_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_trackState_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -663,7 +663,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleTrackRequest_withNullEventData_doesNotDispatchEvent() {
+	public void testHandleTrackEvent_withNullEventData_doesNotDispatchEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(null)
 			.build();
@@ -674,7 +674,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleTrackRequest_withEmptyEventData_doesNotDispatchEvent() {
+	public void testHandleTrackEvent_withEmptyEventData_doesNotDispatchEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(Collections.<String, Object>emptyMap())
 			.build();
@@ -689,7 +689,7 @@ public class EdgeBridgeExtensionTests {
 	// ========================================================================================
 
 	@Test
-	public void test_handleRulesEngineResponse_dispatchesEdgeRequestEvent() {
+	public void testHandleRulesEngineResponse_withTrackEvent_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -793,7 +793,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withNullEventData_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withNullEventData_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -808,7 +808,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withEmptyEventData_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withEmptyEventData_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -823,7 +823,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withoutTriggerConsequence_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withoutTriggerConsequence_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -868,7 +868,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withTriggerConsequenceWrongType_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withTriggerConsequenceWrongType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -889,7 +889,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withoutConsequenceId_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withoutConsequenceId_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -933,7 +933,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withConsequenceIdWrongType_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withConsequenceIdWrongType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -985,7 +985,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withWrongConsequenceType_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withWrongConsequenceType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -1030,7 +1030,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withoutConsequenceType_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withoutConsequenceType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -1074,7 +1074,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withConsequenceTypeWrongType_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withConsequenceTypeWrongType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -1126,7 +1126,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withoutConsequenceDetail_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withoutConsequenceDetail_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -1155,7 +1155,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withNullConsequenceDetail_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withNullConsequenceDetail_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -1185,7 +1185,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withEmptyConsequenceDetail_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withEmptyConsequenceDetail_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
@@ -1215,7 +1215,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void test_handleRulesEngineResponse_withConsequenceDetailWrongType_doesNotDispatchEvent() {
+	public void testHandleRulesEngineResponse_withConsequenceDetailWrongType_doesNotDispatchEvent() {
 		final Event event = new Event.Builder(
 			"Test Rules Engine Event",
 			EventType.RULES_ENGINE,
