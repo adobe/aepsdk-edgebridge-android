@@ -301,7 +301,7 @@ class EdgeBridgeExtension extends Extension {
 		try {
 			return EventDataUtils.clone(map);
 		} catch (CloneFailedException e) {
-			Log.debug(
+			Log.warning(
 				LOG_TAG,
 				LOG_SOURCE,
 				"Unable to deep copy map. CloneFailedException: %s",
