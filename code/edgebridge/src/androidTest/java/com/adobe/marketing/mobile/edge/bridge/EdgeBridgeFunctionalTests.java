@@ -94,6 +94,7 @@ public class EdgeBridgeFunctionalTests {
 		List<TestableNetworkRequest> networkRequests = getNetworkRequestsWith(EDGE_INTERACT_ENDPOINT, HttpMethod.POST);
 		assertEquals(1, networkRequests.size());
 		Map<String, String> requestData = flattenBytes(networkRequests.get(0).getBody());
+		assertEquals(15, requestData.size());
 		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
 		assertNotNull(requestData.get("events[0].xdm.timestamp"));
 		assertNotNull(requestData.get("events[0].xdm._id"));
@@ -120,6 +121,7 @@ public class EdgeBridgeFunctionalTests {
 		List<TestableNetworkRequest> networkRequests = getNetworkRequestsWith(EDGE_INTERACT_ENDPOINT, HttpMethod.POST);
 		assertEquals(1, networkRequests.size());
 		Map<String, String> requestData = flattenBytes(networkRequests.get(0).getBody());
+		assertEquals(16, requestData.size());
 		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
 		assertNotNull(requestData.get("events[0].xdm.timestamp"));
 		assertNotNull(requestData.get("events[0].xdm._id"));
@@ -149,6 +151,7 @@ public class EdgeBridgeFunctionalTests {
 		List<TestableNetworkRequest> networkRequests = getNetworkRequestsWith(EDGE_INTERACT_ENDPOINT, HttpMethod.POST);
 		assertEquals(1, networkRequests.size());
 		Map<String, String> requestData = flattenBytes(networkRequests.get(0).getBody());
+		assertEquals(16, requestData.size());
 		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
 		assertNotNull(requestData.get("events[0].xdm.timestamp"));
 		assertNotNull(requestData.get("events[0].xdm._id"));
