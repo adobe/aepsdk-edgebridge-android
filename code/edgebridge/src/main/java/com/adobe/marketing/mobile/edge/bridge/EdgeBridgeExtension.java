@@ -224,7 +224,7 @@ class EdgeBridgeExtension extends Extension {
 	 * @param data track event data
 	 * @return data formatted for the Analytics Edge translator.
 	 */
-	private Map<String, Object> formatData(Map<String, Object> data) {
+	private Map<String, Object> formatData(final Map<String, Object> data) {
 		// Create a mutable copy of data
 		Map<String, Object> mutableData = deepCopy(data);
 		// __adobe.analytics data container
