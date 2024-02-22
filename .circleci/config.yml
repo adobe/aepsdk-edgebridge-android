@@ -4,7 +4,7 @@ orbs:
   android: circleci/android@2.4.0
   codecov: codecov/codecov@4.0.1
 
-# Workflows orchestrate a set of jobs to be run;
+# Workflows orchestrate a set of jobs to be run
 workflows:
   version: 2
   build-test-deploy:
@@ -31,16 +31,20 @@ jobs:
       - android/restore-build-cache
 
       - run:
-          name: Check code format
+          name: Check Format
           command: make checkformat
       
       - run:
-          name: Run lint
+          name: Lint
           command: make lint
 
       - android/save-gradle-cache
 
       - android/save-build-cache
+
+      # Store Lint report
+      - store_artifacts:
+          path: code/edgebridge/build/reports
 
   build-and-unit-test:
     executor:
@@ -63,7 +67,7 @@ jobs:
           path: code/edgebridge/build/docs/javadoc
 
       - run:
-          name: Assemble phone
+          name: Assemble Phone
           command: make assemble-phone
 
       - run:
@@ -84,14 +88,14 @@ jobs:
       - store_test_results:
           path: code/edgebridge/build/test-results/testPhoneDebugUnitTest
 
+      - android/save-gradle-cache
+
+      - android/save-build-cache
+
       # Upload code coverage report to Codecov
       - codecov/upload:
           file: code/edgebridge/build/reports/coverage/test/phone/debug/report.xml
           flags: unit-tests
-      
-      - android/save-gradle-cache
-
-      - android/save-build-cache
 
   functional-test:
     executor:
@@ -114,7 +118,7 @@ jobs:
       
       # Upload code coverage report to Codecov
       - codecov/upload:
-          file: code/edgebridge/build/reports/coverage/androidTest/phone/connected/debug/report.xml
+          file: code/edgebridge/build/reports/coverage/androidTest/phone/debug/connected/report.xml
           flags: functional-tests
 
       - android/save-build-cache
