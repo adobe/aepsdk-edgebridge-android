@@ -4,6 +4,18 @@ orbs:
   android: circleci/android@2.4.0
   codecov: codecov/codecov@4.0.1
 
+# Define pipeline parameters available to all jobs
+parameters:
+  gradle-cache-prefix:
+    type: string
+    default: v1
+  build-cache-prefix:
+    type: string
+    default: v1
+  build-path:
+    type: string
+    default: code/edgebridge/build
+
 # Workflows orchestrate a set of jobs to be run
 workflows:
   version: 2
@@ -27,8 +39,10 @@ jobs:
       - checkout
 
       - android/restore-gradle-cache
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
 
       - android/restore-build-cache
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       - run:
           name: Check Format
@@ -39,8 +53,10 @@ jobs:
           command: make lint
 
       - android/save-gradle-cache
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
 
       - android/save-build-cache
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       # Store Lint report
       - store_artifacts:
@@ -55,8 +71,10 @@ jobs:
       - checkout
 
       - android/restore-gradle-cache
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
 
       - android/restore-build-cache
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       - run:
           name: Javadoc
@@ -89,8 +107,10 @@ jobs:
           path: code/edgebridge/build/test-results/testPhoneDebugUnitTest
 
       - android/save-gradle-cache
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
 
       - android/save-build-cache
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       # Upload code coverage report to Codecov
       - codecov/upload:
@@ -106,6 +126,7 @@ jobs:
       - checkout
 
       - android/restore-build-cache
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       # By default this command handles restoring and saving the Gradle cache
       - android/start-emulator-and-run-tests:
@@ -115,6 +136,7 @@ jobs:
           post-emulator-launch-assemble-command: make assemble-phone
           # The test command
           test-command: make functional-test-coverage
+          restore-gradle-cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
       
       # Upload code coverage report to Codecov
       - codecov/upload:
@@ -122,6 +144,7 @@ jobs:
           flags: functional-tests
 
       - android/save-build-cache
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       - store_artifacts:
           path: code/edgebridge/build/reports/androidTests
