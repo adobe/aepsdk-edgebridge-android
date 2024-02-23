@@ -16,7 +16,19 @@ orbs:
   android: circleci/android@2.4.0
   codecov: codecov/codecov@4.0.1
 
-# Workflows orchestrate a set of jobs to be run;
+# Define pipeline parameters available to all jobs
+parameters:
+  gradle-cache-prefix:
+    type: string
+    default: v1
+  build-cache-prefix:
+    type: string
+    default: v1
+  build-path:
+    type: string
+    default: code/edgebridge/build
+
+# Workflows orchestrate a set of jobs to be run
 workflows:
   version: 2
   build-test-deploy:
@@ -38,38 +50,43 @@ jobs:
     steps:
       - checkout
 
-      - android/restore-gradle-cache
+      - android/restore-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
 
-      - android/restore-build-cache
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
-      # TODO: Re-enable these steps once formatting and linting issues are resolved
-      # - run:
-      #     name: Check Format
-      #     command: make checkformat
+      - run:
+          name: Check Format
+          command: make checkformat
       
-      # - run:
-      #     name: Lint
-      #     command: make lint
-      
-      # Store Lint report 
+      - run:
+          name: Lint
+          command: make lint
+
+      - android/save-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
+      # Store Lint report
       - store_artifacts:
-          path: code/edgebridge/build/reports
-
-      - android/save-gradle-cache
-
-      - android/save-build-cache
+          path: << pipeline.parameters.build-path >>/reports
 
   build-and-unit-test:
     executor:
       name: android/android-docker
       resource-class: medium
-      tag: 2024.01.1
+      tag: 2024.01.1-node
     steps:
       - checkout
 
-      - android/restore-gradle-cache
+      - android/restore-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
 
-      - android/restore-build-cache
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       - run:
           name: Javadoc
@@ -77,15 +94,11 @@ jobs:
 
       # Save Javadoc results
       - store_artifacts:
-          path: code/edgebridge/build/docs/javadoc
+          path: << pipeline.parameters.build-path >>/docs/javadoc
 
       - run:
-          name: Assemble phone
+          name: Assemble Phone
           command: make assemble-phone
-
-      - run:
-          name: Assemble for Jitpack
-          command: make ci-publish-maven-local-jitpack
 
       - run:
           name: Assemble App
@@ -96,19 +109,21 @@ jobs:
           test-command: make unit-test-coverage
 
       - store_artifacts:
-          path: code/edgebridge/build/reports/tests
+          path: << pipeline.parameters.build-path >>/reports/tests
 
       - store_test_results:
-          path: code/edgebridge/build/test-results/testPhoneDebugUnitTest
+          path: << pipeline.parameters.build-path >>/test-results/testPhoneDebugUnitTest
+
+      - android/save-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       # Upload code coverage report to Codecov
       - codecov/upload:
-          file: code/edgebridge/build/reports/coverage/test/phone/debug/report.xml
+          file: << pipeline.parameters.build-path >>/reports/coverage/test/phone/debug/report.xml
           flags: unit-tests
-      
-      - android/save-gradle-cache
-
-      - android/save-build-cache
 
   functional-test:
     executor:
@@ -118,7 +133,8 @@ jobs:
     steps:
       - checkout
 
-      - android/restore-build-cache
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       # By default this command handles restoring and saving the Gradle cache
       - android/start-emulator-and-run-tests:
@@ -128,18 +144,18 @@ jobs:
           post-emulator-launch-assemble-command: make assemble-phone
           # The test command
           test-command: make functional-test-coverage
+          restore-gradle-cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
       
       # Upload code coverage report to Codecov
       - codecov/upload:
-          file: code/edgebridge/build/reports/coverage/androidTest/phone/connected/debug/report.xml
+          file: << pipeline.parameters.build-path >>/reports/coverage/androidTest/phone/debug/connected/report.xml
           flags: functional-tests
 
-      - android/save-build-cache
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       - store_artifacts:
-          path: code/edgebridge/build/reports/androidTests
+          path: << pipeline.parameters.build-path >>/reports/androidTests
 
       - store_test_results:
-          path: code/edgebridge/build/outputs/androidTest-results
-          
-    
+          path: << pipeline.parameters.build-path >>/outputs/androidTest-results

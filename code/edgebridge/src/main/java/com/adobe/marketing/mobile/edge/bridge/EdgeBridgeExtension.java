@@ -35,20 +35,17 @@ class EdgeBridgeExtension extends Extension {
 		super(extensionApi);
 	}
 
-	@NonNull
-	@Override
+	@NonNull @Override
 	protected String getName() {
 		return EdgeBridgeConstants.EXTENSION_NAME;
 	}
 
-	@NonNull
-	@Override
+	@NonNull @Override
 	protected String getFriendlyName() {
 		return EdgeBridgeConstants.FRIENDLY_NAME;
 	}
 
-	@NonNull
-	@Override
+	@NonNull @Override
 	protected String getVersion() {
 		return EdgeBridgeConstants.EXTENSION_VERSION;
 	}
