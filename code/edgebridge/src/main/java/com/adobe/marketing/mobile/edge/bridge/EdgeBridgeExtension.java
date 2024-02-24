@@ -34,6 +34,13 @@ class EdgeBridgeExtension extends Extension {
 
 	private static final String LOG_SOURCE = "EdgeBridgeExtension";
 
+	public class InvalidEventDataException extends Exception {
+
+		public InvalidEventDataException(String message) {
+			super(message);
+		}
+	}
+
 	protected EdgeBridgeExtension(final ExtensionApi extensionApi) {
 		super(extensionApi);
 	}
@@ -158,7 +165,9 @@ class EdgeBridgeExtension extends Extension {
 	/**
 	 * Helper to create and dispatch an experience event.
 	 *
-	 * If event payload formatting fails, then the track event will not be dispatched.
+	 * Track events will not be dispatched in any of the following cases:
+	 * 1. Deep copy of the event data map fails.
+	 * 2. Event data map does not have any data or valid action/state.
 	 *
 	 * @param data map containing free-form data to send to Edge Network
 	 * @param parentEvent the triggering parent event used for event chaining; its timestamp is set as xdm.timestamp
@@ -174,6 +183,10 @@ class EdgeBridgeExtension extends Extension {
 				LOG_SOURCE,
 				"Failed to format data for dispatch due to map clone failure: " + e.getMessage()
 			);
+			return;
+		} catch (InvalidEventDataException e) {
+			// If event data map does not have any data or valid action/state, do not dispatch event.
+			Log.warning(LOG_TAG, LOG_SOURCE, "Invalid event data: " + e.getMessage());
 			return;
 		}
 		Map<String, Object> xdmData = new HashMap<>();
@@ -239,8 +252,10 @@ class EdgeBridgeExtension extends Extension {
 	 * @param data track event data
 	 * @return data formatted for the Analytics Edge translator.
 	 * @throws CloneFailedException if the cloning process fails.
+	 * @throws InvalidEventDataException if event data map does not have any data or valid action/state.
 	 */
-	private Map<String, Object> formatData(final Map<String, Object> data) throws CloneFailedException {
+	private Map<String, Object> formatData(final Map<String, Object> data)
+		throws CloneFailedException, InvalidEventDataException {
 		// Create a mutable copy of data - can throw exception if deep copy fails
 		Map<String, Object> mutableData = deepCopy(data);
 		// __adobe.analytics data container
@@ -250,10 +265,26 @@ class EdgeBridgeExtension extends Extension {
 		final Map<String, Object> contextData = DataReader.optTypedMap(
 			Object.class,
 			mutableData,
-			EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA,
+			EdgeBridgeConstants.MobileCoreKeys.CONTEXT_DATA,
 			null
 		);
-		mutableData.remove(EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA);
+		mutableData.remove(EdgeBridgeConstants.MobileCoreKeys.CONTEXT_DATA);
+
+		// Extract action
+		String actionValue = DataReader.optString(mutableData, EdgeBridgeConstants.MobileCoreKeys.ACTION, null);
+		mutableData.remove(EdgeBridgeConstants.MobileCoreKeys.ACTION);
+		// Extract state
+		String stateValue = DataReader.optString(mutableData, EdgeBridgeConstants.MobileCoreKeys.STATE, null);
+		mutableData.remove(EdgeBridgeConstants.MobileCoreKeys.STATE);
+
+		boolean actionIsValid = !StringUtils.isNullOrEmpty(actionValue);
+		boolean stateIsValid = !StringUtils.isNullOrEmpty(stateValue);
+
+		// Check for required event payload conditions
+		if (isNullOrEmpty(mutableData) && isNullOrEmpty(contextData) && !actionIsValid && !stateIsValid) {
+			throw new InvalidEventDataException("Missing required event data or valid 'action/state' value.");
+		}
+
 		if (!isNullOrEmpty(contextData)) {
 			Map<String, Object> prefixedData = new HashMap<>();
 			Map<String, Object> nonPrefixedData = new HashMap<>();
@@ -263,8 +294,8 @@ class EdgeBridgeExtension extends Extension {
 				Object value = entry.getValue();
 
 				// Check if the key starts with the specified prefix and add to corresponding map
-				if (key.startsWith(EdgeBridgeConstants.EdgeValues.PREFIX)) {
-					String newKey = key.substring(EdgeBridgeConstants.EdgeValues.PREFIX.length());
+				if (key.startsWith(EdgeBridgeConstants.AnalyticsValues.PREFIX)) {
+					String newKey = key.substring(EdgeBridgeConstants.AnalyticsValues.PREFIX.length());
 					prefixedData.put(newKey, value);
 				} else {
 					nonPrefixedData.put(key, value);
@@ -278,30 +309,26 @@ class EdgeBridgeExtension extends Extension {
 
 			// If there are non-prefixed data entries, add them under the contextData key
 			if (!nonPrefixedData.isEmpty()) {
-				analyticsData.put(EdgeBridgeConstants.EdgeKeys.CONTEXT_DATA, nonPrefixedData);
+				analyticsData.put(EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA, nonPrefixedData);
 			}
 		}
 
 		// Process action
-		Object actionValue = mutableData.remove(EdgeBridgeConstants.AnalyticsKeys.ACTION);
-		if (actionValue instanceof String) { // Validates non-null and correct type
-			String action = (String) actionValue;
-			analyticsData.put(EdgeBridgeConstants.EdgeKeys.LINK_NAME, action);
-			analyticsData.put(EdgeBridgeConstants.EdgeKeys.LINK_TYPE, EdgeBridgeConstants.EdgeValues.OTHER);
+		if (actionIsValid) {
+			analyticsData.put(EdgeBridgeConstants.AnalyticsKeys.LINK_NAME, actionValue);
+			analyticsData.put(EdgeBridgeConstants.AnalyticsKeys.LINK_TYPE, EdgeBridgeConstants.AnalyticsValues.OTHER);
 		}
 
 		// Process state
-		Object stateValue = mutableData.remove(EdgeBridgeConstants.AnalyticsKeys.STATE);
-		if (stateValue instanceof String) { // Validates non-null and correct type
-			String state = (String) stateValue;
-			analyticsData.put(EdgeBridgeConstants.EdgeKeys.PAGE_NAME, state);
+		if (stateIsValid) {
+			analyticsData.put(EdgeBridgeConstants.AnalyticsKeys.PAGE_NAME, stateValue);
 		}
 
 		// If analyticsData is not empty, add it to mutableData under __adobe.analytics
 		if (!analyticsData.isEmpty()) {
 			Map<String, Object> adobeAnalytics = new HashMap<>();
-			adobeAnalytics.put(EdgeBridgeConstants.EdgeKeys.ANALYTICS, analyticsData);
-			mutableData.put(EdgeBridgeConstants.EdgeKeys.ADOBE, adobeAnalytics);
+			adobeAnalytics.put(EdgeBridgeConstants.AnalyticsKeys.ANALYTICS, analyticsData);
+			mutableData.put(EdgeBridgeConstants.AnalyticsKeys.ADOBE, adobeAnalytics);
 		}
 
 		return mutableData;

@@ -13,7 +13,6 @@ package com.adobe.marketing.mobile.edge.bridge;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -24,6 +23,7 @@ import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.ExtensionEventListener;
+import com.adobe.marketing.mobile.util.CloneFailedException;
 import com.adobe.marketing.mobile.util.TimeUtils;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -423,6 +423,57 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
+	public void testHandleTrackEvent_withEmptyContextData_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("contextdata", Collections.<String, Object>emptyMap());
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_withNullContextData_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("contextdata", null);
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_withUnexpectedContextDataType_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("contextdata", 123);
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
 	public void testHandleTrackEvent_withDataField_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
@@ -574,7 +625,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void testHandleTrackEvent_nullAction_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_nullActionAndNoContextData_doesNotDispatchEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -587,44 +638,106 @@ public class EdgeBridgeExtensionTests {
 
 		extension.handleTrackRequest(event);
 
-		ArgumentCaptor<Event> dispatchedEventCaptor = ArgumentCaptor.forClass(Event.class);
-
-		verify(mockExtensionApi, times(1)).dispatch(dispatchedEventCaptor.capture());
-
-		Event responseEvent = dispatchedEventCaptor.getAllValues().get(0);
-		assertEquals(EventType.EDGE, responseEvent.getType());
-		assertEquals(EventSource.REQUEST_CONTENT, responseEvent.getSource());
-		assertEquals(EdgeBridgeTestConstants.EventNames.EDGE_BRIDGE_REQUEST, responseEvent.getName());
-
-		Map<String, Object> expectedData = new HashMap<String, Object>() {
-			{
-				put("data", new HashMap<String, Object>() {});
-				put(
-					"xdm",
-					new HashMap<String, Object>() {
-						{
-							put("eventType", EdgeBridgeTestConstants.JsonValues.EVENT_TYPE);
-							put(
-								"timestamp",
-								TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(event.getTimestamp()))
-							);
-						}
-					}
-				);
-			}
-		};
-
-		assertEquals(expectedData, responseEvent.getEventData());
-		assertEquals(event.getUniqueIdentifier(), responseEvent.getParentID());
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
 	}
 
 	@Test
-	public void testHandleTrackEvent_emptyAction_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_emptyActionAndNoContextData_doesNotDispatchEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
 					{
 						put("action", "");
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_nullActionAndEmptyContextData_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("action", null);
+						put("contextdata", Collections.<String, Object>emptyMap());
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_emptyActionAndEmptyContextData_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("action", "");
+						put("contextdata", Collections.<String, Object>emptyMap());
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_nullActionAndNullContextData_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("action", null);
+						put("contextdata", null);
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_emptyActionAndNullContextData_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("action", "");
+						put("contextdata", null);
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_nullActionWithOtherData_filtersAction_dispatchesEdgeRequestEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("action", null);
+						put("key1", "value1");
 					}
 				}
 			)
@@ -647,22 +760,60 @@ public class EdgeBridgeExtensionTests {
 					"data",
 					new HashMap<String, Object>() {
 						{
+							put("key1", "value1");
+						}
+					}
+				);
+				put(
+					"xdm",
+					new HashMap<String, Object>() {
+						{
+							put("eventType", EdgeBridgeTestConstants.JsonValues.EVENT_TYPE);
 							put(
-								"__adobe",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"analytics",
-											new HashMap<String, Object>() {
-												{
-													put("linkName", "");
-													put("linkType", "other");
-												}
-											}
-										);
-									}
-								}
+								"timestamp",
+								TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(event.getTimestamp()))
 							);
+						}
+					}
+				);
+			}
+		};
+
+		assertEquals(expectedData, responseEvent.getEventData());
+		assertEquals(event.getUniqueIdentifier(), responseEvent.getParentID());
+	}
+
+	@Test
+	public void testHandleTrackEvent_emptyActionWithOtherData_filtersAction_dispatchesEdgeRequestEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("action", "");
+						put("key1", "value1");
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		ArgumentCaptor<Event> dispatchedEventCaptor = ArgumentCaptor.forClass(Event.class);
+
+		verify(mockExtensionApi, times(1)).dispatch(dispatchedEventCaptor.capture());
+
+		Event responseEvent = dispatchedEventCaptor.getAllValues().get(0);
+		assertEquals(EventType.EDGE, responseEvent.getType());
+		assertEquals(EventSource.REQUEST_CONTENT, responseEvent.getSource());
+		assertEquals(EdgeBridgeTestConstants.EventNames.EDGE_BRIDGE_REQUEST, responseEvent.getName());
+
+		Map<String, Object> expectedData = new HashMap<String, Object>() {
+			{
+				put(
+					"data",
+					new HashMap<String, Object>() {
+						{
+							put("key1", "value1");
 						}
 					}
 				);
@@ -776,7 +927,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void testHandleTrackEvent_nullState_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_nullStateOnly_doesNotDispatchEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
@@ -789,44 +940,106 @@ public class EdgeBridgeExtensionTests {
 
 		extension.handleTrackRequest(event);
 
-		ArgumentCaptor<Event> dispatchedEventCaptor = ArgumentCaptor.forClass(Event.class);
-
-		verify(mockExtensionApi, times(1)).dispatch(dispatchedEventCaptor.capture());
-
-		Event responseEvent = dispatchedEventCaptor.getAllValues().get(0);
-		assertEquals(EventType.EDGE, responseEvent.getType());
-		assertEquals(EventSource.REQUEST_CONTENT, responseEvent.getSource());
-		assertEquals(EdgeBridgeTestConstants.EventNames.EDGE_BRIDGE_REQUEST, responseEvent.getName());
-
-		Map<String, Object> expectedData = new HashMap<String, Object>() {
-			{
-				put("data", new HashMap<String, Object>() {});
-				put(
-					"xdm",
-					new HashMap<String, Object>() {
-						{
-							put("eventType", EdgeBridgeTestConstants.JsonValues.EVENT_TYPE);
-							put(
-								"timestamp",
-								TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(event.getTimestamp()))
-							);
-						}
-					}
-				);
-			}
-		};
-
-		assertEquals(expectedData, responseEvent.getEventData());
-		assertEquals(event.getUniqueIdentifier(), responseEvent.getParentID());
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
 	}
 
 	@Test
-	public void testHandleTrackEvent_emptyState_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_emptyStateOnly_doesNotDispatchEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
 					{
 						put("state", "");
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_nullStateAndEmptyContextData_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("state", null);
+						put("contextdata", Collections.<String, Object>emptyMap());
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_emptyStateAndEmptyContextData_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("state", null);
+						put("contextdata", Collections.<String, Object>emptyMap());
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_nullStateAndNullContextData_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("state", null);
+						put("contextdata", null);
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_emptyStateAndNullContextData_doesNotDispatchEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("state", "");
+						put("contextdata", null);
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		verify(mockExtensionApi, never()).dispatch(any(Event.class));
+	}
+
+	@Test
+	public void testHandleTrackEvent_nullStateAndOtherData_filtersState_dispatchesEdgeRequestEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("state", null);
+						put("key1", "value1");
 					}
 				}
 			)
@@ -849,21 +1062,60 @@ public class EdgeBridgeExtensionTests {
 					"data",
 					new HashMap<String, Object>() {
 						{
+							put("key1", "value1");
+						}
+					}
+				);
+				put(
+					"xdm",
+					new HashMap<String, Object>() {
+						{
+							put("eventType", EdgeBridgeTestConstants.JsonValues.EVENT_TYPE);
 							put(
-								"__adobe",
-								new HashMap<String, Object>() {
-									{
-										put(
-											"analytics",
-											new HashMap<String, Object>() {
-												{
-													put("pageName", "");
-												}
-											}
-										);
-									}
-								}
+								"timestamp",
+								TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(event.getTimestamp()))
 							);
+						}
+					}
+				);
+			}
+		};
+
+		assertEquals(expectedData, responseEvent.getEventData());
+		assertEquals(event.getUniqueIdentifier(), responseEvent.getParentID());
+	}
+
+	@Test
+	public void testHandleTrackEvent_emptyStateAndOtherData_filtersState_dispatchesEdgeRequestEvent() {
+		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+			.setEventData(
+				new HashMap<String, Object>() {
+					{
+						put("state", "");
+						put("key1", "value1");
+					}
+				}
+			)
+			.build();
+
+		extension.handleTrackRequest(event);
+
+		ArgumentCaptor<Event> dispatchedEventCaptor = ArgumentCaptor.forClass(Event.class);
+
+		verify(mockExtensionApi, times(1)).dispatch(dispatchedEventCaptor.capture());
+
+		Event responseEvent = dispatchedEventCaptor.getAllValues().get(0);
+		assertEquals(EventType.EDGE, responseEvent.getType());
+		assertEquals(EventSource.REQUEST_CONTENT, responseEvent.getSource());
+		assertEquals(EdgeBridgeTestConstants.EventNames.EDGE_BRIDGE_REQUEST, responseEvent.getName());
+
+		Map<String, Object> expectedData = new HashMap<String, Object>() {
+			{
+				put(
+					"data",
+					new HashMap<String, Object>() {
+						{
+							put("key1", "value1");
 						}
 					}
 				);
@@ -1749,11 +2001,11 @@ public class EdgeBridgeExtensionTests {
 		verify(mockExtensionApi, never()).dispatch(any(Event.class));
 	}
 
-	@Test
-	public void testDeepCopyFailure() {
+	@Test(expected = CloneFailedException.class)
+	public void testDeepCopyFailure() throws CloneFailedException {
 		Map<String, Object> deeplyNested = createDeeplyNestedMap(260);
-		Map<String, Object> result = extension.deepCopy(deeplyNested);
-		assertNull(result);
+		// This call is expected to throw CloneFailedException due to the depth of the map
+		extension.deepCopy(deeplyNested);
 	}
 
 	private static Map<String, Object> createDeeplyNestedMap(int depth) {
