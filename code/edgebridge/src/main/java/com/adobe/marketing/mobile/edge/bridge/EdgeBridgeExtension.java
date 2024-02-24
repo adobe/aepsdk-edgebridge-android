@@ -15,7 +15,6 @@ import static com.adobe.marketing.mobile.edge.bridge.EdgeBridgeConstants.LOG_TAG
 import static com.adobe.marketing.mobile.util.MapUtils.isNullOrEmpty;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.VisibleForTesting;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
@@ -158,17 +157,32 @@ class EdgeBridgeExtension extends Extension {
 
 	/**
 	 * Helper to create and dispatch an experience event.
+	 *
+	 * If event payload formatting fails, then the track event will not be dispatched.
+	 *
 	 * @param data map containing free-form data to send to Edge Network
 	 * @param parentEvent the triggering parent event used for event chaining; its timestamp is set as xdm.timestamp
 	 */
 	private void dispatchTrackRequest(final Map<String, Object> data, final Event parentEvent) {
+		Map<String, Object> formattedData;
+		try {
+			formattedData = formatData(data);
+		} catch (CloneFailedException e) {
+			// If formatting data fails (due to deep copy exception), do not dispatch event.
+			Log.warning(
+				LOG_TAG,
+				LOG_SOURCE,
+				"Failed to format data for dispatch due to map clone failure: " + e.getMessage()
+			);
+			return;
+		}
 		Map<String, Object> xdmData = new HashMap<>();
 		xdmData.put("eventType", EdgeBridgeConstants.JsonValues.EVENT_TYPE);
 		xdmData.put("timestamp", TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(parentEvent.getTimestamp())));
 
 		Map<String, Object> eventData = new HashMap<>();
 		eventData.put("xdm", xdmData);
-		eventData.put("data", formatData(data));
+		eventData.put("data", formattedData);
 
 		final Event event = new Event.Builder(
 			EdgeBridgeConstants.EventNames.EDGE_BRIDGE_REQUEST,
@@ -224,13 +238,11 @@ class EdgeBridgeExtension extends Extension {
 	 *
 	 * @param data track event data
 	 * @return data formatted for the Analytics Edge translator.
+	 * @throws CloneFailedException if the cloning process fails.
 	 */
-	private Map<String, Object> formatData(final Map<String, Object> data) {
-		// Create a mutable copy of data
+	private Map<String, Object> formatData(final Map<String, Object> data) throws CloneFailedException {
+		// Create a mutable copy of data - can throw exception if deep copy fails
 		Map<String, Object> mutableData = deepCopy(data);
-		if (mutableData == null) {
-			return data;
-		}
 		// __adobe.analytics data container
 		Map<String, Object> analyticsData = new HashMap<>();
 
@@ -298,22 +310,11 @@ class EdgeBridgeExtension extends Extension {
 	/**
 	 * Creates a deep copy of the provided {@link Map}.
 	 *
-	 * @param map to be copied
-	 * @return {@link Map} containing a deep copy of all the elements in {@code map}
+	 * @param map The map to be copied.
+	 * @return A {@link Map} containing a deep copy of all the elements in {@code map}.
+	 * @throws CloneFailedException if the cloning process fails.
 	 */
-	@VisibleForTesting
-	public Map<String, Object> deepCopy(final Map<String, Object> map) {
-		try {
-			return EventDataUtils.clone(map);
-		} catch (CloneFailedException e) {
-			Log.warning(
-				LOG_TAG,
-				LOG_SOURCE,
-				"Unable to deep copy map. CloneFailedException: %s",
-				e.getLocalizedMessage()
-			);
-		}
-
-		return null;
+	Map<String, Object> deepCopy(final Map<String, Object> map) throws CloneFailedException {
+		return EventDataUtils.clone(map);
 	}
 }
