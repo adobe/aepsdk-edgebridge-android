@@ -15,6 +15,7 @@ import static com.adobe.marketing.mobile.edge.bridge.EdgeBridgeConstants.LOG_TAG
 import static com.adobe.marketing.mobile.util.MapUtils.isNullOrEmpty;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
@@ -238,7 +239,8 @@ class EdgeBridgeExtension extends Extension {
 	 * @return data formatted for the Analytics Edge translator. {@code null} if there is no data in
 	 * the payload after format rules are applied, OR if the cloning process fails.
 	 */
-	private Map<String, Object> formatData(final Map<String, Object> data) {
+	@VisibleForTesting
+	Map<String, Object> formatData(final Map<String, Object> data) {
 		Map<String, Object> mutableData;
 
 		// Create a mutable copy of data - can throw exception if deep copy fails
