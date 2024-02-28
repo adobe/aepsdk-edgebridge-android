@@ -166,20 +166,7 @@ class EdgeBridgeExtension extends Extension {
 	 * @param parentEvent the triggering parent event used for event chaining; its timestamp is set as xdm.timestamp
 	 */
 	private void dispatchTrackRequest(final Map<String, Object> data, final Event parentEvent) {
-		Map<String, Object> formattedData;
-		try {
-			formattedData = formatData(data);
-		} catch (CloneFailedException e) {
-			// If formatting data fails (due to deep copy exception), do not dispatch event.
-			Log.warning(
-				LOG_TAG,
-				LOG_SOURCE,
-				"Failed to format data due to map clone failure: " +
-				e.getMessage() +
-				". Experience event not dispatched."
-			);
-			return;
-		}
+		Map<String, Object> formattedData = formatData(data);
 		if (formattedData == null) {
 			Log.warning(
 				LOG_TAG,
@@ -252,12 +239,24 @@ class EdgeBridgeExtension extends Extension {
 	 *
 	 * @param data track event data
 	 * @return data formatted for the Analytics Edge translator. {@code null} if there is no data in
-	 * the payload after format rules are applied.
-	 * @throws CloneFailedException if the cloning process fails.
+	 * the payload after format rules are applied, OR if the cloning process fails.
 	 */
-	private Map<String, Object> formatData(final Map<String, Object> data) throws CloneFailedException {
+	private Map<String, Object> formatData(final Map<String, Object> data) {
+		Map<String, Object> mutableData;
+
 		// Create a mutable copy of data - can throw exception if deep copy fails
-		Map<String, Object> mutableData = deepCopy(data);
+		try {
+			mutableData = EventDataUtils.clone(data);
+		} catch (CloneFailedException e) {
+			Log.warning(LOG_TAG, LOG_SOURCE, "Failed to format data due to map clone failure: " + e.getMessage());
+			return null;
+		}
+
+		// If there is no data to format, early exit and return null
+		if (isNullOrEmpty(mutableData)) {
+			return null;
+		}
+
 		// __adobe.analytics data container
 		Map<String, Object> analyticsData = new HashMap<>();
 
@@ -281,6 +280,8 @@ class EdgeBridgeExtension extends Extension {
 		boolean stateIsValid = !StringUtils.isNullOrEmpty(stateValue);
 
 		// Check for required event payload conditions
+		// `mutableData` check is still required here because there can be properties outside of the
+		// remapped ones that would cause this to still be a valid event
 		if (isNullOrEmpty(mutableData) && isNullOrEmpty(extractedContextData) && !actionIsValid && !stateIsValid) {
 			return null;
 		}
@@ -374,16 +375,5 @@ class EdgeBridgeExtension extends Extension {
 			}
 		}
 		return cleanedData;
-	}
-
-	/**
-	 * Creates a deep copy of the provided {@link Map}.
-	 *
-	 * @param map The map to be copied.
-	 * @return A {@link Map} containing a deep copy of all the elements in {@code map}.
-	 * @throws CloneFailedException if the cloning process fails.
-	 */
-	Map<String, Object> deepCopy(final Map<String, Object> map) throws CloneFailedException {
-		return EventDataUtils.clone(map);
 	}
 }
