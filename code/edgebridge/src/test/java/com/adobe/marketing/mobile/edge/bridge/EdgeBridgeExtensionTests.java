@@ -805,6 +805,7 @@ public class EdgeBridgeExtensionTests {
 											"analytics",
 											new HashMap<String, Object>() {
 												{
+													// Note: whitespace only keys are invalid
 													put("&", "value2");
 													put("&&", "value3");
 													put("1", "value4");
