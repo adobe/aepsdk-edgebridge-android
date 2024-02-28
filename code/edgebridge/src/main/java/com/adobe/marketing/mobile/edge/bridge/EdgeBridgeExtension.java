@@ -34,13 +34,6 @@ class EdgeBridgeExtension extends Extension {
 
 	private static final String LOG_SOURCE = "EdgeBridgeExtension";
 
-	public class InvalidEventDataException extends Exception {
-
-		public InvalidEventDataException(String message) {
-			super(message);
-		}
-	}
-
 	protected EdgeBridgeExtension(final ExtensionApi extensionApi) {
 		super(extensionApi);
 	}
@@ -181,12 +174,20 @@ class EdgeBridgeExtension extends Extension {
 			Log.warning(
 				LOG_TAG,
 				LOG_SOURCE,
-				"Failed to format data for dispatch due to map clone failure: " + e.getMessage()
+				"Failed to format data due to map clone failure: " +
+				e.getMessage() +
+				". Experience event not dispatched."
 			);
 			return;
-		} catch (InvalidEventDataException e) {
-			// If event data map does not have any data or valid action/state, do not dispatch event.
-			Log.warning(LOG_TAG, LOG_SOURCE, "Invalid event data: " + e.getMessage());
+		}
+		if (formattedData == null) {
+			Log.warning(
+				LOG_TAG,
+				LOG_SOURCE,
+				"Event '" +
+				parentEvent.getUniqueIdentifier() +
+				"' did not contain any mappable data. Experience event not dispatched."
+			);
 			return;
 		}
 		Map<String, Object> xdmData = new HashMap<>();
@@ -250,19 +251,18 @@ class EdgeBridgeExtension extends Extension {
 	 * ```
 	 *
 	 * @param data track event data
-	 * @return data formatted for the Analytics Edge translator.
+	 * @return data formatted for the Analytics Edge translator. {@code null} if there is no data in
+	 * the payload after format rules are applied.
 	 * @throws CloneFailedException if the cloning process fails.
-	 * @throws InvalidEventDataException if event data map does not have any data or valid action/state.
 	 */
-	private Map<String, Object> formatData(final Map<String, Object> data)
-		throws CloneFailedException, InvalidEventDataException {
+	private Map<String, Object> formatData(final Map<String, Object> data) throws CloneFailedException {
 		// Create a mutable copy of data - can throw exception if deep copy fails
 		Map<String, Object> mutableData = deepCopy(data);
 		// __adobe.analytics data container
 		Map<String, Object> analyticsData = new HashMap<>();
 
 		// Extract contextData
-		final Map<String, Object> contextData = DataReader.optTypedMap(
+		final Map<String, Object> extractedContextData = DataReader.optTypedMap(
 			Object.class,
 			mutableData,
 			EdgeBridgeConstants.MobileCoreKeys.CONTEXT_DATA,
@@ -281,21 +281,50 @@ class EdgeBridgeExtension extends Extension {
 		boolean stateIsValid = !StringUtils.isNullOrEmpty(stateValue);
 
 		// Check for required event payload conditions
-		if (isNullOrEmpty(mutableData) && isNullOrEmpty(contextData) && !actionIsValid && !stateIsValid) {
-			throw new InvalidEventDataException("Missing required event data or valid 'action/state' value.");
+		if (isNullOrEmpty(mutableData) && isNullOrEmpty(extractedContextData) && !actionIsValid && !stateIsValid) {
+			return null;
 		}
 
-		if (!isNullOrEmpty(contextData)) {
+		if (!isNullOrEmpty(extractedContextData)) {
+			final Map<String, String> contextData = cleanContextData(extractedContextData);
 			Map<String, Object> prefixedData = new HashMap<>();
 			Map<String, Object> nonPrefixedData = new HashMap<>();
 
-			for (Map.Entry<String, Object> entry : contextData.entrySet()) {
+			for (Map.Entry<String, String> entry : contextData.entrySet()) {
 				String key = entry.getKey();
 				Object value = entry.getValue();
 
+				// Filter out invalid keys
+				if (StringUtils.isNullOrEmpty(key)) {
+					Log.warning(
+						LOG_TAG,
+						LOG_SOURCE,
+						"formatData - Dropping Key(" +
+						key +
+						") with Value(" +
+						value +
+						"). Key must be a non-empty String."
+					);
+					continue;
+				}
 				// Check if the key starts with the specified prefix and add to corresponding map
 				if (key.startsWith(EdgeBridgeConstants.AnalyticsValues.PREFIX)) {
 					String newKey = key.substring(EdgeBridgeConstants.AnalyticsValues.PREFIX.length());
+					// After modifying key by removing prefix, filter out invalid keys
+					if (StringUtils.isNullOrEmpty(newKey)) {
+						Log.warning(
+							LOG_TAG,
+							LOG_SOURCE,
+							"formatData - Dropping Key(" +
+							key +
+							" -> " +
+							newKey +
+							") with Value(" +
+							value +
+							"). Key must be a non-empty String."
+						);
+						continue;
+					}
 					prefixedData.put(newKey, value);
 				} else {
 					nonPrefixedData.put(key, value);
@@ -332,6 +361,19 @@ class EdgeBridgeExtension extends Extension {
 		}
 
 		return mutableData;
+	}
+
+	/**
+	 * Remove entries with values which cannot be converted to String.
+	 */
+	private Map<String, String> cleanContextData(Map<String, Object> eventData) {
+		Map<String, String> cleanedData = new HashMap<>();
+		for (Map.Entry<String, Object> entry : eventData.entrySet()) {
+			if (entry.getValue() instanceof String) {
+				cleanedData.put(entry.getKey(), (String) entry.getValue());
+			}
+		}
+		return cleanedData;
 	}
 
 	/**
