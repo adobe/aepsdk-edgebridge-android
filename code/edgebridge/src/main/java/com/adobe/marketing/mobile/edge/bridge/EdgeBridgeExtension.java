@@ -296,7 +296,7 @@ class EdgeBridgeExtension extends Extension {
 
 				// Filter out invalid keys
 				if (StringUtils.isNullOrEmpty(key)) {
-					Log.warning(
+					Log.debug(
 						LOG_TAG,
 						LOG_SOURCE,
 						"formatData - Dropping Key(" +
@@ -312,7 +312,7 @@ class EdgeBridgeExtension extends Extension {
 					String newKey = key.substring(EdgeBridgeConstants.AnalyticsValues.PREFIX.length());
 					// After modifying key by removing prefix, filter out invalid keys
 					if (StringUtils.isNullOrEmpty(newKey)) {
-						Log.warning(
+						Log.debug(
 							LOG_TAG,
 							LOG_SOURCE,
 							"formatData - Dropping Key(" +
