@@ -30,13 +30,13 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btn_track_action).setOnClickListener {
             // Dispatch an Analytics track action event which is handled by the
             // Edge Bridge extension which forwards it to the Edge Network.
+            // This track action represents a purchase event of two products.
             MobileCore.trackAction(
-                "add_to_cart",
+                "purchase",
                 mapOf<String, String>(
-                    "product.id" to "12345",
-                    "product.add.event" to "1",
-                    "product.name" to "wide_brim_sunhat",
-                    "product.units" to "1"
+                    "&&products" to ";Running Shoes;1;69.95;event1|event2=55.99;eVar1=12345,;Running Socks;10;29.99;event2=10.95;eVar1=54321",
+                    "&&events" to "event5,purchase",
+                    "myapp.promotion" to "a0138"
                 )
             )
         }
@@ -44,12 +44,13 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.btn_track_state).setOnClickListener {
             // Dispatch an Analytics track state event which is handled by the
             // Edge Bridge extension which forwards it to the Edge Network.
+            // This track state represents a product view.
             MobileCore.trackState(
-                "hats/sunhat/wide_brim_sunhat_id12345",
+                "products/189025/runningshoes/12345",
                 mapOf<String, String>(
-                    "product.name" to "wide_brim_sunhat",
-                    "product.id" to "12345",
-                    "product.view.event" to "1"
+                    "&&products" to ";Running Shoes;1;69.95;prodView|event2=55.99;eVar1=12345",
+                    "myapp.category" to "189025",
+                    "myapp.promotion" to "a0138"
                 )
             )
         }

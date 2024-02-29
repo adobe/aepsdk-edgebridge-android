@@ -12,6 +12,7 @@
 package com.adobe.marketing.mobile.edge.bridge;
 
 import static com.adobe.marketing.mobile.edge.bridge.EdgeBridgeConstants.LOG_TAG;
+import static com.adobe.marketing.mobile.util.MapUtils.isNullOrEmpty;
 
 import androidx.annotation.NonNull;
 import com.adobe.marketing.mobile.Event;
@@ -20,7 +21,9 @@ import com.adobe.marketing.mobile.EventType;
 import com.adobe.marketing.mobile.Extension;
 import com.adobe.marketing.mobile.ExtensionApi;
 import com.adobe.marketing.mobile.services.Log;
+import com.adobe.marketing.mobile.util.CloneFailedException;
 import com.adobe.marketing.mobile.util.DataReader;
+import com.adobe.marketing.mobile.util.EventDataUtils;
 import com.adobe.marketing.mobile.util.StringUtils;
 import com.adobe.marketing.mobile.util.TimeUtils;
 import java.util.Date;
@@ -151,17 +154,33 @@ class EdgeBridgeExtension extends Extension {
 
 	/**
 	 * Helper to create and dispatch an experience event.
+	 *
+	 * Track events will not be dispatched in any of the following cases:
+	 * 1. Deep copy of the event data map fails.
+	 * 2. Event data map does not have any data or valid action/state.
+	 *
 	 * @param data map containing free-form data to send to Edge Network
 	 * @param parentEvent the triggering parent event used for event chaining; its timestamp is set as xdm.timestamp
 	 */
 	private void dispatchTrackRequest(final Map<String, Object> data, final Event parentEvent) {
+		Map<String, Object> formattedData = formatData(data);
+		if (formattedData == null) {
+			Log.warning(
+				LOG_TAG,
+				LOG_SOURCE,
+				"Event '" +
+				parentEvent.getUniqueIdentifier() +
+				"' did not contain any mappable data. Experience event not dispatched."
+			);
+			return;
+		}
 		Map<String, Object> xdmData = new HashMap<>();
 		xdmData.put("eventType", EdgeBridgeConstants.JsonValues.EVENT_TYPE);
 		xdmData.put("timestamp", TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(parentEvent.getTimestamp())));
 
 		Map<String, Object> eventData = new HashMap<>();
 		eventData.put("xdm", xdmData);
-		eventData.put("data", data);
+		eventData.put("data", formattedData);
 
 		final Event event = new Event.Builder(
 			EdgeBridgeConstants.EventNames.EDGE_BRIDGE_REQUEST,
@@ -175,7 +194,183 @@ class EdgeBridgeExtension extends Extension {
 		getApi().dispatch(event);
 	}
 
-	private boolean isNullOrEmpty(final Map map) {
-		return map == null || map.isEmpty();
+	/**
+	 * Formats track event data to the required Analytics Edge translator format under the `data.__adobe.analytics` object.
+	 *
+	 * The following is the mapping logic:
+	 * - The "action" field is mapped to "data.__adobe.analytics.linkName", and "data.__adobe.analytics.linkType" is set to "other".
+	 * - The "state" field is mapped to "data.__adobe.analytics.pageName".
+	 * - Any "contextData" keys that start with the "&&" prefix are mapped to "data.__adobe.analytics" with the prefix removed.
+	 * - Any "contextData" keys without the "&&" prefix are mapped to "data.__adobe.analytics.contextData".
+	 * - Any additional fields are passed through and left directly under the "data" object.
+	 *
+	 * As an example, the following track event data:
+	 * ```
+	 * {
+	 *    "action": "action name",
+	 *    "contextData": {
+	 *       "&&c1": "propValue1",
+	 *       "key1": "value1"
+	 *    },
+	 *    "key2": "value2"
+	 * }
+	 * ```
+	 * Is mapped to:
+	 * ```
+	 * {
+	 *   "data": {
+	 *     "__adobe": {
+	 *       "analytics": {
+	 *         "linkName": "action name",
+	 *         "linkType": "other",
+	 *         "c1": "propValue1",
+	 *         "contextData": {
+	 *           "key1": "value1"
+	 *         }
+	 *       }
+	 *     },
+	 *     "key2": "value2"
+	 *   }
+	 * }
+	 * ```
+	 *
+	 * @param data track event data
+	 * @return data formatted for the Analytics Edge translator. {@code null} if there is no data in
+	 * the payload after format rules are applied, OR if the cloning process fails.
+	 */
+	private Map<String, Object> formatData(final Map<String, Object> data) {
+		Map<String, Object> mutableData;
+
+		// Create a mutable copy of data - can throw exception if deep copy fails
+		try {
+			mutableData = EventDataUtils.clone(data);
+		} catch (CloneFailedException e) {
+			Log.warning(LOG_TAG, LOG_SOURCE, "Failed to format data due to map clone failure: " + e.getMessage());
+			return null;
+		}
+
+		// If there is no data to format, early exit and return null
+		if (isNullOrEmpty(mutableData)) {
+			return null;
+		}
+
+		// __adobe.analytics data container
+		Map<String, Object> analyticsData = new HashMap<>();
+
+		// Extract contextData
+		final Map<String, Object> extractedContextData = DataReader.optTypedMap(
+			Object.class,
+			mutableData,
+			EdgeBridgeConstants.MobileCoreKeys.CONTEXT_DATA,
+			null
+		);
+		mutableData.remove(EdgeBridgeConstants.MobileCoreKeys.CONTEXT_DATA);
+
+		// Extract action
+		String actionValue = DataReader.optString(mutableData, EdgeBridgeConstants.MobileCoreKeys.ACTION, null);
+		mutableData.remove(EdgeBridgeConstants.MobileCoreKeys.ACTION);
+		// Extract state
+		String stateValue = DataReader.optString(mutableData, EdgeBridgeConstants.MobileCoreKeys.STATE, null);
+		mutableData.remove(EdgeBridgeConstants.MobileCoreKeys.STATE);
+
+		boolean actionIsValid = !StringUtils.isNullOrEmpty(actionValue);
+		boolean stateIsValid = !StringUtils.isNullOrEmpty(stateValue);
+
+		// Check for required event payload conditions
+		// `mutableData` check is still required here because there can be properties outside of the
+		// remapped ones that would cause this to still be a valid event
+		if (isNullOrEmpty(mutableData) && isNullOrEmpty(extractedContextData) && !actionIsValid && !stateIsValid) {
+			return null;
+		}
+
+		if (!isNullOrEmpty(extractedContextData)) {
+			final Map<String, String> contextData = cleanContextData(extractedContextData);
+			Map<String, Object> prefixedData = new HashMap<>();
+			Map<String, Object> nonPrefixedData = new HashMap<>();
+
+			for (Map.Entry<String, String> entry : contextData.entrySet()) {
+				String key = entry.getKey();
+				Object value = entry.getValue();
+
+				// Filter out invalid keys
+				if (StringUtils.isNullOrEmpty(key)) {
+					Log.debug(
+						LOG_TAG,
+						LOG_SOURCE,
+						"formatData - Dropping Key(" +
+						key +
+						") with Value(" +
+						value +
+						"). Key must be a non-empty String."
+					);
+					continue;
+				}
+				// Check if the key starts with the specified prefix and add to corresponding map
+				if (key.startsWith(EdgeBridgeConstants.AnalyticsValues.PREFIX)) {
+					String newKey = key.substring(EdgeBridgeConstants.AnalyticsValues.PREFIX.length());
+					// After modifying key by removing prefix, filter out invalid keys
+					if (StringUtils.isNullOrEmpty(newKey)) {
+						Log.debug(
+							LOG_TAG,
+							LOG_SOURCE,
+							"formatData - Dropping Key(" +
+							key +
+							" -> " +
+							newKey +
+							") with Value(" +
+							value +
+							"). Key must be a non-empty String."
+						);
+						continue;
+					}
+					prefixedData.put(newKey, value);
+				} else {
+					nonPrefixedData.put(key, value);
+				}
+			}
+
+			// If there are prefixed data entries, add them to analyticsData
+			if (!prefixedData.isEmpty()) {
+				analyticsData.putAll(prefixedData);
+			}
+
+			// If there are non-prefixed data entries, add them under the contextData key
+			if (!nonPrefixedData.isEmpty()) {
+				analyticsData.put(EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA, nonPrefixedData);
+			}
+		}
+
+		// Process action
+		if (actionIsValid) {
+			analyticsData.put(EdgeBridgeConstants.AnalyticsKeys.LINK_NAME, actionValue);
+			analyticsData.put(EdgeBridgeConstants.AnalyticsKeys.LINK_TYPE, EdgeBridgeConstants.AnalyticsValues.OTHER);
+		}
+
+		// Process state
+		if (stateIsValid) {
+			analyticsData.put(EdgeBridgeConstants.AnalyticsKeys.PAGE_NAME, stateValue);
+		}
+
+		// If analyticsData is not empty, add it to mutableData under __adobe.analytics
+		if (!analyticsData.isEmpty()) {
+			Map<String, Object> adobeAnalytics = new HashMap<>();
+			adobeAnalytics.put(EdgeBridgeConstants.AnalyticsKeys.ANALYTICS, analyticsData);
+			mutableData.put(EdgeBridgeConstants.AnalyticsKeys.ADOBE, adobeAnalytics);
+		}
+
+		return mutableData;
+	}
+
+	/**
+	 * Remove entries with values which cannot be converted to String.
+	 */
+	private Map<String, String> cleanContextData(Map<String, Object> eventData) {
+		Map<String, String> cleanedData = new HashMap<>();
+		for (Map.Entry<String, Object> entry : eventData.entrySet()) {
+			if (entry.getValue() instanceof String) {
+				cleanedData.put(entry.getKey(), (String) entry.getValue());
+			}
+		}
+		return cleanedData;
 	}
 }
