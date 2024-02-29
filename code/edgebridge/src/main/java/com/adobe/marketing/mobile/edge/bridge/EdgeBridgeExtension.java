@@ -15,6 +15,7 @@ import static com.adobe.marketing.mobile.edge.bridge.EdgeBridgeConstants.LOG_TAG
 import static com.adobe.marketing.mobile.util.MapUtils.isNullOrEmpty;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
@@ -174,6 +175,9 @@ class EdgeBridgeExtension extends Extension {
 			);
 			return;
 		}
+		// Add in out-of-the-box metrics
+		addAnalyticsProperties(formattedData);
+
 		Map<String, Object> xdmData = new HashMap<>();
 		xdmData.put("eventType", EdgeBridgeConstants.JsonValues.EVENT_TYPE);
 		xdmData.put("timestamp", TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(parentEvent.getTimestamp())));
@@ -364,7 +368,7 @@ class EdgeBridgeExtension extends Extension {
 	/**
 	 * Remove entries with values which cannot be converted to String.
 	 */
-	private Map<String, String> cleanContextData(Map<String, Object> eventData) {
+	private Map<String, String> cleanContextData(final Map<String, Object> eventData) {
 		Map<String, String> cleanedData = new HashMap<>();
 		for (Map.Entry<String, Object> entry : eventData.entrySet()) {
 			if (entry.getValue() instanceof String) {
@@ -372,5 +376,66 @@ class EdgeBridgeExtension extends Extension {
 			}
 		}
 		return cleanedData;
+	}
+
+	/**
+	 * Adds various Analytics standard properties into the final track event payload. Creates required
+	 * parts of the hierarchy if they are not already present in the original event data. This should
+	 * be used only after first validating the event data.
+	 *
+	 * @param eventData
+	 */
+	@VisibleForTesting
+	void addAnalyticsProperties(final Map<String, Object> eventData) {
+		// Access to the `__adobe` map
+		Map<String, Object> adobeMap = DataReader.optTypedMap(
+			Object.class,
+			eventData,
+			EdgeBridgeConstants.AnalyticsKeys.ADOBE,
+			null
+		);
+		if (adobeMap == null) {
+			adobeMap = new HashMap<>();
+			eventData.put(EdgeBridgeConstants.AnalyticsKeys.ADOBE, adobeMap);
+		}
+
+		// Access to the `analytics` map
+		Map<String, Object> analyticsMap = DataReader.optTypedMap(
+			Object.class,
+			adobeMap,
+			EdgeBridgeConstants.AnalyticsKeys.ANALYTICS,
+			null
+		);
+		if (analyticsMap == null) {
+			analyticsMap = new HashMap<>();
+			adobeMap.put(EdgeBridgeConstants.AnalyticsKeys.ANALYTICS, analyticsMap);
+		}
+		// Analytics original implementation: Customer perspective defaults to foreground when unknown and is always present
+		analyticsMap.put(
+			EdgeBridgeConstants.AnalyticsKeys.CUSTOMER_PERSPECTIVE,
+			EdgeBridgeMetricsBuilder.getCustomerPerspective()
+		);
+
+		// Analytics original implementation: AppID is only populated if it passes `StringUtils.isNullOrEmpty`
+		// Note that since AppID is the only property dependent on `contextData`, it being invalid
+		// triggers an early exit here; if other metrics are added later, this early exit logic should
+		// be updated accordingly.
+		String appId = EdgeBridgeMetricsBuilder.getApplicationIdentifier();
+		if (StringUtils.isNullOrEmpty(appId)) {
+			return;
+		}
+		// Access to the `contextData` map
+		Map<String, Object> contextDataMap = DataReader.optTypedMap(
+			Object.class,
+			analyticsMap,
+			EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA,
+			null
+		);
+		if (contextDataMap == null) {
+			contextDataMap = new HashMap<>();
+			analyticsMap.put(EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA, contextDataMap);
+		}
+
+		contextDataMap.put(EdgeBridgeConstants.AnalyticsKeys.APPLICATION_IDENTIFIER, appId);
 	}
 }
