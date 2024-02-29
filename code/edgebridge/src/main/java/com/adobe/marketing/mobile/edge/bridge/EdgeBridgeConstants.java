@@ -33,7 +33,9 @@ final class EdgeBridgeConstants {
 
 		static final String ADOBE = "__adobe";
 		static final String ANALYTICS = "analytics";
+		static final String APPLICATION_IDENTIFIER = "a.AppID";
 		static final String CONTEXT_DATA = "contextData";
+		static final String CUSTOMER_PERSPECTIVE = "cp";
 		static final String LINK_NAME = "linkName";
 		static final String LINK_TYPE = "linkType";
 		static final String PAGE_NAME = "pageName";
@@ -43,6 +45,8 @@ final class EdgeBridgeConstants {
 
 	final class AnalyticsValues {
 
+		static final String APP_STATE_BACKGROUND = "background";
+		static final String APP_STATE_FOREGROUND = "foreground";
 		static final String OTHER = "other";
 		static final String PREFIX = "&&";
 
