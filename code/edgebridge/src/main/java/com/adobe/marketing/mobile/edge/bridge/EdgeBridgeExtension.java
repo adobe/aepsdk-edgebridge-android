@@ -379,24 +379,30 @@ class EdgeBridgeExtension extends Extension {
 	}
 
 	/**
-	 * Adds various Analytics standard properties into the final track event payload. Creates required
-	 * parts of the hierarchy if they are not already present in the original event data. This should
-	 * be used only after first validating the event data.
+	 * Adds the following keys to the given data map:
+	 * <p>__adobe.analytics.cp</p>
+	 * <p>__adobe.analytics.contextData.a.AppId</p>
+	 * Creates required paths if they are not already present in the original data map.
+	 * This should be used only after first validating the track event has valid data from the public API.
 	 *
-	 * @param eventData
+	 * @param data the mutable map that will have Analytics properties added.
 	 */
 	@VisibleForTesting
-	void addAnalyticsProperties(final Map<String, Object> eventData) {
+	void addAnalyticsProperties(final Map<String, Object> data) {
 		// Access to the `__adobe` map
 		Map<String, Object> adobeMap = DataReader.optTypedMap(
 			Object.class,
-			eventData,
+			data,
 			EdgeBridgeConstants.AnalyticsKeys.ADOBE,
-			null
+			new HashMap<>()
 		);
-		if (adobeMap == null) {
-			adobeMap = new HashMap<>();
-			eventData.put(EdgeBridgeConstants.AnalyticsKeys.ADOBE, adobeMap);
+		if (adobeMap.isEmpty()) {
+			// If the target map is empty it could be:
+			// 1. Already existing and empty
+			// 2. Newly created as the fallback value
+			// However in both cases, it is safe to replace the existing value since there will be
+			// no data loss (this applies to all similar logic)
+			data.put(EdgeBridgeConstants.AnalyticsKeys.ADOBE, adobeMap);
 		}
 
 		// Access to the `analytics` map
@@ -404,10 +410,9 @@ class EdgeBridgeExtension extends Extension {
 			Object.class,
 			adobeMap,
 			EdgeBridgeConstants.AnalyticsKeys.ANALYTICS,
-			null
+			new HashMap<>()
 		);
-		if (analyticsMap == null) {
-			analyticsMap = new HashMap<>();
+		if (analyticsMap.isEmpty()) {
 			adobeMap.put(EdgeBridgeConstants.AnalyticsKeys.ANALYTICS, analyticsMap);
 		}
 		// Analytics original implementation: Customer perspective defaults to foreground when unknown and is always present
@@ -429,10 +434,9 @@ class EdgeBridgeExtension extends Extension {
 			Object.class,
 			analyticsMap,
 			EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA,
-			null
+			new HashMap<>()
 		);
-		if (contextDataMap == null) {
-			contextDataMap = new HashMap<>();
+		if (contextDataMap.isEmpty()) {
 			analyticsMap.put(EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA, contextDataMap);
 		}
 
