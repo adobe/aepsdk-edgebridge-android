@@ -1314,7 +1314,7 @@ public class EdgeBridgeExtensionTests {
 	}
 
 	@Test
-	public void testHandleTrackEvent_mapsNullAndEmptyValues_dispatchesEdgeRequestEvent() {
+	public void testHandleTrackEvent_mapsNullAndEmptyValues_andClearsNullValues_dispatchesEdgeRequestEvent() {
 		final Event event = new Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
 			.setEventData(
 				new HashMap<String, Object>() {
