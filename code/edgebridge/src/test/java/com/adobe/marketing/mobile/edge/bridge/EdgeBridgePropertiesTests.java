@@ -24,7 +24,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-public class EdgeBridgeExtensionHelperTests {
+public class EdgeBridgePropertiesTests {
 
 	private EdgeBridgeExtension extension;
 
