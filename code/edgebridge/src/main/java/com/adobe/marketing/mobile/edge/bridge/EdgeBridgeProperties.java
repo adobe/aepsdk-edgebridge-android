@@ -21,7 +21,7 @@ import com.adobe.marketing.mobile.services.Log;
 import com.adobe.marketing.mobile.services.ServiceProvider;
 import com.adobe.marketing.mobile.util.StringUtils;
 
-public class EdgeBridgeMetricsBuilder {
+class EdgeBridgeProperties {
 
 	private static final String LOG_SOURCE = "EdgeBridgeMetricsBuilder";
 

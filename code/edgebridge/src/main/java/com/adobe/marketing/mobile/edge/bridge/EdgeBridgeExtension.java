@@ -413,14 +413,14 @@ class EdgeBridgeExtension extends Extension {
 		// Analytics original implementation: Customer perspective defaults to foreground when unknown and is always present
 		analyticsMap.put(
 			EdgeBridgeConstants.AnalyticsKeys.CUSTOMER_PERSPECTIVE,
-			EdgeBridgeMetricsBuilder.getCustomerPerspective()
+			EdgeBridgeProperties.getCustomerPerspective()
 		);
 
 		// Analytics original implementation: AppID is only populated if it passes `StringUtils.isNullOrEmpty`
 		// Note that since AppID is the only property dependent on `contextData`, it being invalid
 		// triggers an early exit here; if other metrics are added later, this early exit logic should
 		// be updated accordingly.
-		String appId = EdgeBridgeMetricsBuilder.getApplicationIdentifier();
+		String appId = EdgeBridgeProperties.getApplicationIdentifier();
 		if (StringUtils.isNullOrEmpty(appId)) {
 			return;
 		}
