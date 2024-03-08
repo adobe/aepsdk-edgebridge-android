@@ -25,6 +25,13 @@ class EdgeBridgeProperties {
 
 	private static final String LOG_SOURCE = "EdgeBridgeProperties";
 
+	/**
+	 * Provides the current customer perspective based on the application's state.
+	 *
+	 * @return A {@link String} representing the customer perspective, either {@link EdgeBridgeConstants.AnalyticsValues#APP_STATE_FOREGROUND}
+	 * for foreground or {@link EdgeBridgeConstants.AnalyticsValues#APP_STATE_BACKGROUND} for background,
+	 * defaulting to foreground if the state cannot be determined.
+	 */
 	@NonNull static String getCustomerPerspective() {
 		if (ServiceProvider.getInstance().getAppContextService() == null) {
 			Log.trace(
