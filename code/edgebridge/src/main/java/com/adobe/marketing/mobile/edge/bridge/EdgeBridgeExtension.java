@@ -15,6 +15,7 @@ import static com.adobe.marketing.mobile.edge.bridge.EdgeBridgeConstants.LOG_TAG
 import static com.adobe.marketing.mobile.util.MapUtils.isNullOrEmpty;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.VisibleForTesting;
 import com.adobe.marketing.mobile.Event;
 import com.adobe.marketing.mobile.EventSource;
 import com.adobe.marketing.mobile.EventType;
@@ -174,6 +175,7 @@ class EdgeBridgeExtension extends Extension {
 			);
 			return;
 		}
+
 		Map<String, Object> xdmData = new HashMap<>();
 		xdmData.put("eventType", EdgeBridgeConstants.JsonValues.EVENT_TYPE);
 		xdmData.put("timestamp", TimeUtils.getISO8601UTCDateWithMilliseconds(new Date(parentEvent.getTimestamp())));
@@ -208,7 +210,7 @@ class EdgeBridgeExtension extends Extension {
 	 * ```
 	 * {
 	 *    "action": "action name",
-	 *    "contextData": {
+	 *    "contextdata": {
 	 *       "&&c1": "propValue1",
 	 *       "key1": "value1"
 	 *    },
@@ -353,6 +355,7 @@ class EdgeBridgeExtension extends Extension {
 
 		// If analyticsData is not empty, add it to mutableData under __adobe.analytics
 		if (!analyticsData.isEmpty()) {
+			addAnalyticsProperties(analyticsData);
 			Map<String, Object> adobeAnalytics = new HashMap<>();
 			adobeAnalytics.put(EdgeBridgeConstants.AnalyticsKeys.ANALYTICS, analyticsData);
 			mutableData.put(EdgeBridgeConstants.AnalyticsKeys.ADOBE, adobeAnalytics);
@@ -364,7 +367,7 @@ class EdgeBridgeExtension extends Extension {
 	/**
 	 * Remove entries with values which cannot be converted to String.
 	 */
-	private Map<String, String> cleanContextData(Map<String, Object> eventData) {
+	private Map<String, String> cleanContextData(final Map<String, Object> eventData) {
 		Map<String, String> cleanedData = new HashMap<>();
 		for (Map.Entry<String, Object> entry : eventData.entrySet()) {
 			if (entry.getValue() instanceof String) {
@@ -372,5 +375,45 @@ class EdgeBridgeExtension extends Extension {
 			}
 		}
 		return cleanedData;
+	}
+
+	/**
+	 * Adds the following keys to the given data map:
+	 * <p>__adobe.analytics.cp</p>
+	 * <p>__adobe.analytics.contextData.a.AppId</p>
+	 * Creates required paths if they are not already present in the original data map.
+	 * This should be used only after first validating the Analytics data map is valid and should have
+	 * the additional properties added.
+	 *
+	 * @param analyticsData the Analytics data mutable map that will have Analytics properties added.
+	 */
+	@VisibleForTesting
+	void addAnalyticsProperties(final Map<String, Object> analyticsData) {
+		// Analytics original implementation: Customer perspective defaults to foreground when unknown and is always present
+		analyticsData.put(
+			EdgeBridgeConstants.AnalyticsKeys.CUSTOMER_PERSPECTIVE,
+			EdgeBridgeProperties.getCustomerPerspective()
+		);
+
+		// Analytics original implementation: AppID is only populated if it passes `StringUtils.isNullOrEmpty`
+		// Note that since AppID is the only property dependent on `contextData`, it being invalid
+		// triggers an early exit here; if other metrics are added later, this early exit logic should
+		// be updated accordingly.
+		String appId = EdgeBridgeProperties.getApplicationIdentifier();
+		if (StringUtils.isNullOrEmpty(appId)) {
+			return;
+		}
+		// Access to the `contextData` map
+		Map<String, Object> contextDataMap = DataReader.optTypedMap(
+			Object.class,
+			analyticsData,
+			EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA,
+			new HashMap<>()
+		);
+		if (contextDataMap.isEmpty()) {
+			analyticsData.put(EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA, contextDataMap);
+		}
+
+		contextDataMap.put(EdgeBridgeConstants.AnalyticsKeys.APPLICATION_IDENTIFIER, appId);
 	}
 }
