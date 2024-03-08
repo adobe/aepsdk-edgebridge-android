@@ -70,14 +70,16 @@ class EdgeBridgePropertiesTests {
         mockedStaticServiceProvider.close()
     }
 
-    // region Map modification tests
-    // These tests validate the modification of the input map results in the desired format,
-    // and that the values are correctly populated, without testing what specific values are set.
+    // region addAnalyticsProperties tests
+    // These tests validate:
+    //   1. The modification of the input map results in the desired format and
+    //   2. The values are correctly populated (without testing specific value variations)
+    // It is implicitly expected that the caller will handle setting up the higher level hierarchy
+    // of `__adobe.analytics`.
 
     // Validates method:
     // 1. Creates expected hierarchy when not present:
-    //     1. `__adobe.analytics`
-    //     2. `__adobe.analytics.contextData`
+    //     1. `__adobe.analytics.contextData`
     // 2. Adds the expected values
     @Test
     fun testAnalyticsProperties_withEmptyMap_addsProperties() {
@@ -86,13 +88,9 @@ class EdgeBridgePropertiesTests {
         extension.addAnalyticsProperties(eventData)
 
         val expectedData = mapOf(
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "foreground",
-                    "contextData" to mapOf(
-                        "a.AppID" to "null"
-                    )
-                )
+            "cp" to "foreground",
+            "contextData" to mapOf(
+                "a.AppID" to "null"
             )
         )
         assertEquals(expectedData, eventData)
@@ -107,92 +105,71 @@ class EdgeBridgePropertiesTests {
     @Test
     fun testAnalyticsProperties_withAdobeAnalytics_noContextData_addsProperties() {
         val eventData = mutableMapOf<String, Any>(
-            "__adobe" to mutableMapOf(
-                "analytics" to mutableMapOf(
-                    "linkName" to "action name",
-                    "linkType" to "other"
-                )
-            )
+            "linkName" to "action name",
+            "linkType" to "other"
         )
 
         extension.addAnalyticsProperties(eventData)
 
         val expectedData = mapOf(
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "foreground",
-                    "linkName" to "action name",
-                    "linkType" to "other",
-                    "contextData" to mapOf(
-                        "a.AppID" to "null"
-                    )
-                )
+            "cp" to "foreground",
+            "linkName" to "action name",
+            "linkType" to "other",
+            "contextData" to mapOf(
+                "a.AppID" to "null"
             )
         )
         assertEquals(expectedData, eventData)
     }
 
     // Validates method:
-    // 1. Does not overwrite existing values in the hierarchy when already present:
+    // 1. Does not overwrite unrelated existing values in the hierarchy when already present:
     //     1. `__adobe.analytics`
     //     2. `__adobe.analytics.contextData`
     // 2. Adds the expected values
     @Test
     fun testAnalyticsProperties_withAdobeAnalytics_andContextData_addsProperties() {
         val eventData = mutableMapOf<String, Any>(
-            "__adobe" to mutableMapOf(
-                "analytics" to mutableMapOf(
-                    "linkName" to "action name",
-                    "linkType" to "other",
-                    "contextData" to mutableMapOf(
-                        "key1" to "value1"
-                    )
-                )
+            "linkName" to "action name",
+            "linkType" to "other",
+            "contextData" to mutableMapOf(
+                "key1" to "value1"
             )
         )
 
         extension.addAnalyticsProperties(eventData)
 
         val expectedData = mapOf(
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "foreground",
-                    "linkName" to "action name",
-                    "linkType" to "other",
-                    "contextData" to mapOf(
-                        "key1" to "value1",
-                        "a.AppID" to "null"
-                    )
-                )
+            "cp" to "foreground",
+            "linkName" to "action name",
+            "linkType" to "other",
+            "contextData" to mapOf(
+                "key1" to "value1",
+                "a.AppID" to "null"
             )
         )
         assertEquals(expectedData, eventData)
     }
 
     // Validates method:
-    // 1. Does not overwrite existing values in the hierarchy when already present:
-    //     1. Values outside `__adobe.analytics`
-    // 2. Creates expected hierarchy when not present:
-    //     1. `__adobe.analytics`
-    //     2. `__adobe.analytics.contextData`
-    // 3. Adds the expected values
+    // 1. Overwrites existing related values in the hierarchy when already present:
+    //     1. `__adobe.analytics.cp`
+    //     2. `__adobe.analytics.contextData.a.AppID`
     @Test
-    fun testAnalyticsProperties_withNoAdobeAnalytics_addsProperties() {
+    fun testAnalyticsProperties_withExistingAnalyticsProperties_overwritesProperties() {
         val eventData = mutableMapOf<String, Any>(
-            "key1" to "value1"
+            "cp" to "customValue",
+            "contextData" to mutableMapOf(
+                "a.AppID" to "customValue"
+            )
         )
 
         extension.addAnalyticsProperties(eventData)
 
         val expectedData = mapOf(
-            "key1" to "value1",
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "foreground",
-                    "contextData" to mapOf(
-                        "a.AppID" to "null"
-                    )
-                )
+            "cp" to "foreground",
+            "contextData" to mapOf(
+                "a.AppID" to "null"
             )
         )
         assertEquals(expectedData, eventData)
@@ -204,156 +181,77 @@ class EdgeBridgePropertiesTests {
     // These tests validate that the property values are set correctly based on various possible
     // ServiceProvider values.
 
-    // Validates `AppState` `null` is correctly added to the payload
+    // region getCustomerPerspective tests
+
+    // Validates `AppState` `null`'s corresponding value is correctly returned
     @Test
     fun testAnalyticsProperties_withAppStateNull_addsCorrectValue() {
         configureAppContextService(null)
 
-        val eventData = mutableMapOf<String, Any>()
+        val actual = EdgeBridgeProperties.getCustomerPerspective()
 
-        extension.addAnalyticsProperties(eventData)
-
-        val expectedData = mapOf(
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "foreground",
-                    "contextData" to mapOf(
-                        "a.AppID" to "null"
-                    )
-                )
-            )
-        )
-        assertEquals(expectedData, eventData)
+        assertEquals("foreground", actual)
     }
 
-    // Validates `AppState.FOREGROUND` is correctly added to the payload
+    // Validates `AppState.FOREGROUND`'s corresponding value is correctly returned
     @Test
     fun testAnalyticsProperties_withAppStateForeground_addsCorrectValue() {
         configureAppContextService(AppState.FOREGROUND)
 
-        val eventData = mutableMapOf<String, Any>()
+        val actual = EdgeBridgeProperties.getCustomerPerspective()
 
-        extension.addAnalyticsProperties(eventData)
-
-        val expectedData = mapOf(
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "foreground",
-                    "contextData" to mapOf(
-                        "a.AppID" to "null"
-                    )
-                )
-            )
-        )
-        assertEquals(expectedData, eventData)
+        assertEquals("foreground", actual)
     }
 
-    // Validates `AppState.BACKGROUND` is correctly added to the payload
+    // Validates `AppState.BACKGROUND`'s corresponding value is correctly returned
     @Test
     fun testAnalyticsProperties_withAppStateBackground_addsCorrectValue() {
         configureAppContextService(AppState.BACKGROUND)
 
-        val eventData = mutableMapOf<String, Any>()
+        val actual = EdgeBridgeProperties.getCustomerPerspective()
 
-        extension.addAnalyticsProperties(eventData)
-
-        val expectedData = mapOf(
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "background",
-                    "contextData" to mapOf(
-                        "a.AppID" to "null"
-                    )
-                )
-            )
-        )
-        assertEquals(expectedData, eventData)
+        assertEquals("background", actual)
     }
+
+    // endregion getCustomerPerspective tests
+    // region getApplicationIdentifier tests
 
     @Test
     fun testAnalyticsProperties_withFullDeviceInfo_addsCorrectValue() {
         configureDeviceInfoService("Test App Name", "1.2.3", "456")
 
-        val eventData = mutableMapOf<String, Any>()
+        val actual = EdgeBridgeProperties.getApplicationIdentifier()
 
-        extension.addAnalyticsProperties(eventData)
-
-        val expectedData = mapOf(
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "foreground",
-                    "contextData" to mapOf(
-                        "a.AppID" to "Test App Name 1.2.3 (456)"
-                    )
-                )
-            )
-        )
-        assertEquals(expectedData, eventData)
+        assertEquals("Test App Name 1.2.3 (456)", actual)
     }
 
     @Test
     fun testAnalyticsProperties_withDeviceInfoAppName_addsCorrectValue() {
         configureDeviceInfoService("Test App Name", null, null)
 
-        val eventData = mutableMapOf<String, Any>()
+        val actual = EdgeBridgeProperties.getApplicationIdentifier()
 
-        extension.addAnalyticsProperties(eventData)
-
-        val expectedData = mapOf(
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "foreground",
-                    "contextData" to mapOf(
-                        "a.AppID" to "Test App Name"
-                    )
-                )
-            )
-        )
-        assertEquals(expectedData, eventData)
+        assertEquals("Test App Name", actual)
     }
 
     @Test
     fun testAnalyticsProperties_withDeviceInfoAppVersion_addsCorrectValue() {
         configureDeviceInfoService(null, "1.2.3", null)
 
-        val eventData = mutableMapOf<String, Any>()
+        val actual = EdgeBridgeProperties.getApplicationIdentifier()
 
-        extension.addAnalyticsProperties(eventData)
-
-        val expectedData = mapOf(
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "foreground",
-                    "contextData" to mapOf(
-                        "a.AppID" to "null 1.2.3"
-                    )
-                )
-            )
-        )
-        assertEquals(expectedData, eventData)
+        assertEquals("null 1.2.3", actual)
     }
 
     @Test
     fun testAnalyticsProperties_withDeviceInfoAppVersionCode_addsCorrectValue() {
         configureDeviceInfoService(null, null, "456")
 
-        val eventData = mutableMapOf<String, Any>()
+        val actual = EdgeBridgeProperties.getApplicationIdentifier()
 
-        extension.addAnalyticsProperties(eventData)
-
-        val expectedData = mapOf(
-            "__adobe" to mapOf(
-                "analytics" to mapOf(
-                    "cp" to "foreground",
-                    "contextData" to mapOf(
-                        "a.AppID" to "null (456)"
-                    )
-                )
-            )
-        )
-        assertEquals(expectedData, eventData)
+        assertEquals("null (456)", actual)
     }
-
+    // endregion getApplicationIdentifier tests
     // endregion Properties tests
 
     // Private helpers

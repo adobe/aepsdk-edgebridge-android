@@ -175,8 +175,6 @@ class EdgeBridgeExtension extends Extension {
 			);
 			return;
 		}
-		// Add in out-of-the-box metrics
-		addAnalyticsProperties(formattedData);
 
 		Map<String, Object> xdmData = new HashMap<>();
 		xdmData.put("eventType", EdgeBridgeConstants.JsonValues.EVENT_TYPE);
@@ -212,7 +210,7 @@ class EdgeBridgeExtension extends Extension {
 	 * ```
 	 * {
 	 *    "action": "action name",
-	 *    "contextData": {
+	 *    "contextdata": {
 	 *       "&&c1": "propValue1",
 	 *       "key1": "value1"
 	 *    },
@@ -357,6 +355,7 @@ class EdgeBridgeExtension extends Extension {
 
 		// If analyticsData is not empty, add it to mutableData under __adobe.analytics
 		if (!analyticsData.isEmpty()) {
+			addAnalyticsProperties(analyticsData);
 			Map<String, Object> adobeAnalytics = new HashMap<>();
 			adobeAnalytics.put(EdgeBridgeConstants.AnalyticsKeys.ANALYTICS, analyticsData);
 			mutableData.put(EdgeBridgeConstants.AnalyticsKeys.ADOBE, adobeAnalytics);
@@ -383,40 +382,15 @@ class EdgeBridgeExtension extends Extension {
 	 * <p>__adobe.analytics.cp</p>
 	 * <p>__adobe.analytics.contextData.a.AppId</p>
 	 * Creates required paths if they are not already present in the original data map.
-	 * This should be used only after first validating the track event has valid data from the public API.
+	 * This should be used only after first validating the Analytics data map is valid and should have
+	 * the additional properties added.
 	 *
-	 * @param data the mutable map that will have Analytics properties added.
+	 * @param analyticsData the Analytics data mutable map that will have Analytics properties added.
 	 */
 	@VisibleForTesting
-	void addAnalyticsProperties(final Map<String, Object> data) {
-		// Access to the `__adobe` map
-		Map<String, Object> adobeMap = DataReader.optTypedMap(
-			Object.class,
-			data,
-			EdgeBridgeConstants.AnalyticsKeys.ADOBE,
-			new HashMap<>()
-		);
-		if (adobeMap.isEmpty()) {
-			// If the target map is empty it could be:
-			// 1. Already existing and empty
-			// 2. Newly created as the fallback value
-			// However in both cases, it is safe to replace the existing value since there will be
-			// no data loss (this applies to all similar logic)
-			data.put(EdgeBridgeConstants.AnalyticsKeys.ADOBE, adobeMap);
-		}
-
-		// Access to the `analytics` map
-		Map<String, Object> analyticsMap = DataReader.optTypedMap(
-			Object.class,
-			adobeMap,
-			EdgeBridgeConstants.AnalyticsKeys.ANALYTICS,
-			new HashMap<>()
-		);
-		if (analyticsMap.isEmpty()) {
-			adobeMap.put(EdgeBridgeConstants.AnalyticsKeys.ANALYTICS, analyticsMap);
-		}
+	void addAnalyticsProperties(final Map<String, Object> analyticsData) {
 		// Analytics original implementation: Customer perspective defaults to foreground when unknown and is always present
-		analyticsMap.put(
+		analyticsData.put(
 			EdgeBridgeConstants.AnalyticsKeys.CUSTOMER_PERSPECTIVE,
 			EdgeBridgeProperties.getCustomerPerspective()
 		);
@@ -432,12 +406,12 @@ class EdgeBridgeExtension extends Extension {
 		// Access to the `contextData` map
 		Map<String, Object> contextDataMap = DataReader.optTypedMap(
 			Object.class,
-			analyticsMap,
+			analyticsData,
 			EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA,
 			new HashMap<>()
 		);
 		if (contextDataMap.isEmpty()) {
-			analyticsMap.put(EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA, contextDataMap);
+			analyticsData.put(EdgeBridgeConstants.AnalyticsKeys.CONTEXT_DATA, contextDataMap);
 		}
 
 		contextDataMap.put(EdgeBridgeConstants.AnalyticsKeys.APPLICATION_IDENTIFIER, appId);
