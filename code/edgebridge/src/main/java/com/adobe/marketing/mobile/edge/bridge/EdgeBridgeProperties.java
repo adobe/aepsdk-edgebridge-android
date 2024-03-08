@@ -23,7 +23,7 @@ import com.adobe.marketing.mobile.util.StringUtils;
 
 class EdgeBridgeProperties {
 
-	private static final String LOG_SOURCE = "EdgeBridgeMetricsBuilder";
+	private static final String LOG_SOURCE = "EdgeBridgeProperties";
 
 	@NonNull static String getCustomerPerspective() {
 		if (ServiceProvider.getInstance().getAppContextService() == null) {
