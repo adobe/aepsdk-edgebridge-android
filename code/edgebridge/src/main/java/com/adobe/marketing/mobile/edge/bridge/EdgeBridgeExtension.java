@@ -240,7 +240,8 @@ class EdgeBridgeExtension extends Extension {
 	 * @return data formatted for the Analytics Edge translator. {@code null} if there is no data in
 	 * the payload after format rules are applied, OR if the cloning process fails.
 	 */
-	private Map<String, Object> formatData(final Map<String, Object> data) {
+	@VisibleForTesting
+	Map<String, Object> formatData(final Map<String, Object> data) {
 		Map<String, Object> mutableData;
 
 		// Create a mutable copy of data - can throw exception if deep copy fails
