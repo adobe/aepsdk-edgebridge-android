@@ -590,6 +590,8 @@ class EdgeBridgeExtensionTests {
         verify(mockExtensionApi, never()).dispatch(any())
     }
 
+    // Test using prefixed key of '&&' is not included in request as it produces an empty string key,
+    // and that event is still dispatched since there is other valid data
     @Test
     fun testHandleTrackEvent_withContextDataFieldUsingReservedPrefix_emptyKeyName_dispatchesEdgeRequestEvent_emptyKeysIgnored() {
         val event = Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
@@ -614,6 +616,147 @@ class EdgeBridgeExtensionTests {
                         "c1" to "propValue",
                         "cp" to "foreground",
                         "contextData" to mapOf(
+                            "a.AppID" to "null"
+                        )
+                    )
+                )
+            ),
+            "xdm" to mapOf(
+                "eventType" to EdgeBridgeTestConstants.JsonValues.EVENT_TYPE,
+                "timestamp" to TimeUtils.getISO8601UTCDateWithMilliseconds(Date(event.timestamp))
+            )
+        )
+
+        assertEquals(expectedData, responseEvent.eventData)
+        assertEquals(event.uniqueIdentifier, responseEvent.parentID)
+    }
+
+    // Test empty string keys are not allowed
+    @Test
+    fun testHandleTrackEvent_withContextDataField_emptyKeyName_dispatchesEdgeRequestEvent_emptyKeysIgnored() {
+        val event = Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+            .setEventData(
+                mapOf("contextdata" to mapOf("key" to "value", "" to "valueEmptyKey"))
+            )
+            .build()
+
+        extension.handleTrackRequest(event)
+
+        val responseEvent = captureAndAssertDispatchedEvent()
+
+        val expectedData = mapOf(
+            "data" to mapOf(
+                "__adobe" to mapOf(
+                    "analytics" to mapOf(
+                        "cp" to "foreground",
+                        "contextData" to mapOf(
+                            "key" to "value",
+                            "a.AppID" to "null"
+                        )
+                    )
+                )
+            ),
+            "xdm" to mapOf(
+                "eventType" to EdgeBridgeTestConstants.JsonValues.EVENT_TYPE,
+                "timestamp" to TimeUtils.getISO8601UTCDateWithMilliseconds(Date(event.timestamp))
+            )
+        )
+
+        assertEquals(expectedData, responseEvent.eventData)
+        assertEquals(event.uniqueIdentifier, responseEvent.parentID)
+    }
+
+    @Test
+    fun testHandleTrackEvent_withContextDataField_nullKeyName_dispatchesEdgeRequestEvent_nullKeysIgnored() {
+        val event = Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+            .setEventData(
+                mapOf(
+                    "state" to "test state",
+                    "contextdata" to mapOf("key" to "value", null to "valueNullKey")
+                )
+            )
+            .build()
+
+        extension.handleTrackRequest(event)
+
+        val responseEvent = captureAndAssertDispatchedEvent()
+
+        val expectedData = mapOf(
+            "data" to mapOf(
+                "__adobe" to mapOf(
+                    "analytics" to mapOf(
+                        "pageName" to "test state",
+                        "contextData" to mapOf(
+                            "key" to "value",
+                            "a.AppID" to "null"
+                        ),
+                        "cp" to "foreground",
+                    )
+                )
+            ),
+            "xdm" to mapOf(
+                "eventType" to EdgeBridgeTestConstants.JsonValues.EVENT_TYPE,
+                "timestamp" to TimeUtils.getISO8601UTCDateWithMilliseconds(Date(event.timestamp))
+            )
+        )
+
+        assertEquals(expectedData, responseEvent.eventData)
+        assertEquals(event.uniqueIdentifier, responseEvent.parentID)
+    }
+
+    @Test
+    fun testHandleTrackEvent_withContextDataField_emptyValue_dispatchesEdgeRequestEvent() {
+        val event = Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+            .setEventData(
+                mapOf("contextdata" to mapOf("emptyValue" to ""))
+            )
+            .build()
+
+        extension.handleTrackRequest(event)
+
+        val responseEvent = captureAndAssertDispatchedEvent()
+
+        val expectedData = mapOf(
+            "data" to mapOf(
+                "__adobe" to mapOf(
+                    "analytics" to mapOf(
+                        "cp" to "foreground",
+                        "contextData" to mapOf(
+                            "emptyValue" to "",
+                            "a.AppID" to "null"
+                        )
+                    )
+                )
+            ),
+            "xdm" to mapOf(
+                "eventType" to EdgeBridgeTestConstants.JsonValues.EVENT_TYPE,
+                "timestamp" to TimeUtils.getISO8601UTCDateWithMilliseconds(Date(event.timestamp))
+            )
+        )
+
+        assertEquals(expectedData, responseEvent.eventData)
+        assertEquals(event.uniqueIdentifier, responseEvent.parentID)
+    }
+
+    @Test
+    fun testHandleTrackEvent_withContextDataField_nullValue_dispatchesEdgeRequestEvent_nilValuesIgnored() {
+        val event = Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+            .setEventData(
+                mapOf("contextdata" to mapOf("key" to "value", "nullValue" to null))
+            )
+            .build()
+
+        extension.handleTrackRequest(event)
+
+        val responseEvent = captureAndAssertDispatchedEvent()
+
+        val expectedData = mapOf(
+            "data" to mapOf(
+                "__adobe" to mapOf(
+                    "analytics" to mapOf(
+                        "cp" to "foreground",
+                        "contextData" to mapOf(
+                            "key" to "value",
                             "a.AppID" to "null"
                         )
                     )
@@ -740,19 +883,15 @@ class EdgeBridgeExtensionTests {
         assertEquals(event.uniqueIdentifier, responseEvent.parentID)
     }
 
+    // Tests that top level properties are unaffected by Analytics keys mapping formatting validation
     @Test
-    fun testHandleTrackEvent_mapsNullAndEmptyValues_andClearsNullValues_dispatchesEdgeRequestEvent() {
+    fun testHandleTrackEvent_mapsNullAndEmptyValues_dispatchesEdgeRequestEvent() {
         val event = Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
             .setEventData(
                 mapOf(
                     "key3" to "",
                     "key4" to null,
-                    "contextdata" to mapOf(
-                        "&&key1" to "",
-                        "&&key2" to null,
-                        "key5" to "",
-                        "key6" to null
-                    )
+                    null to "valueNullKey" // This is filtered out by setEventData
                 )
             )
             .build()
@@ -764,12 +903,56 @@ class EdgeBridgeExtensionTests {
         val expectedData = mapOf(
             "data" to mapOf(
                 "key3" to "",
-                "key4" to null,
+                "key4" to null
+            ),
+            "xdm" to mapOf(
+                "eventType" to EdgeBridgeTestConstants.JsonValues.EVENT_TYPE,
+                "timestamp" to TimeUtils.getISO8601UTCDateWithMilliseconds(Date(event.timestamp))
+            )
+        )
+
+        assertEquals(expectedData, responseEvent.eventData)
+        assertEquals(event.uniqueIdentifier, responseEvent.parentID)
+    }
+
+    // Test context data values are cleaned such that only String type is allowed.
+    //
+    // NOTE: Android is stricter than iOS because of the Map<String, String> public API requirement
+    // and its enforcement in `cleanContextData` - `char` and number types are not allowed
+    @Test
+    fun testHandleTrackEvent_withContextData_valuesOfWrongTypes_dispatchesEdgeRequestEvent_valuesOfWrongTypesDropped() {
+        val charValue = '\u0041'
+        val event = Event.Builder("Test Track Event", EventType.GENERIC_TRACK, EventSource.REQUEST_CONTENT)
+            .setEventData(
+                mapOf(
+                    "contextdata" to mapOf(
+                        "keyString" to "valueString",
+                        "keyNumber" to 5,
+                        "keyCharacter" to charValue,
+                        "&&v1" to "evar1",
+                        "&&v2" to 10,
+                        "&&v3" to charValue,
+                        "keyDict" to mapOf("hello" to "world"),
+                        "keyArray" to listOf("one", "two", "three"),
+                        // "keyObj" is causes event build to fail
+                        "&&events" to listOf("event1", "event2"),
+                        "&&c1" to mapOf("prop1" to "propValue")
+                    )
+                )
+            )
+            .build()
+
+        extension.handleTrackRequest(event)
+
+        val responseEvent = captureAndAssertDispatchedEvent()
+
+        val expectedData = mapOf(
+            "data" to mapOf(
                 "__adobe" to mapOf(
                     "analytics" to mapOf(
-                        "key1" to "",
+                        "v1" to "evar1",
                         "contextData" to mapOf(
-                            "key5" to "",
+                            "keyString" to "valueString",
                             "a.AppID" to "null"
                         ),
                         "cp" to "foreground"
@@ -777,7 +960,7 @@ class EdgeBridgeExtensionTests {
                 )
             ),
             "xdm" to mapOf(
-                "eventType" to EdgeBridgeTestConstants.JsonValues.EVENT_TYPE,
+                "eventType" to "analytics.track",
                 "timestamp" to TimeUtils.getISO8601UTCDateWithMilliseconds(Date(event.timestamp))
             )
         )
