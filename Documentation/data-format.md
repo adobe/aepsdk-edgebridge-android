@@ -2,7 +2,7 @@
 
 The Adobe Experience Platform Edge Bridge extension maps the data sent in `trackAction` and `trackState` API calls to a specific format known to Adobe Analytics which requires no additional server-side mapping. This document outlines the data format applied to the tracking data.
 
-As of version 3.0.0 of the Adobe Experience Platform Edge Bridge for Android, the table below shows how the `trackAction` and `trackState` parameters map to the `data` node of the Experience Event sent to the Experience Platform Edge Network. Edge Network automatically maps these data variables to Adobe Analytics without additional server-side configuration. If you are using Edge Bridge version 2.x and mapping data to XDM in your datastream, adjustments are required for version 3.0.0.
+As of version 3.0.0 of Adobe Experience Platform Edge Bridge for Android, the table below shows how the `trackAction` and `trackState` parameters map to the `data` node of the Experience Event sent to Experience Platform Edge Network. Edge Network automatically maps these data variables to Analytics without additional server-side configuration. If you are using Edge Bridge version 2.x and mapping data to XDM in your datastream, adjustments are required for version 3.0.0.
 
 | Data | Key path in the network request | Description |
 | --- | --- | ---
