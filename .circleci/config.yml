@@ -40,6 +40,14 @@ workflows:
       - functional-test:
           requires:
             - validate-code
+      - build-test-app:
+          requires:
+            - validate-code
+          filters:
+            branches:
+              only:
+                - main
+                - staging
  
 jobs:
   validate-code:
@@ -100,10 +108,6 @@ jobs:
           name: Assemble Phone
           command: make assemble-phone
 
-      - run:
-          name: Assemble App
-          command: make assemble-app
-
       # Run unit tests and create code coverage report, with auto retry from run-tests command
       - android/run-tests:
           test-command: make unit-test-coverage
@@ -159,3 +163,27 @@ jobs:
 
       - store_test_results:
           path: << pipeline.parameters.build-path >>/outputs/androidTest-results
+
+  build-test-app:
+    executor:
+      name: android/android-docker
+      resource-class: medium
+      tag: 2024.01.1-node
+
+    steps:
+      - checkout
+
+      - android/restore-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
+      - run:
+          name: Assemble App
+          command: make assemble-app
+
+      - android/save-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>

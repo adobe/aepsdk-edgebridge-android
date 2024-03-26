@@ -19,6 +19,7 @@ Edge Bridge has the following peer dependencies, which must be installed with it
 
 1. Add the Mobile Core and Edge extensions to your project using the app's Gradle file.
 
+### Kotlin
 ```kotlin
 implementation(platform("com.adobe.marketing.mobile:sdk-bom:3.+"))
 implementation("com.adobe.marketing.mobile:core")
@@ -26,6 +27,17 @@ implementation("com.adobe.marketing.mobile:edge")
 implementation("com.adobe.marketing.mobile:edgebridge")
 implementation("com.adobe.marketing.mobile:edgeidentity")
 ```
+
+### Groovy
+
+```groovy
+implementation platform('com.adobe.marketing.mobile:sdk-bom:3.+')
+implementation 'com.adobe.marketing.mobile:core'
+implementation 'com.adobe.marketing.mobile:edge'
+implementation 'com.adobe.marketing.mobile:edgebridge'
+implementation 'com.adobe.marketing.mobile:edgeidentity'
+```
+
 
 > **Warning**  
 > Using dynamic dependency versions is not recommended for production apps. Refer to this [page](https://github.com/adobe/aepsdk-core-android/blob/main/Documentation/MobileCore/gradle-dependencies.md) for managing Gradle dependencies.

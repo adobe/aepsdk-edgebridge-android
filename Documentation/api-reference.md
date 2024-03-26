@@ -5,7 +5,6 @@
 | APIs                                           |
 | ---------------------------------------------- |
 | [extensionVersion](#extensionversion)	         |
-| [registerExtension](#registerextension)	     |
 
 ------
 
