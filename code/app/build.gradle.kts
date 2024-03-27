@@ -59,10 +59,17 @@ android {
 dependencies {
     implementation(project(":edgebridge"))
     // TODO: Use 3.x versions for testing
-    implementation("com.adobe.marketing.mobile:core:2.+")
-    implementation("com.adobe.marketing.mobile:assurance:2.+")
-    implementation("com.adobe.marketing.mobile:edge:2.+")
-    implementation("com.adobe.marketing.mobile:edgeidentity:2.+")
+    implementation("com.adobe.marketing.mobile:core:3.0.0-SNAPSHOT")
+    implementation("com.adobe.marketing.mobile:assurance:3.0.0-SNAPSHOT") {
+        exclude(group = "com.adobe.marketing.mobile", module = "core")
+    }
+    implementation("com.adobe.marketing.mobile:edge:3.0.0-SNAPSHOT") {
+        exclude(group = "com.adobe.marketing.mobile", module = "core")
+        exclude(group = "com.adobe.marketing.mobile", module = "edgeidentity")
+    }
+    implementation("com.adobe.marketing.mobile:edgeidentity:3.0.0-SNAPSHOT") {
+        exclude(group = "com.adobe.marketing.mobile", module = "core")
+    }
 
     implementation("androidx.appcompat:appcompat:1.4.1")
     implementation("com.google.android.material:material:1.6.0")
