@@ -1,8 +1,34 @@
+#
+# Copyright 2022 Adobe. All rights reserved.
+# This file is licensed to you under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License. You may obtain a copy
+# of the License at http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software distributed under
+# the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+# OF ANY KIND, either express or implied. See the License for the specific language
+# governing permissions and limitations under the License.
+#
+
 version: 2.1
 orbs:
-  android: circleci/android@1.0
+  # Use the circleci android orb version that supports OpenJDK17 required by AGP 8.2+
+  android: circleci/android@2.4.0
+  codecov: codecov/codecov@4.0.1
 
-# Workflows orchestrate a set of jobs to be run;
+# Define pipeline parameters available to all jobs
+parameters:
+  gradle-cache-prefix:
+    type: string
+    default: v1
+  build-cache-prefix:
+    type: string
+    default: v1
+  build-path:
+    type: string
+    default: code/edgebridge/build
+
+# Workflows orchestrate a set of jobs to be run
 workflows:
   version: 2
   build-test-deploy:
@@ -14,104 +40,150 @@ workflows:
       - functional-test:
           requires:
             - validate-code
+      - build-test-app:
+          requires:
+            - validate-code
+          filters:
+            branches:
+              only:
+                - main
+                - staging
  
 jobs:
   validate-code:
-    working_directory: ~/code
-    docker:
-      - image: circleci/android:api-29-node
-    environment:
-      JVM_OPTS: -Xmx3200m
+    executor:
+      name: android/android-docker
+      resource-class: medium
+      tag: 2024.01.1-node
     steps:
       - checkout
+
+      - android/restore-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       - run:
-          name: Check Code Format
-          command: make format-check
+          name: Check Format
+          command: make checkformat
+      
+      - run:
+          name: Lint
+          command: make lint
+
+      - android/save-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
+      # Store Lint report
+      - store_artifacts:
+          path: << pipeline.parameters.build-path >>/reports
 
   build-and-unit-test:
-    working_directory: ~/code
-    docker:
-      - image: circleci/android:api-29-node
-    environment:
-      JVM_OPTS: -Xmx3200m
+    executor:
+      name: android/android-docker
+      resource-class: medium
+      tag: 2024.01.1-node
     steps:
       - checkout
+
+      - android/restore-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       - run:
           name: Javadoc
-          command: make ci-javadoc
+          command: make javadoc
+
+      # Save Javadoc results
       - store_artifacts:
-          path: ci/javadoc/build/reports
+          path: << pipeline.parameters.build-path >>/docs/javadoc
 
       - run:
-          name: Build
-          command: make ci-build
+          name: Assemble Phone
+          command: make assemble-phone
 
-      - run:
-          name: Build App
-          command: make ci-build-app
-
-      - run:
-          name: UnitTests
-          command: make ci-unit-test
-
-      # code coverage
-      - run:
-          name: Upload Code Coverage Report
-          command: |
-            curl -s https://codecov.io/bash > codecov;
-            VERSION=$(grep 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
-            SHAVERSION=$(shasum -v);
-            echo "Using CodeCov version '$VERSION'"
-            echo "Using shasum '$SHAVERSION'"
-            for i in 1 256 512
-            do
-              shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") ||
-              shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM" | grep -w "codecov")
-            done
-            bash ./codecov -v -X s3 -c -D "./ci/unit-test/build/reports" -F unit-tests
+      # Run unit tests and create code coverage report, with auto retry from run-tests command
+      - android/run-tests:
+          test-command: make unit-test-coverage
 
       - store_artifacts:
-          path: ci/unit-test/build/reports
+          path: << pipeline.parameters.build-path >>/reports/tests
 
       - store_test_results:
-          path: ci/unit-test/build/test-results
+          path: << pipeline.parameters.build-path >>/test-results/testPhoneDebugUnitTest
+
+      - android/save-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
+      # Upload code coverage report to Codecov
+      - codecov/upload:
+          file: << pipeline.parameters.build-path >>/reports/coverage/test/phone/debug/report.xml
+          flags: unit-tests
 
   functional-test:
     executor:
       name: android/android-machine
       resource-class: large
+      tag: 2024.01.1
     steps:
       - checkout
+
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
+      # By default this command handles restoring and saving the Gradle cache
       - android/start-emulator-and-run-tests:
-          #   It should match the name seen in the "sdkmanager --list" output
+          # It should match the name seen in the "sdkmanager --list" output
           system-image: system-images;android-29;default;x86
-          #   The command to be run, while waiting for emulator startup
-          post-emulator-launch-assemble-command: make ci-build
-          #   The test command
-          test-command: make ci-functional-test
+          # The command to be run, while waiting for emulator startup
+          post-emulator-launch-assemble-command: make assemble-phone
+          # The test command
+          test-command: make functional-test-coverage
+          restore-gradle-cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
       
-      # code coverage
-      - run:
-          name: Upload Code Coverage Report
-          command: |
-            curl -s https://codecov.io/bash > codecov;
-            VERSION=$(grep 'VERSION=\"[0-9\.]*\"' codecov | cut -d'"' -f2);
-            SHAVERSION=$(shasum -v);
-            echo "Using CodeCov version '$VERSION'"
-            echo "Using shasum '$SHAVERSION'"
-            for i in 1 256 512
-            do
-              shasum -a $i -c --ignore-missing <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM") ||
-              shasum -a $i -c <(curl -s "https://raw.githubusercontent.com/codecov/codecov-bash/${VERSION}/SHA${i}SUM" | grep -w "codecov")
-            done
-            bash ./codecov -v -X s3 -c -D "./ci/functional-test/build/reports" -F functional-tests
+      # Upload code coverage report to Codecov
+      - codecov/upload:
+          file: << pipeline.parameters.build-path >>/reports/coverage/androidTest/phone/debug/connected/report.xml
+          flags: functional-tests
+
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
 
       - store_artifacts:
-          path: ci/functional-test/build/reports
+          path: << pipeline.parameters.build-path >>/reports/androidTests
 
       - store_test_results:
-          path: ci/functional-test/build/outputs/androidTest-results
-          
-    
+          path: << pipeline.parameters.build-path >>/outputs/androidTest-results
+
+  build-test-app:
+    executor:
+      name: android/android-docker
+      resource-class: medium
+      tag: 2024.01.1-node
+
+    steps:
+      - checkout
+
+      - android/restore-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+
+      - android/restore-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
+
+      - run:
+          name: Assemble App
+          command: make assemble-app
+
+      - android/save-gradle-cache:
+          cache-prefix: << pipeline.parameters.gradle-cache-prefix >>
+      - android/save-build-cache:
+          cache-prefix: << pipeline.parameters.build-cache-prefix >>
