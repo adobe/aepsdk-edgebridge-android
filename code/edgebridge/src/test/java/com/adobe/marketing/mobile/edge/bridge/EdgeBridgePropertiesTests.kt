@@ -192,7 +192,7 @@ class EdgeBridgePropertiesTests {
 
     @Test
     fun testAnalyticsProperties_withNullAppContextService_returnsExpectedDefault() {
-        // Mock the case where deviceInfoService is null
+        // Mock the case where appContextService is null
         whenever(mockServiceProvider.appContextService).thenReturn(null)
 
         val eventData = mutableMapOf<String, Any>()
