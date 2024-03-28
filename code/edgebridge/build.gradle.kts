@@ -28,17 +28,18 @@ aepLibrary {
 }
 
 dependencies {
-    // TODO: Use 3.x versions for testing
-    // TODO: Remove -SNAPSHOT suffix after Core 3.0.0 is published
-    implementation("com.adobe.marketing.mobile:core:$mavenCoreVersion-SNAPSHOT")
+    implementation("com.adobe.marketing.mobile:core:$mavenCoreVersion")
 
     // testImplementation dependencies provided by aep-library:
     // MOCKITO_CORE, MOCKITO_INLINE
 
-    // TODO: Use 3.x versions for testing
-    // TODO: change these to set version numbers for reliable testing
-    androidTestImplementation("com.adobe.marketing.mobile:edge:2.+")
-    androidTestImplementation("com.adobe.marketing.mobile:edgeidentity:2.+")
+    androidTestImplementation("com.adobe.marketing.mobile:edge:3.0.0-SNAPSHOT") {
+        exclude(group = "com.adobe.marketing.mobile", module = "core")
+        exclude(group = "com.adobe.marketing.mobile", module = "edgeidentity")
+    }
+    androidTestImplementation("com.adobe.marketing.mobile:edgeidentity:3.0.0-SNAPSHOT") {
+        exclude(group = "com.adobe.marketing.mobile", module = "core")
+    }
 
     // androidTestImplementation dependencies provided by aep-library:
     // ANDROIDX_TEST_EXT_JUNIT, ESPRESSO_CORE

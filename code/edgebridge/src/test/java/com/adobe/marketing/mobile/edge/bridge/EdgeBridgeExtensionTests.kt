@@ -1284,10 +1284,16 @@ class EdgeBridgeExtensionTests {
     // formatData
     // ========================================================================================
     @Test
-    fun testFormatDataFailure() {
+    fun testFormatData_mapCloneFailure_returnsNull() {
         val deeplyNested = createDeeplyNestedMap(260)
         // This call is expected to fail due to exceeding EventDataUtils.clone max depth size
         val result = extension.formatData(deeplyNested)
+        assertNull(result)
+    }
+
+    @Test
+    fun testFormatData_nullMap_returnsNull() {
+        val result = extension.formatData(null)
         assertNull(result)
     }
 
