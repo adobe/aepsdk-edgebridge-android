@@ -175,6 +175,21 @@ class EdgeBridgePropertiesTests {
         assertEquals(expectedData, eventData)
     }
 
+    @Test
+    fun testAnalyticsProperties_withNullDeviceInfoService_returnsEarly() {
+        // Mock the case where deviceInfoService is null
+        whenever(mockServiceProvider.deviceInfoService).thenReturn(null)
+
+        val eventData = mutableMapOf<String, Any>()
+
+        extension.addAnalyticsProperties(eventData)
+
+        val expectedData = mapOf(
+            "cp" to "foreground"
+        )
+        assertEquals(expectedData, eventData)
+    }
+
     // endregion Map modification tests
 
     // region Properties tests
