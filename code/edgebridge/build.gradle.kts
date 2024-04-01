@@ -33,13 +33,8 @@ dependencies {
     // testImplementation dependencies provided by aep-library:
     // MOCKITO_CORE, MOCKITO_INLINE
 
-    androidTestImplementation("com.adobe.marketing.mobile:edge:3.0.0-SNAPSHOT") {
-        exclude(group = "com.adobe.marketing.mobile", module = "core")
-        exclude(group = "com.adobe.marketing.mobile", module = "edgeidentity")
-    }
-    androidTestImplementation("com.adobe.marketing.mobile:edgeidentity:3.0.0-SNAPSHOT") {
-        exclude(group = "com.adobe.marketing.mobile", module = "core")
-    }
+    androidTestImplementation("com.adobe.marketing.mobile:edge:3.0.0")
+    androidTestImplementation("com.adobe.marketing.mobile:edgeidentity:3.0.0")
 
     // androidTestImplementation dependencies provided by aep-library:
     // ANDROIDX_TEST_EXT_JUNIT, ESPRESSO_CORE
