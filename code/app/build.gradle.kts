@@ -17,6 +17,8 @@ plugins {
     id("com.diffplug.spotless")
 }
 
+val mavenCoreVersion: String by project
+
 configure<com.diffplug.gradle.spotless.SpotlessExtension> {
     kotlin {
         target("src/*/java/**/*.kt")
@@ -59,7 +61,7 @@ android {
 dependencies {
     implementation(project(":edgebridge"))
 
-    implementation("com.adobe.marketing.mobile:core:3.0.0")
+    implementation("com.adobe.marketing.mobile:core:$mavenCoreVersion")
     implementation("com.adobe.marketing.mobile:assurance:3.0.0")
     implementation("com.adobe.marketing.mobile:edge:3.0.0")
     implementation("com.adobe.marketing.mobile:edgeidentity:3.0.0")
