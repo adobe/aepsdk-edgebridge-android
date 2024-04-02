@@ -6,7 +6,7 @@
   - [Prerequisites](#prerequisites)
 - [Adobe Experience Platform setup](#adobe-experience-platform-setup)
   - [1. Set up mobile property](#1-set-up-mobile-property)
-  - [2. Configure a Rule to forward PII events to Edge Network](#2-configure-a-rule-to-forward-pii-events-to-edge-network)
+  - [2. Configure a rule to forward personally identifiable information (PII) events to Edge Network](#2-configure-a-rule-to-forward-personally-identifiable-information-pii-events-to-edge-network)
 - [Client-side implementation](#client-side-implementation)
   - [1. Get a copy of the files (code and tutorial app)](#1-get-a-copy-of-the-files-code-and-tutorial-app)
   - [2. Install Edge Bridge using dependency manager (Gradle)](#2-install-edge-bridge-using-dependency-manager-gradle)
@@ -21,51 +21,59 @@
 - [Final validation using Assurance](#final-validation-using-assurance)
 
 ## Overview
-This hands-on tutorial provides end-to-end instructions on how to migrate from sending data to Analytics to sending data to the Edge Network using the Edge Bridge mobile extension.
+This tutorial covers how to use Edge Bridge as a drop-in solution for migrating from an existing Analytics implementation to sending data via the Edge Network to Analytics.
 
 ```mermaid
-graph LR;
-    step1(1<br/>Existing Adobe Analytics app) -->
+graph TD;
+    step1(1<br/>Existing app using Adobe Analytics) -->
     step2(2<br/>Adobe Experience Platform<br/>Update server-side configuration) --> 
-    step3(3<br/>Edge Bridge<br/>Send event data to the Edge Network & Analytics) --> 
-    step4(4<br/>Assurance<br/>Verify event data formats) -->
-    step5(5<br/>Data mapper<br/>Map data to XDM - Edge network data format) -->
-    step6(6<br/>Assurance<br/>Verify trackAction/trackState to XDM conversion)
+    step3(3<br/>Edge Bridge<br/>Update app to send event data via Edge Network to Analytics) --> 
+    step4(4<br/>Assurance<br/>Verify implementation)
+
+style step1 fill:#3273de,stroke:#333,stroke-width:2px,color:#fff
+style step2 fill:#3273de,stroke:#333,stroke-width:2px,color:#fff
+style step3 fill:#3273de,stroke:#333,stroke-width:2px,color:#fff
+style step4 fill:#3273de,stroke:#333,stroke-width:2px,color:#fff
 ```
 
 ### Environment
-- Android Studio version which supports Gradle plugin 7.2 and a working Android simulator.
+- Android Studio version which supports Gradle plugin 8.2.
+- Android emulator or device.
 
 ### Prerequisites
-- The tutorial app for this exercise already includes the Edge extensions. If you want to learn more about this, check out the [Edge tutorial](https://github.com/adobe/aepsdk-edge-android/tree/main/Documentation/Tutorials).
-- A timestamp enabled report suite is configured for mobile data collection.
-- A tag (also known as mobile property) is configured in Data Collection UI which has Adobe Analytics extension installed and configured.
+> [!NOTE]
+> The tutorial app for this exercise already includes the Edge extensions. To learn more about these extensions, please see the [Edge extension tutorials](https://github.com/adobe/aepsdk-edge-android/tree/main/Documentation/Tutorials).
+1. A timestamp enabled report suite configured for mobile data collection.
+2. A tag (also known as a mobile property) configured in the Data Collection UI, which has the Adobe Analytics extension installed and configured.
 
 ## Adobe Experience Platform setup
-Before any app changes we need to set up some configuration items on the Adobe Experience Platform side. The end goal of this section is to create a mobile property that controls the configuration settings for the various Experience Platform extensions used in this tutorial.
+This section demonstrates how to create and configure a mobile property in Experience Platform, which controls the configuration settings for the Mobile SDK extensions used in this tutorial.
 
-### 1. Set up mobile property
-If you don't have an existing mobile property, see the [instructions on how to set up a new property](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#1-create-a-schema).
+<details>
+  <summary> <b>Setup instructions - Skip this section if prerequisite item 2 has already been set up.</b> </summary>
 
-The following Adobe Experience Platform extension configurations should be installed:  
+### 1. Set up mobile property  
+To create a new mobile property, refer to the [instructions on how to set up a new property](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#1-create-a-schema).
+
+Install the following Experience Platform extensions:  
 
 <details>
   <summary> Adobe Analytics </summary><p>
 
-Open the **Catalog** and install the `Adobe Analytics` extension configuration.
+Open the **Catalog** and install the **Adobe Analytics** extension.
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/mobile-property-analytics-catalog.png" alt="Catalog search for Adobe Experience Platform Edge Network" width="1100"/>  
 
-In the extension configuration settings window, set the report suite ID (**1**) for each environment to the one for this tutorial. Then click `Save` (**2**)
+In the extension configuration settings window, set the report suite ID (**1**) for each environment (**2**) to the one designated for this tutorial. Then, select **Save** (**3**).
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/mobile-property-analytics-settings.png" alt="Edge extension settings" width="1100"/>  
 
 </p></details>
 
 <details>
-  <summary> Adobe Experience Platform Assurance </summary><p>
+  <summary> AEP Assurance </summary><p>
 
-Open the **Catalog** and install the `AEP Assurance` extension configuration.
+Open the **Catalog** and install the **AEP Assurance** extension.
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/mobile-property-assurance-catalog.png" alt="Catalog search for Adobe Experience Platform Edge Network" width="1100"/>  
 
@@ -74,11 +82,11 @@ Open the **Catalog** and install the `AEP Assurance` extension configuration.
 <details>
   <summary> Adobe Experience Platform Edge Network </summary><p>
 
-Go back to the `Catalog` and install the `Adobe Experience Platform Edge Network` extension configuration.
+Open the **Catalog** and install the **Adobe Experience Platform Edge Network** extension.
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/mobile-property-edge-catalog.png" alt="Catalog search for Adobe Experience Platform Edge Network" width="1100"/>  
 
-In the extension configuration settings window, set the datastream for each environment (**1**) to the one created for this tutorial. Then click `Save` (**2**)
+In the extension configuration settings window, set the datastream for each environment (**1**) to the one designated for this tutorial. Then, select **Save** (**2**).
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/mobile-property-edge-settings.png" alt="Edge extension settings" width="1100"/>  
 
@@ -87,7 +95,7 @@ In the extension configuration settings window, set the datastream for each envi
 <details>
   <summary> Identity </summary><p>
 
-Open the `Catalog` and install the `Identity` extension configuration. There are no settings for this extension.
+Open the **Catalog** and install the **Identity** extension. There are no settings to configure for this extension.
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/mobile-property-identity-catalog.png" alt="Catalog search for Identity" width="1100"/>  
 
@@ -96,32 +104,36 @@ Open the `Catalog` and install the `Identity` extension configuration. There are
 <details>
   <summary> Consent </summary><p>
 
-Open the `Catalog` and install the `Consent` extension configuration.
+Open the **Catalog** and install the **Consent** extension.
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/mobile-property-consent-catalog.png" alt="Catalog search for Consent" width="1100"/>  
 
-In the extension configuration settings window, the `Default Consent Level` should be set to `Yes` by default (**1**); for the tutorial app this setting is fine as-is, however when using this configuration in production apps, it should reflect the requirements of the company's actual data collection policy for the app.
+In the extension configuration settings window, the **Default Consent Level** should be set to **Yes** by default (**1**). 
+
+> ⚠️ **Important**  
+> For the tutorial app, this setting is acceptable as-is. However, when configuring this setting in production applications, it should align with the organization's data collection and privacy policies.
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/mobile-property-consent-settings.png" alt="Consent extension settings" width="1100"/>  
 
 </p></details>
 
-The following cards should be visible after all the extensions are installed:
+The following cards should be visible once all the extensions have been installed:
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/mobile-property-all-extensions.png" alt="All installed extensions" width="1100"/>  
 
-### 2. Configure a Rule to forward PII events to Edge Network
-The collectPII API for Analytics does not send events to the Edge Network by default, and needs a rule to be configured in order to forward these events.
+### 2. Configure a rule to forward personally identifiable information (PII) events to Edge Network
+The [`collectPII`](https://developer.adobe.com/client-sdks/home/base/mobile-core/api-reference/#collectpii) API for Analytics does not send events to Edge Network by default; it requires a rule to be configured to forward these events. This section provides an example of how to create such a rule.
 
-#### Create a rule<!-- omit in toc -->
-1. On the Rules tab, select **Create New Rule**.
+#### Create a rule <!-- omit in toc -->
+1. In the Rules tab, select **Create New Rule**.
    - If your property already has rules, the button will be in the top right of the screen.
-2. Give your rule an easily recognizable name (**1**) in your list of rules. In this example, the rule is named "Forward PII events to Edge Network".
-3. Under the **EVENTS** section, select **Add** (**2**).
+2. Give the rule a recognizable name (**1**) in your list of rules. 
+   - In this example, the rule is named "Forward PII events to Edge Network".
+4. In the **EVENTS** section, select **Add** (**2**).
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/analytics-rule-1.png" alt="Analytics rule 1" width="1100"/>  
 
-#### Define the event<!-- omit in toc -->
+#### Define the event <!-- omit in toc -->
 
 1. From the **Extension** dropdown list (**1**), select **Mobile Core**.
 2. From the **Event Type** dropdown list (**2**), select **Collect PII**.
@@ -129,7 +141,7 @@ The collectPII API for Analytics does not send events to the Edge Network by def
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/analytics-rule-2.png" alt="Analytics rule 2" width="1100"/>  
 
-#### Define the action<!-- omit in toc -->
+#### Define the action <!-- omit in toc -->
 1. Under the Actions section, select **+ Add** (**1**).
 
 2. From the **Extension** dropdown list (**1**), select **Adobe Analytics**.
@@ -140,11 +152,12 @@ The collectPII API for Analytics does not send events to the Edge Network by def
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/analytics-rule-3.png" alt="Analytics rule 3" width="1100"/>  
 
-#### Save the rule and rebuild your property<!-- omit in toc -->
-1. After you complete your configuration, verify that your rule looks like the following:
+#### Save the rule and rebuild your property <!-- omit in toc -->
+1. After completing your configuration, verify that your rule appears as follows:
 2. Select **Save** (**1**).
 
 <img src="../assets/edge-bridge-tutorial/aep-setup/analytics-rule-4.png" alt="Analytics rule 4" width="1100"/>  
+</details>
 
 ## Client-side implementation
 ### 1. Get a copy of the files (code and tutorial app)
