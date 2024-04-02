@@ -15,7 +15,7 @@ Integrate the Edge Bridge mobile extension into your app by following the [getti
 
 **Open the project**
 
-To open and run the project, open the `code/settings.gradle` file in Android Studio
+To open and run the project, open the `code/settings.gradle.kt` file in Android Studio
 
 ### Development
 
@@ -39,7 +39,6 @@ make init
 | ------------------------------------------------------------ | ------------------------------------------------------------ |
 | [Core extensions](https://github.com/adobe/aepsdk-core-android)                                    | The Mobile Core represents the foundation of the Adobe Experience Platform Mobile SDK. |
 | [Edge Network extension](https://github.com/adobe/aepsdk-edge-android) | The Edge Network extension allows you to send data to the Adobe Edge Network from a mobile application. |
-| [Adobe Experience Platform Android sample app](https://github.com/adobe/aepsdk-sample-app-android) | Contains a fully implemented Android sample app using the Experience Platform SDKs.                 |
 
 ## Documentation
 

@@ -18,7 +18,40 @@ final class EdgeBridgeConstants {
 	static final String LOG_TAG = "EdgeBridge";
 	static final String EXTENSION_NAME = "com.adobe.edge.bridge";
 	static final String FRIENDLY_NAME = "Edge Bridge";
-	static final String EXTENSION_VERSION = "2.1.0";
+	static final String EXTENSION_VERSION = "3.0.0";
+
+	final class MobileCoreKeys {
+
+		static final String ACTION = "action";
+		static final String CONTEXT_DATA = "contextdata";
+		static final String STATE = "state";
+
+		private MobileCoreKeys() {}
+	}
+
+	final class AnalyticsKeys {
+
+		static final String ADOBE = "__adobe";
+		static final String ANALYTICS = "analytics";
+		static final String APPLICATION_IDENTIFIER = "a.AppID";
+		static final String CONTEXT_DATA = "contextData";
+		static final String CUSTOMER_PERSPECTIVE = "cp";
+		static final String LINK_NAME = "linkName";
+		static final String LINK_TYPE = "linkType";
+		static final String PAGE_NAME = "pageName";
+
+		private AnalyticsKeys() {}
+	}
+
+	final class AnalyticsValues {
+
+		static final String APP_STATE_BACKGROUND = "background";
+		static final String APP_STATE_FOREGROUND = "foreground";
+		static final String OTHER = "other";
+		static final String PREFIX = "&&";
+
+		private AnalyticsValues() {}
+	}
 
 	final class EventNames {
 

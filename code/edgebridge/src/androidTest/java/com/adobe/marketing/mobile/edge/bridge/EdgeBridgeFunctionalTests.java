@@ -77,14 +77,15 @@ public class EdgeBridgeFunctionalTests {
 	}
 
 	@Test
-	public void testTrackStateSendsEdgeExperienceEvent() throws InterruptedException {
+	public void testTrackState_sendsEdgeExperienceEvent() throws InterruptedException {
 		setExpectationNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
 
 		MobileCore.trackState(
-			"Test State",
+			"state name",
 			new HashMap<String, String>() {
 				{
-					put("testKey", "testValue");
+					put("key1", "value1");
+					put("&&c1", "propValue1");
 				}
 			}
 		);
@@ -93,22 +94,30 @@ public class EdgeBridgeFunctionalTests {
 		List<TestableNetworkRequest> networkRequests = getNetworkRequestsWith(EDGE_INTERACT_ENDPOINT, HttpMethod.POST);
 		assertEquals(1, networkRequests.size());
 		Map<String, String> requestData = flattenBytes(networkRequests.get(0).getBody());
+		assertEquals(17, requestData.size());
 		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
 		assertNotNull(requestData.get("events[0].xdm.timestamp"));
 		assertNotNull(requestData.get("events[0].xdm._id"));
-		assertEquals("Test State", requestData.get("events[0].data.state"));
-		assertEquals("testValue", requestData.get("events[0].data.contextdata.testKey"));
+		assertEquals("foreground", requestData.get("events[0].data.__adobe.analytics.cp"));
+		assertEquals("state name", requestData.get("events[0].data.__adobe.analytics.pageName"));
+		assertEquals("propValue1", requestData.get("events[0].data.__adobe.analytics.c1"));
+		assertEquals("value1", requestData.get("events[0].data.__adobe.analytics.contextData.key1"));
+		assertEquals(
+			"com.adobe.marketing.mobile.edge.bridge.test",
+			requestData.get("events[0].data.__adobe.analytics.contextData.a.AppID")
+		);
 	}
 
 	@Test
-	public void testTrackActionSendsEdgeExperienceEvent() throws InterruptedException {
+	public void testTrackAction_sendsCorrectRequestEvent() throws InterruptedException {
 		setExpectationNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
 
-		MobileCore.trackState(
-			"Test Action",
+		MobileCore.trackAction(
+			"action name",
 			new HashMap<String, String>() {
 				{
-					put("testKey", "testValue");
+					put("key1", "value1");
+					put("&&c1", "propValue1");
 				}
 			}
 		);
@@ -117,15 +126,23 @@ public class EdgeBridgeFunctionalTests {
 		List<TestableNetworkRequest> networkRequests = getNetworkRequestsWith(EDGE_INTERACT_ENDPOINT, HttpMethod.POST);
 		assertEquals(1, networkRequests.size());
 		Map<String, String> requestData = flattenBytes(networkRequests.get(0).getBody());
+		assertEquals(18, requestData.size());
 		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
 		assertNotNull(requestData.get("events[0].xdm.timestamp"));
 		assertNotNull(requestData.get("events[0].xdm._id"));
-		assertEquals("Test Action", requestData.get("events[0].data.state"));
-		assertEquals("testValue", requestData.get("events[0].data.contextdata.testKey"));
+		assertEquals("foreground", requestData.get("events[0].data.__adobe.analytics.cp"));
+		assertEquals("action name", requestData.get("events[0].data.__adobe.analytics.linkName"));
+		assertEquals("other", requestData.get("events[0].data.__adobe.analytics.linkType"));
+		assertEquals("propValue1", requestData.get("events[0].data.__adobe.analytics.c1"));
+		assertEquals("value1", requestData.get("events[0].data.__adobe.analytics.contextData.key1"));
+		assertEquals(
+			"com.adobe.marketing.mobile.edge.bridge.test",
+			requestData.get("events[0].data.__adobe.analytics.contextData.a.AppID")
+		);
 	}
 
 	@Test
-	public void testRulesEngineResponseSendsEdgeExperienceEvent() throws InterruptedException, IOException {
+	public void testRulesEngineResponse_sendsCorrectRequestEvent() throws InterruptedException, IOException {
 		updateConfigurationWithRules("rules_analytics");
 		resetTestExpectations();
 
@@ -144,13 +161,20 @@ public class EdgeBridgeFunctionalTests {
 		List<TestableNetworkRequest> networkRequests = getNetworkRequestsWith(EDGE_INTERACT_ENDPOINT, HttpMethod.POST);
 		assertEquals(1, networkRequests.size());
 		Map<String, String> requestData = flattenBytes(networkRequests.get(0).getBody());
+		assertEquals(18, requestData.size());
 		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
 		assertNotNull(requestData.get("events[0].xdm.timestamp"));
 		assertNotNull(requestData.get("events[0].xdm._id"));
-		// data is defined in the rule, not from the dispatched PII event
-		assertEquals("Rule Action", requestData.get("events[0].data.action"));
-		assertEquals("Rule State", requestData.get("events[0].data.state"));
-		assertEquals("testValue", requestData.get("events[0].data.contextdata.testKey"));
+		assertEquals("foreground", requestData.get("events[0].data.__adobe.analytics.cp"));
+		assertEquals("Rule Action", requestData.get("events[0].data.__adobe.analytics.linkName"));
+		assertEquals("other", requestData.get("events[0].data.__adobe.analytics.linkType"));
+		assertEquals("Rule State", requestData.get("events[0].data.__adobe.analytics.pageName"));
+		// Data is defined in the rule, not from the dispatched PII event
+		assertEquals("testValue", requestData.get("events[0].data.__adobe.analytics.contextData.testKey"));
+		assertEquals(
+			"com.adobe.marketing.mobile.edge.bridge.test",
+			requestData.get("events[0].data.__adobe.analytics.contextData.a.AppID")
+		);
 	}
 
 	/**
