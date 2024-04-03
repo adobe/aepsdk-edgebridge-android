@@ -21,7 +21,7 @@ import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.tutorial.databinding.FragmentFirstBinding;
 import java.util.HashMap;
 
-public class EdgeFragment extends Fragment {
+public class EdgeBridgeFragment extends Fragment {
 
 	private FragmentFirstBinding binding;
 
