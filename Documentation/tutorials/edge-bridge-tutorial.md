@@ -247,7 +247,7 @@ To connect the tutorial app to the Assurance session, see the instructions on [c
 
 ### 3. Event transactions view - check for Edge Bridge events
 #### `trackAction`/`trackState` events<!-- omit in toc -->
-In order to see Edge Bridge events, in the connected app instance:
+To view Edge Bridge events in the connected app instance:
 1. Trigger a `trackAction` or `trackState` (**1**) within the app, which the Edge Bridge extension will convert into Edge events. These events will be captured by the Assurance extension and displayed in the web session viewer.
 
 <img src="../assets/edge-bridge-tutorial/assurance-validation/android-app-track-buttons.png" alt="Simulator track buttons" width="400"/>
