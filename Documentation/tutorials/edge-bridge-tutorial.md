@@ -259,9 +259,9 @@ In order to see Edge Bridge events, in the connected app instance:
 <img src="../assets/edge-bridge-tutorial/assurance-validation/assurance-analytics-track-event.png" alt="Assurance Analytics track event" width="800"/>
 
 1. Now select the **Edge Bridge Request** event (**1**) in the events table.
-2. Select the **RAW EVENT** dropdown (**2**) in the event details window; observe the transformation of the payload structure with the help of the Edge Bridge extension. The **Edge Bridge Request** event conforms to the format of an Edge Network event.
+2. Select the **RAW EVENT** dropdown (**2**) in the event details window; observe the transformation of the payload structure (**3**) with the help of the Edge Bridge extension. The **Edge Bridge Request** event conforms to the format of an Edge Network event.
 
-<img src="../assets/edge-bridge-tutorial/assurance-validation/assurance-edge-bridge-track-event.jpg" alt="Assurance Edge Bridge track event" width="800"/>
+<img src="../assets/edge-bridge-tutorial/assurance-validation/assurance-edge-bridge-track-event.png" alt="Assurance Edge Bridge track event" width="800"/>
 
 The following table and diagram highlight the differences in event data structure and format between the two types of events: Analytics (left) vs Edge (right) when using the Edge Bridge extension:
 
@@ -272,7 +272,7 @@ The following table and diagram highlight the differences in event data structur
 | 3 | Keys with reserved prefix `&&` directly under `contextdata` | Keys with prefix `&&` transformed and moved under `data.__adobe.analytics` |
 | 4 | No Analytics metrics | Analytics metrics added under `data.__adobe.analytics` (varying locations) |
 
-<img src="../assets/edge-bridge-tutorial/assurance-validation/analytics-edge-bridge-conversion.jpg" alt="Comparison of event data between analytics and edge bridge events" width="1100"/>
+<img src="../assets/edge-bridge-tutorial/assurance-validation/analytics-edge-bridge-conversion.png" alt="Comparison of event data between analytics and edge bridge events" width="1100"/>
 
 > [!NOTE]
 > The two new top-level properties `xdm` and `data` are standard Edge Network event properties, integral to Experience Platform's [Experience Data Model (XDM)](https://experienceleague.adobe.com/en/docs/experience-platform/xdm/home) schema-based system for event data organization. This system allows for powerful, customizable data processing.
@@ -282,7 +282,7 @@ To learn more about the final data format created by Edge Bridge, please refer t
 #### Trigger rule-based `trackAction` events<!-- omit in toc -->
 Rule-based `trackAction`/`trackState` events are also converted to Edge events by the Edge Bridge extension. Select the **Trigger Consequence** button (**1**) to initiate a rule that generates a `trackAction` event.
 
-<img src="../assets/edge-bridge-tutorial/assurance-validation/android-app-trigger-rule-button.png" alt="Simulator trigger rule button" width="400"/>
+<img src="../assets/edge-bridge-tutorial/assurance-validation/android-app-trigger-consequence-button.png" alt="Simulator trigger rule button" width="400"/>
 
 > [!TIP]
 > If no `trackAction` event is dispatched upon selecting the **Trigger Consequence** button, verify that your mobile property is [set up with the correct rule](#2-configure-a-rule-to-forward-personally-identifiable-information-pii-events-to-edge-network).
