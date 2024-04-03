@@ -13,7 +13,7 @@
   - [3. Update tutorial app code to enable Edge Bridge functionality](#3-update-tutorial-app-code-to-enable-edge-bridge-functionality)
   - [4. Run app](#4-run-app)
   - [5. `trackAction`/`trackState` implementation examples](#5-trackactiontrackstate-implementation-examples)
-- [Initial validation with Assurance](#initial-validation-with-assurance)
+- [Validation with Assurance](#validation-with-assurance)
   - [1. Set up the Assurance session](#1-set-up-the-assurance-session)
   - [2. Connect the app to the Assurance session](#2-connect-the-app-to-the-assurance-session)
   - [3. Event transactions view - check for Edge Bridge events](#3-event-transactions-view---check-for-edge-bridge-events)
@@ -162,102 +162,80 @@ The [`collectPII`](https://developer.adobe.com/client-sdks/home/base/mobile-core
 ## Client-side implementation
 ### 1. Get a copy of the files (code and tutorial app)
 1. Open the code repository: https://github.com/adobe/aepsdk-edgebridge-android
-2. Click **Code** in the top right
-3. In the window that opens, click **Download ZIP**; by default it should land in your **Downloads** folder.
-   - Optionally, move the ZIP to your **Documents** folder
-4. Unzip the archived file by double clicking it.
-5. Navigate inside the unarchived file, then to Documentation -> tutorials -> EdgeBridgeTutorialAppStart.
-6. Right click **settings.gradle** and select **Open With -> Other....**
-7. Pick **Android Studio** and click **Open**
+2. Select the green **Code** button in the top right.
+3. In the window that opens, select **Download ZIP**; by default, it should download to your **Downloads** folder.
+4. Unzip the archived file by opening it.
+6. Open **Android Studio**, then select **File** -> **Open**.
+7. Navigate to the unarchived folder, then navigate to **Documentation** -> **tutorials** -> **EdgeBridgeTutorialAppStart**.
+8. Open the file **settings.gradle**.
 
 ### 2. Install Edge Bridge using dependency manager (Gradle)
-The next task is to add the necessary dependencies that will enable the Edge Bridge extension to function.
+The next task is to update the necessary dependencies to enable the Edge Bridge extension to function.
 
-1. In Android Studio, click the dropdown chevron next to **Gradle Scripts** in the left-side navigation panel to open the folder
-2. Double click file **build.gradle** (Module: EdgeBridgeTutorialAppStart.app); note that there are two `build.gradle` files, the one we want is the module level one that ends with `.app`.
+1. In Android Studio, click the dropdown chevron next to **Gradle Scripts** in the left-side project navigation panel.
+   - If the **Project** navigation panel is not visible, from the top menu, select **View** -> **Tool Windows** -> **Project**.
+2. Select the file **build.gradle (Module: :app)**
 
-Inside this file, you will see a code block for this tutorial that is greyed out, because it is block commented out. It's marked by the header and footer:
-`Edge Bridge Tutorial - code section (n/m)`
-Where `n` is the current section and `m` is the total number of sections in the file.
+Inside, you will see code blocks for this tutorial that are greyed out because they are commented out. They are marked by the header and footer `Edge Bridge tutorial - code section (n/m)` (where `n` is the current comment section number and `m` is the total number of sections in the file).
 
-To activate the code, simply add a forward slash `/` at the front of the **header**:
+To uncomment the section and activate the code, simply add a forward slash at the beginning of the header:
 ```java
-/* Edge Bridge Tutorial - code section (1/2)
+/* Edge Bridge tutorial - code section (1/2)
 ```
 To:
 ```java
-//* Edge Bridge Tutorial - code section (1/2)
+//* Edge Bridge tutorial - code section (1/2)
 ```
 
-Next, remove the Analytics dependency by removing a forward slash `/` at the front of the **header**:
-```java
-//* Edge Bridge Tutorial - remove section (2/2)
-```
-To:
-```java
-/* Edge Bridge Tutorial - remove section (2/2)
-```
+> [!WARNING]
+> The tutorial app removes `AEPIdentity` because aside from Analytics, no other [Adobe Experience Cloud Solution extensions](https://developer.adobe.com/client-sdks/solution/) are in use, such as Adobe Target or Adobe Campaign. If following along with a different app, only remove `AEPIdentity` if no other solution extensions are in use.
 
-With the block uncommented, you should see a blue ribbon appear at the top of the code view window, with text like: "Gradle files have changed since last project sync. A project sync may be necessary for the IDE to work properly."
-
-1. Click **Sync Now**.
-
-Gradle will use the configuration settings we just activated to install all of the Edge Bridge extensions we want for our tutorial app, and allow us to use their features within the app's code.
-
-> **Warning**  
-> After this step, there are no Adobe Experience Cloud Solution extensions in the app. At this point, the import and registration for the Identity extension can also be removed since the Identity for Edge Network extension takes care of the identity functionality for the Edge extensions.
-> If your application still uses Adobe Experience Cloud Solution extensions, such as Adobe Target, Adobe Campaign, etc. (find the full list [here](https://developer.adobe.com/client-sdks/documentation/)) you should ignore the steps below for removing Identity and continue to use the extension.
+1. Add a forward slash in front of the header `/* Edge Bridge tutorial - code section (1/1)` to install the Edge Bridge (`AEPEdgeBridge`) extension.
+2. Delete everything between the headers: `Edge Bridge tutorial - remove section` to remove the Analytics (`AEPAnalytics`) and Identity (`AEPIdentity`) extensions.
+3. Sync these changes to the Gradle file with the project:
+   1. You should see a ribbon appear at the top of the code view window, with text like: "Gradle files have changed since last project sync. A project sync may be necessary for the IDE to work properly." Select **Sync Now**.
+   2. Alternatively, use **File** -> **Sync Project with Gradle Files**.
 
 ### 3. Update tutorial app code to enable Edge Bridge functionality
-There is one file that needs to be updated to enable the Edge Bridge extension:
+#### Add the Edge Bridge extension <!-- omit in toc -->
+The file `MainApp.java` needs to be updated to enable the **Edge Bridge** extension.
 
-1. Click dropdown chevrons to expand the folders: **java** -> **com.adobe.marketing.mobile** (the first one which should not be highlighted in green) -> **tutorial**.
-2. Double click to open the **MainApp** file, which should be under the **tutorial** folder.
-3. First update the `ENVIRONMENT_FILE_ID` value to the mobile property ID published in the first section.
-   - See how to get your mobile property ID in the instructions for [getting the mobile property ID](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#getting-the-mobile-property-id).
+1. In the left-side project navigation panel (with Android view selected), select the dropdown chevrons to expand the folders: **app** -> **java** -> **com.adobe.marketing.mobile.tutorial**.
+2. Open the file **MainApp.java**.
 
-#### Add the Edge Bridge extension<!-- omit in toc -->
-Inside you will see code blocks for this tutorial that are greyed out, because they are commented out. They are marked by the header and footer `Edge Bridge Tutorial - code section n/m` (where `n` is the current section and `m` is the total number of sections in the file).
+Uncomment the code blocks marked with the header `/* Edge Bridge tutorial - code section` by adding a forward slash at the beginning of the header, enabling:
+1. The import statement for Edge Bridge.
+2. The registration of Edge Bridge.
 
-To uncomment the section and activate the code, simply add a forward slash at the front of the header:
-```java
-/* Edge Bridge Tutorial - code section (1/2)
-```
-To:
-```java
-//* Edge Bridge Tutorial - code section (1/2)
-```
-Find the next `Edge Bridge Tutorial - code section (2/2)` and uncomment by adding a forward slash to register the Edge Bridge extension with the Mobile SDK.
+**Set the tutorial app to use the mobile property ID:**
+1. Update the `ENVIRONMENT_FILE_ID` value to the mobile property ID published in the first section.
+   - See how to find your mobile property ID in the instructions for [getting the mobile property ID](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#getting-the-mobile-property-id).
 
-#### Remove Analytics and Identity<!-- omit in toc -->
-Inside you will see code blocks for this tutorial marked by a header and footer `Edge Bridge Tutorial - remove section (n/m)` (where `n` is the current section and `m` is the total number of sections in the file).
-
-Simply delete everything between the header and footer.
-
-The first `Edge Bridge Tutorial - remove section (3/4)`, removes the import statements for Analytics and Identity while the second, `Edge Bridge Tutorial - remove section (4/4)`, removes the registration code for Analytics and Identity.
+**Remove the Analytics and AEPIdentity extensions:**  
+Remove all code blocks marked with the header and footer `Edge Bridge tutorial - remove section`, removing:
+1. The import statement for Analytics.
+2. The registration of AEPIdentity and Analytics.
 
 For details on the various Edge extensions used, see the [table of related projects](../../README.md#related-projects).
 
 ### 4. Run app
-In Android Studio
-1. Set the app target (1) to **app** (if not already).
+In Android Studio:
+1. Set the app target (1) to **app**.
 2. Choose which destination device (2) to run it on.
 3. Click the green play button (3).
 
-You should see your application running on the device you selected, with logs being displayed in the debug console in Android Studio.
+You should see your application running on the selected device, with logs displayed in the Android Studio console.
 
-> **Note**
-> If the log console area is not shown by default, activate it by selecting:
-> View -> Tool Windows -> Logcat
-
+> [!TIP]
+> If the log console area is not shown by default, activate it by selecting: **View** -> **Tool Windows** -> **Logcat**
 
 ### 5. `trackAction`/`trackState` implementation examples
-With Edge Bridge extension successfully installed and registered, you can make the regular Analytics `trackAction` and `trackState` calls, which will be captured by Edge Bridge extension and sent to the Edge Network.
+With the Edge Bridge extension successfully installed and registered, you can continue to make existing Analytics `trackAction` and `trackState` calls. These will be captured by the Edge Bridge extension and sent to the Edge Network.
 
-Check `ContentView.swift` for implementation examples of both APIs. You can see the data payloads that are to be sent with the calls.
+Check `EdgeBridgeFragment.java` for implementation examples of both APIs. You will see the data payloads that are sent with each call.
 
-## Initial validation with Assurance
-Assurance is the Adobe Experience Platform tool for inspecting all events that Adobe extensions send out, in real time. It will allow us to see the flow of events, including the Edge Bridge conversion of `trackAction`/`trackState`.
+## Validation with Assurance
+Assurance is the Experience Platform tool for inspecting all events that Adobe extensions send out in real time. It allows observing the flow of events, including the Edge Bridge conversion of `trackAction`/`trackState` events.
 
 ### 1. Set up the Assurance session
 To create a new Assurance session and connect to it, see the instructions on [setting up an Assurance session](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#1-set-up-the-assurance-session), using the base URL value:
@@ -266,22 +244,7 @@ edgebridgetutorialapp://main
 ```
 
 ### 2. Connect the app to the Assurance session
-To connect to Assurance, we will use the session link method:
-
-1. Copy the session link; you can click the icon of a double overlapping box to the right of the link to copy it.
-  - If using a physical device, it may be helpful to have a way to send this link to the device (ex: email, text, etc.). Alternatively, you can use the camera on your physical device to scan the QR code.
-2. Open the tutorial app and tap the 3 dot menu (**1**) in the top right. Select **Connect to Assurance**.
-
-<img src="../assets/edge-bridge-tutorial/assurance-validation/android-app-assurance-menu.png" alt="Assurance menu Android" width="400"/>
-
-3. Paste the Assurance session link copied from step 1 into the text field and tap the Connect button.
-
-<img src="../assets/edge-bridge-tutorial/assurance-validation/android-app-assurance-connection.png" alt="Assurance connection Android" width="400"/>
-
-4. App should open and show the Assurance PIN screen to authenticate the session connection; enter the PIN from the session details and tap **Connect (1)**.
-
-<img src="../assets/edge-bridge-tutorial/assurance-validation/android-app-assurance-pin.png" alt="Android Assurance PIN" width="400"/>
-
+To connect the tutorial app to the Assurance session, see the instructions on [connecting the app to the Assurance session](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#2-connect-to-the-app).
 
 ### 3. Event transactions view - check for Edge Bridge events
 #### `trackAction`/`trackState` events<!-- omit in toc -->
