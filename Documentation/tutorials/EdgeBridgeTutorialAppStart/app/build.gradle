@@ -4,12 +4,11 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.adobe.marketing.mobile.tutorial"
         minSdk 21
-        compileSdk 34
         targetSdk 34
         versionCode 1
         versionName "1.0"

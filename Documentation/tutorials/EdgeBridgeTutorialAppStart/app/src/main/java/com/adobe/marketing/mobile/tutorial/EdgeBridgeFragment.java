@@ -39,13 +39,12 @@ public class EdgeBridgeFragment extends Fragment {
 				@Override
 				public void onClick(View view) {
 					MobileCore.trackAction(
-						"add_to_cart",
+						"purchase",
 						new HashMap<String, String>() {
 							{
-								put("product.id", "12345");
-								put("product.add.event", "1");
-								put("product.name", "wide_brim_sunhat");
-								put("product.units", "1");
+								put("&&products", ";Running Shoes;1;69.95;event1|event2=55.99;eVar1=12345,;Running Socks;10;29.99;event2=10.95;eVar1=54321");
+								put("&&events", "event5,purchase");
+								put("myapp.promotion", "a0138");
 							}
 						}
 					);
@@ -58,12 +57,12 @@ public class EdgeBridgeFragment extends Fragment {
 				@Override
 				public void onClick(View view) {
 					MobileCore.trackState(
-						"hats/sunhat/wide_brim_sunhat_id12345",
+						"products/189025/runningshoes/12345",
 						new HashMap<String, String>() {
 							{
-								put("product.name", "wide_brim_sunhat");
-								put("product.id", "12345");
-								put("product.view.event", "1");
+								put("&&products", ";Running Shoes;1;69.95;prodView|event2=55.99;eVar1=12345");
+								put("myapp.category", "189025");
+								put("myapp.promotion", "a0138");
 							}
 						}
 					);

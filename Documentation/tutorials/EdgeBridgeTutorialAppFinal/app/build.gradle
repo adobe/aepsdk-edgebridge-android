@@ -4,12 +4,12 @@ plugins {
 }
 
 android {
-    compileSdk 32
+    compileSdk 34
 
     defaultConfig {
         applicationId "com.adobe.marketing.mobile.tutorial"
         minSdk 21
-        targetSdk 32
+        targetSdk 34
         versionCode 1
         versionName "1.0"
 
@@ -29,6 +29,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.adobe.marketing.mobile.tutorial'
 }
 
 spotless {
@@ -44,25 +45,21 @@ spotless {
 }
 
 dependencies {
-
     implementation 'androidx.appcompat:appcompat:1.5.1'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'androidx.navigation:navigation-fragment:2.5.2'
     implementation 'androidx.navigation:navigation-ui:2.5.2'
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'
 
     // Add dependencies on Adobe Experience Platform Mobile extensions
-    implementation 'com.adobe.marketing.mobile:assurance:2.0.0'
-    implementation 'com.adobe.marketing.mobile:core:2.0.0'
-    implementation 'com.adobe.marketing.mobile:lifecycle:2.0.0'
-    implementation 'com.adobe.marketing.mobile:edge:2.0.0'
-    implementation 'com.adobe.marketing.mobile:edgeconsent:2.0.0'
-    implementation 'com.adobe.marketing.mobile:edgeidentity:2.0.0'
+    implementation 'com.adobe.marketing.mobile:assurance:3.0.0'
+    implementation 'com.adobe.marketing.mobile:core:3.0.0'
+    implementation 'com.adobe.marketing.mobile:lifecycle:3.0.0'
+    implementation 'com.adobe.marketing.mobile:edge:3.0.0'
+    implementation 'com.adobe.marketing.mobile:edgeconsent:3.0.0'
+    implementation 'com.adobe.marketing.mobile:edgeidentity:3.0.0'
 
     //* Edge Bridge Tutorial - code section (1/2)
-    implementation 'com.adobe.marketing.mobile:edgebridge:2.0.0'
+    implementation 'com.adobe.marketing.mobile:edgebridge:3.0.0'
     // Edge Bridge Tutorial - code section (1/2) */
 }
