@@ -12,13 +12,13 @@
 package com.adobe.marketing.mobile.tutorial;
 
 import android.app.Application;
-/* Edge Bridge Tutorial - code section (1/2)
+/* Edge Bridge tutorial - code section (1/2)
 import com.adobe.marketing.mobile.edge.bridge.EdgeBridge;
-// Edge Bridge Tutorial - code section (1/2) */
+// Edge Bridge tutorial - code section (1/2) */
 
-//* Edge Bridge Tutorial - remove section (1/2)
+//* Edge Bridge tutorial - remove section (1/2)
 import com.adobe.marketing.mobile.Analytics;
-// Edge Bridge Tutorial - remove section (1/2) */
+// Edge Bridge tutorial - remove section (1/2) */
 import com.adobe.marketing.mobile.Assurance;
 import com.adobe.marketing.mobile.Edge;
 import com.adobe.marketing.mobile.Extension;
@@ -55,14 +55,14 @@ public class MainApp extends Application {
 		extensions.add(Identity.EXTENSION); // Identity for Edge Network
 		extensions.add(Lifecycle.EXTENSION);
 
-		/* Edge Bridge Tutorial - code section (2/2)
+		/* Edge Bridge tutorial - code section (2/2)
 		extensions.add(EdgeBridge.EXTENSION);
-		// Edge Bridge Tutorial - code section (2/2) */
+		// Edge Bridge tutorial - code section (2/2) */
 
-		//* Edge Bridge Tutorial - remove section (2/2)
+		//* Edge Bridge tutorial - remove section (2/2)
 		extensions.add(com.adobe.marketing.mobile.Identity.EXTENSION);
 		extensions.add(Analytics.EXTENSION);
-		// Edge Bridge Tutorial - remove section (2/2) */
+		// Edge Bridge tutorial - remove section (2/2) */
 
 		// Register Adobe Experience Platform extensions
 		MobileCore.registerExtensions(
