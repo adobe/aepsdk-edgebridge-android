@@ -22,5 +22,5 @@
     <string name="assurance_titleEnterSessionURL">Enter the Assurance Session URL:</string>
     <string name="assurance_btnConnectToAssuranceSession">Connect</string>
     <string name="action_connect_assurance">Connect to Assurance</string>
-    <string name="trigger_rule_button">Trigger Rule</string>
+    <string name="trigger_consequence_button">Trigger Consequence</string>
 </resources>
