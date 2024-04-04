@@ -179,11 +179,11 @@ Inside, you will see code blocks for this tutorial that are greyed out because t
 
 To uncomment the section and activate the code, simply add a forward slash at the beginning of the header:
 ```java
-/* Edge Bridge tutorial - code section (1/2)
+/* Edge Bridge tutorial - code section (1/1)
 ```
 To:
 ```java
-//* Edge Bridge tutorial - code section (1/2)
+//* Edge Bridge tutorial - code section (1/1)
 ```
 
 > [!WARNING]
@@ -210,18 +210,18 @@ Uncomment the code blocks marked with the header `/* Edge Bridge tutorial - code
 1. Update the `ENVIRONMENT_FILE_ID` value to the mobile property ID published in the first section.
    - See how to find your mobile property ID in the instructions for [getting the mobile property ID](https://github.com/adobe/aepsdk-edge-android/blob/main/Documentation/Tutorials/edge-send-event-tutorial.md#getting-the-mobile-property-id).
 
-**Remove the Analytics and AEPIdentity extensions:**  
+**Remove the Analytics and Identity extensions:**  
 Remove all code blocks marked with the header and footer `Edge Bridge tutorial - remove section`, removing:
 1. The import statement for Analytics.
-2. The registration of AEPIdentity and Analytics.
+2. The registration of Identity and Analytics.
 
 For details on the various Edge extensions used, see the [table of related projects](../../README.md#related-projects).
 
 ### 4. Run app
 In Android Studio:
-1. Set the app target (1) to **app**.
-2. Choose which destination device (2) to run it on.
-3. Click the green play button (3).
+1. Set the app target to **app**.
+2. Choose which destination device to run it on.
+3. Click the green play button.
 
 You should see your application running on the selected device, with logs displayed in the Android Studio console.
 
