@@ -2,7 +2,7 @@
 
 > [!IMPORTANT]
 > Version 3.x of the Edge Bridge extension uses a new data format compared to the previous versions. If you are using version 2.x or lower of the Edge Bridge extension, please find the relevant tutorials [here](https://github.com/adobe/aepsdk-edgebridge-android/tree/v2.1.0/Documentation/tutorials). </br>
-> If you want to learn more about the benefits of upgrading to version 3.x, see the [Edge Bridge migration guide](https://developer.adobe.com/client-sdks/resources/migration/android/migrate-to-2x).
+> If you want to learn more about the benefits of upgrading to version 3.x, see the [Edge Bridge migration guide](https://developer.adobe.com/client-sdks/resources/migration/android/migrate-to-3x).
 
 ## Table of Contents <!-- omit in toc -->
 - [Overview](#overview)
