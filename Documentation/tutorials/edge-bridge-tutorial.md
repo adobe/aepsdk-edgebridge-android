@@ -187,7 +187,7 @@ To:
 ```
 
 > [!WARNING]
-> The tutorial app removes `AEPIdentity` because aside from Analytics, no other [Adobe Experience Cloud Solution extensions](https://developer.adobe.com/client-sdks/solution/) are in use, such as Adobe Target or Adobe Campaign. If following along with a different app, only remove `AEPIdentity` if no other solution extensions are in use.
+> The tutorial app removes Identity because aside from Analytics, no other [Adobe Experience Cloud Solution extensions](https://developer.adobe.com/client-sdks/solution/) are in use, such as Adobe Target or Adobe Campaign. If following along with a different app, only remove Identity if no other solution extensions are in use.
 
 1. Add a forward slash in front of the header `/* Edge Bridge tutorial - code section` to install the Edge Bridge (`AEPEdgeBridge`) extension.
 2. Delete everything between the headers: `Edge Bridge tutorial - remove section` to remove the Analytics (`AEPAnalytics`) and Identity (`AEPIdentity`) extensions.
