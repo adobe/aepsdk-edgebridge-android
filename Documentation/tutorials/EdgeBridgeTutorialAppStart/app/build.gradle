@@ -52,20 +52,21 @@ dependencies {
     implementation 'androidx.navigation:navigation-ui:2.5.2'
 
     // Add dependencies on Adobe Experience Platform Mobile extensions
-    implementation 'com.adobe.marketing.mobile:assurance:3.0.0'
-    implementation 'com.adobe.marketing.mobile:core:3.0.0'
-    implementation 'com.adobe.marketing.mobile:lifecycle:3.0.0'
-    implementation 'com.adobe.marketing.mobile:edge:3.0.0'
-    implementation 'com.adobe.marketing.mobile:edgeconsent:3.0.0'
-    implementation 'com.adobe.marketing.mobile:edgeidentity:3.0.0'
+    implementation platform('com.adobe.marketing.mobile:sdk-bom:3.0.0')
+    implementation 'com.adobe.marketing.mobile:assurance'
+    implementation 'com.adobe.marketing.mobile:core'
+    implementation 'com.adobe.marketing.mobile:lifecycle'
+    implementation 'com.adobe.marketing.mobile:edge'
+    implementation 'com.adobe.marketing.mobile:edgeconsent'
+    implementation 'com.adobe.marketing.mobile:edgeidentity'
 
 
     /* Edge Bridge tutorial - code section (1/1)
-    implementation 'com.adobe.marketing.mobile:edgebridge:3.0.0'
+    implementation 'com.adobe.marketing.mobile:edgebridge'
     // Edge Bridge tutorial - code section (1/1) */
 
     //* Edge Bridge tutorial - remove section (1/1)
-    implementation 'com.adobe.marketing.mobile:analytics:3.0.0'
-    implementation 'com.adobe.marketing.mobile:identity:3.0.0'
+    implementation 'com.adobe.marketing.mobile:analytics'
+    implementation 'com.adobe.marketing.mobile:identity'
     // Edge Bridge tutorial - remove section (1/1) */
 }
