@@ -26,7 +26,6 @@ import com.adobe.marketing.mobile.Edge;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.edge.identity.Identity;
 import com.adobe.marketing.mobile.services.HttpConnecting;
-import com.adobe.marketing.mobile.services.HttpMethod;
 import com.adobe.marketing.mobile.services.ServiceProvider;
 import com.adobe.marketing.mobile.util.ElementCount;
 import com.adobe.marketing.mobile.util.MockNetworkService;
@@ -86,13 +85,12 @@ public class EdgeBridgeFunctionalTests {
 
 	@After
 	public void tearDown() {
-		mockNetworkService.reset();
+		resetTestExpectations();
 	}
 
 	@Test
 	public void testTrackState_sendsEdgeExperienceEvent() throws InterruptedException {
 		mockNetworkService.setExpectationForNetworkRequest(EDGE_INTERACT_ENDPOINT, POST, 1);
-		//setExpectationNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
 
 		MobileCore.trackState(
 			"state name",
@@ -105,6 +103,12 @@ public class EdgeBridgeFunctionalTests {
 		);
 
 		mockNetworkService.assertAllNetworkRequestExpectations();
+
+		List<com.adobe.marketing.mobile.services.TestableNetworkRequest> networkRequests = mockNetworkService.getNetworkRequestsWith(
+			EDGE_INTERACT_ENDPOINT,
+			POST,
+			1000
+		);
 
 		String expected =
 			"{" +
@@ -132,11 +136,6 @@ public class EdgeBridgeFunctionalTests {
 			"  ]" +
 			"}";
 
-		List<com.adobe.marketing.mobile.services.TestableNetworkRequest> networkRequests = mockNetworkService.getNetworkRequestsWith(
-			EDGE_INTERACT_ENDPOINT,
-			POST,
-			1000
-		);
 		assertEquals(1, networkRequests.size());
 		assertExactMatch(
 			expected,
@@ -148,7 +147,7 @@ public class EdgeBridgeFunctionalTests {
 
 	@Test
 	public void testTrackAction_sendsCorrectRequestEvent() throws InterruptedException {
-		mockNetworkService.setExpectationForNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
+		mockNetworkService.setExpectationForNetworkRequest(EDGE_INTERACT_ENDPOINT, POST, 1);
 
 		MobileCore.trackAction(
 			"action name",
@@ -164,7 +163,7 @@ public class EdgeBridgeFunctionalTests {
 
 		List<com.adobe.marketing.mobile.services.TestableNetworkRequest> networkRequests = mockNetworkService.getNetworkRequestsWith(
 			EDGE_INTERACT_ENDPOINT,
-			HttpMethod.POST
+			POST
 		);
 		assertEquals(1, networkRequests.size());
 
@@ -174,8 +173,8 @@ public class EdgeBridgeFunctionalTests {
 			"    {" +
 			"        \"xdm\": {" +
 			"            \"eventType\": \"analytics.track\"," +
-			"            \"timestamp\": \"STRING_STYLE\"," +
-			"            \"_id\": \"STRING_STYLE\"" +
+			"            \"timestamp\": \"STRING_TYPE\"," +
+			"            \"_id\": \"STRING_TYPE\"" +
 			"        }," +
 			"        \"data\": {" +
 			"            \"__adobe\": {" +
@@ -183,6 +182,7 @@ public class EdgeBridgeFunctionalTests {
 			"                    \"cp\": \"foreground\"," +
 			"                    \"linkName\": \"action name\"," +
 			"                    \"linkType\": \"other\"," +
+			"                    \"c1\": \"propValue1\"," +
 			"                    \"contextData\": {" +
 			"                        \"key1\": \"value1\"," +
 			"                        \"a.AppID\": \"com.adobe.marketing.mobile.edge.bridge.test\"" +
@@ -207,7 +207,7 @@ public class EdgeBridgeFunctionalTests {
 		updateConfigurationWithRules("rules_analytics");
 		resetTestExpectations();
 
-		mockNetworkService.setExpectationForNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
+		mockNetworkService.setExpectationForNetworkRequest(EDGE_INTERACT_ENDPOINT, POST, 1);
 
 		// Triggers Analytics rule
 		MobileCore.collectPii(
@@ -226,6 +226,8 @@ public class EdgeBridgeFunctionalTests {
 			1000
 		);
 
+		assertEquals(1, networkRequests.size());
+
 		String expected =
 			"{" +
 			"\"events\": [" +
@@ -243,6 +245,7 @@ public class EdgeBridgeFunctionalTests {
 			"                    \"linkType\": \"other\"," +
 			"                    \"pageName\": \"Rule State\"," +
 			"                    \"contextData\": {" +
+			// Data is defined in the rule, not from the dispatched PII event
 			"                        \"testKey\": \"testValue\"," +
 			"                        \"a.AppID\": \"com.adobe.marketing.mobile.edge.bridge.test\"" +
 			"                    }" +
