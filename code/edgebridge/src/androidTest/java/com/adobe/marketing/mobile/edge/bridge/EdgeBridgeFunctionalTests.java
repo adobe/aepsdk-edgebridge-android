@@ -110,6 +110,8 @@ public class EdgeBridgeFunctionalTests {
 			1000
 		);
 
+		assertEquals(1, networkRequests.size());
+
 		String expected =
 			"{" +
 			"  \"events\": [" +
@@ -136,7 +138,6 @@ public class EdgeBridgeFunctionalTests {
 			"  ]" +
 			"}";
 
-		assertEquals(1, networkRequests.size());
 		assertExactMatch(
 			expected,
 			networkRequests.get(0).getBodyJson(),
