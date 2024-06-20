@@ -11,15 +11,13 @@
 
 package com.adobe.marketing.mobile.edge.bridge;
 
-import static com.adobe.marketing.mobile.util.FlattenUtils.flattenBytes;
-import static com.adobe.marketing.mobile.util.FunctionalTestHelper.LogOnErrorRule;
-import static com.adobe.marketing.mobile.util.FunctionalTestHelper.SetupCoreRule;
-import static com.adobe.marketing.mobile.util.FunctionalTestHelper.assertNetworkRequestCount;
-import static com.adobe.marketing.mobile.util.FunctionalTestHelper.getAsset;
-import static com.adobe.marketing.mobile.util.FunctionalTestHelper.getNetworkRequestsWith;
-import static com.adobe.marketing.mobile.util.FunctionalTestHelper.resetTestExpectations;
-import static com.adobe.marketing.mobile.util.FunctionalTestHelper.setExpectationNetworkRequest;
-import static com.adobe.marketing.mobile.util.FunctionalTestHelper.setNetworkResponseFor;
+import static com.adobe.marketing.mobile.services.HttpMethod.GET;
+import static com.adobe.marketing.mobile.services.HttpMethod.POST;
+import static com.adobe.marketing.mobile.util.JSONAsserts.assertExactMatch;
+import static com.adobe.marketing.mobile.util.NodeConfig.Scope.Subtree;
+import static com.adobe.marketing.mobile.util.TestHelper.LogOnErrorRule;
+import static com.adobe.marketing.mobile.util.TestHelper.SetupCoreRule;
+import static com.adobe.marketing.mobile.util.TestHelper.getAsset;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
@@ -28,8 +26,11 @@ import com.adobe.marketing.mobile.Edge;
 import com.adobe.marketing.mobile.MobileCore;
 import com.adobe.marketing.mobile.edge.identity.Identity;
 import com.adobe.marketing.mobile.services.HttpConnecting;
-import com.adobe.marketing.mobile.services.HttpMethod;
-import com.adobe.marketing.mobile.util.TestableNetworkRequest;
+import com.adobe.marketing.mobile.services.ServiceProvider;
+import com.adobe.marketing.mobile.util.ElementCount;
+import com.adobe.marketing.mobile.util.MockNetworkService;
+import com.adobe.marketing.mobile.util.TestHelper;
+import com.adobe.marketing.mobile.util.ValueTypeMatch;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -41,6 +42,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 import java.util.concurrent.CountDownLatch;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -49,6 +51,8 @@ import org.junit.runner.RunWith;
 
 @RunWith(AndroidJUnit4.class)
 public class EdgeBridgeFunctionalTests {
+
+	private static final MockNetworkService mockNetworkService = new MockNetworkService();
 
 	// Fake Edge Configuration ID, needed for Edge extension initialization
 	private static final String CONFIG_ID = "1234abcd-abcd-1234-5678-123456abcdef";
@@ -60,6 +64,8 @@ public class EdgeBridgeFunctionalTests {
 
 	@Before
 	public void setup() throws Exception {
+		ServiceProvider.getInstance().setNetworkService(mockNetworkService);
+
 		HashMap<String, Object> config = new HashMap<String, Object>() {
 			{
 				put("edge.configId", CONFIG_ID);
@@ -74,11 +80,17 @@ public class EdgeBridgeFunctionalTests {
 		);
 
 		latch.await();
+		resetTestExpectations();
+	}
+
+	@After
+	public void tearDown() {
+		resetTestExpectations();
 	}
 
 	@Test
 	public void testTrackState_sendsEdgeExperienceEvent() throws InterruptedException {
-		setExpectationNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
+		mockNetworkService.setExpectationForNetworkRequest(EDGE_INTERACT_ENDPOINT, POST, 1);
 
 		MobileCore.trackState(
 			"state name",
@@ -90,27 +102,53 @@ public class EdgeBridgeFunctionalTests {
 			}
 		);
 
-		assertNetworkRequestCount();
-		List<TestableNetworkRequest> networkRequests = getNetworkRequestsWith(EDGE_INTERACT_ENDPOINT, HttpMethod.POST);
+		mockNetworkService.assertAllNetworkRequestExpectations();
+
+		List<com.adobe.marketing.mobile.services.TestableNetworkRequest> networkRequests = mockNetworkService.getNetworkRequestsWith(
+			EDGE_INTERACT_ENDPOINT,
+			POST,
+			1000
+		);
+
 		assertEquals(1, networkRequests.size());
-		Map<String, String> requestData = flattenBytes(networkRequests.get(0).getBody());
-		assertEquals(17, requestData.size());
-		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
-		assertNotNull(requestData.get("events[0].xdm.timestamp"));
-		assertNotNull(requestData.get("events[0].xdm._id"));
-		assertEquals("foreground", requestData.get("events[0].data.__adobe.analytics.cp"));
-		assertEquals("state name", requestData.get("events[0].data.__adobe.analytics.pageName"));
-		assertEquals("propValue1", requestData.get("events[0].data.__adobe.analytics.c1"));
-		assertEquals("value1", requestData.get("events[0].data.__adobe.analytics.contextData.key1"));
-		assertEquals(
-			"com.adobe.marketing.mobile.edge.bridge.test",
-			requestData.get("events[0].data.__adobe.analytics.contextData.a.AppID")
+
+		String expected =
+			"{" +
+			"  \"events\": [" +
+			"    {" +
+			"      \"xdm\": {" +
+			"        \"eventType\": \"analytics.track\"," +
+			"        \"timestamp\": \"STRING_TYPE\"," +
+			"        \"_id\": \"STRING_TYPE\"" +
+			"      }," +
+			"      \"data\": {" +
+			"        \"__adobe\": {" +
+			"          \"analytics\": {" +
+			"            \"cp\": \"foreground\"," +
+			"            \"pageName\": \"state name\"," +
+			"            \"c1\": \"propValue1\"," +
+			"            \"contextData\": {" +
+			"              \"key1\": \"value1\"," +
+			"              \"a.AppID\": \"com.adobe.marketing.mobile.edge.bridge.test\"" +
+			"            }" +
+			"          }" +
+			"        }" +
+			"      }" +
+			"    }" +
+			"  ]" +
+			"}";
+
+		assertExactMatch(
+			expected,
+			networkRequests.get(0).getBodyJson(),
+			new ElementCount(17, Subtree),
+			new ValueTypeMatch("events[0].xdm.timestamp", "events[0].xdm._id")
 		);
 	}
 
 	@Test
 	public void testTrackAction_sendsCorrectRequestEvent() throws InterruptedException {
-		setExpectationNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
+		mockNetworkService.setExpectationForNetworkRequest(EDGE_INTERACT_ENDPOINT, POST, 1);
 
 		MobileCore.trackAction(
 			"action name",
@@ -122,22 +160,46 @@ public class EdgeBridgeFunctionalTests {
 			}
 		);
 
-		assertNetworkRequestCount();
-		List<TestableNetworkRequest> networkRequests = getNetworkRequestsWith(EDGE_INTERACT_ENDPOINT, HttpMethod.POST);
+		mockNetworkService.assertAllNetworkRequestExpectations();
+
+		List<com.adobe.marketing.mobile.services.TestableNetworkRequest> networkRequests = mockNetworkService.getNetworkRequestsWith(
+			EDGE_INTERACT_ENDPOINT,
+			POST
+		);
 		assertEquals(1, networkRequests.size());
-		Map<String, String> requestData = flattenBytes(networkRequests.get(0).getBody());
-		assertEquals(18, requestData.size());
-		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
-		assertNotNull(requestData.get("events[0].xdm.timestamp"));
-		assertNotNull(requestData.get("events[0].xdm._id"));
-		assertEquals("foreground", requestData.get("events[0].data.__adobe.analytics.cp"));
-		assertEquals("action name", requestData.get("events[0].data.__adobe.analytics.linkName"));
-		assertEquals("other", requestData.get("events[0].data.__adobe.analytics.linkType"));
-		assertEquals("propValue1", requestData.get("events[0].data.__adobe.analytics.c1"));
-		assertEquals("value1", requestData.get("events[0].data.__adobe.analytics.contextData.key1"));
-		assertEquals(
-			"com.adobe.marketing.mobile.edge.bridge.test",
-			requestData.get("events[0].data.__adobe.analytics.contextData.a.AppID")
+
+		String expected =
+			"{" +
+			"\"events\": [" +
+			"    {" +
+			"        \"xdm\": {" +
+			"            \"eventType\": \"analytics.track\"," +
+			"            \"timestamp\": \"STRING_TYPE\"," +
+			"            \"_id\": \"STRING_TYPE\"" +
+			"        }," +
+			"        \"data\": {" +
+			"            \"__adobe\": {" +
+			"                \"analytics\": {" +
+			"                    \"cp\": \"foreground\"," +
+			"                    \"linkName\": \"action name\"," +
+			"                    \"linkType\": \"other\"," +
+			"                    \"c1\": \"propValue1\"," +
+			"                    \"contextData\": {" +
+			"                        \"key1\": \"value1\"," +
+			"                        \"a.AppID\": \"com.adobe.marketing.mobile.edge.bridge.test\"" +
+			"                    }" +
+			"                }" +
+			"            }" +
+			"        }" +
+			"    }" +
+			"]" +
+			"}";
+
+		assertExactMatch(
+			expected,
+			networkRequests.get(0).getBodyJson(),
+			new ElementCount(18, Subtree),
+			new ValueTypeMatch("events[0].xdm.timestamp", "events[0].xdm._id")
 		);
 	}
 
@@ -146,7 +208,7 @@ public class EdgeBridgeFunctionalTests {
 		updateConfigurationWithRules("rules_analytics");
 		resetTestExpectations();
 
-		setExpectationNetworkRequest(EDGE_INTERACT_ENDPOINT, HttpMethod.POST, 1);
+		mockNetworkService.setExpectationForNetworkRequest(EDGE_INTERACT_ENDPOINT, POST, 1);
 
 		// Triggers Analytics rule
 		MobileCore.collectPii(
@@ -157,23 +219,49 @@ public class EdgeBridgeFunctionalTests {
 			}
 		);
 
-		assertNetworkRequestCount();
-		List<TestableNetworkRequest> networkRequests = getNetworkRequestsWith(EDGE_INTERACT_ENDPOINT, HttpMethod.POST);
+		mockNetworkService.assertAllNetworkRequestExpectations();
+
+		List<com.adobe.marketing.mobile.services.TestableNetworkRequest> networkRequests = mockNetworkService.getNetworkRequestsWith(
+			EDGE_INTERACT_ENDPOINT,
+			POST,
+			1000
+		);
+
 		assertEquals(1, networkRequests.size());
-		Map<String, String> requestData = flattenBytes(networkRequests.get(0).getBody());
-		assertEquals(18, requestData.size());
-		assertEquals("analytics.track", requestData.get("events[0].xdm.eventType"));
-		assertNotNull(requestData.get("events[0].xdm.timestamp"));
-		assertNotNull(requestData.get("events[0].xdm._id"));
-		assertEquals("foreground", requestData.get("events[0].data.__adobe.analytics.cp"));
-		assertEquals("Rule Action", requestData.get("events[0].data.__adobe.analytics.linkName"));
-		assertEquals("other", requestData.get("events[0].data.__adobe.analytics.linkType"));
-		assertEquals("Rule State", requestData.get("events[0].data.__adobe.analytics.pageName"));
-		// Data is defined in the rule, not from the dispatched PII event
-		assertEquals("testValue", requestData.get("events[0].data.__adobe.analytics.contextData.testKey"));
-		assertEquals(
-			"com.adobe.marketing.mobile.edge.bridge.test",
-			requestData.get("events[0].data.__adobe.analytics.contextData.a.AppID")
+
+		String expected =
+			"{" +
+			"\"events\": [" +
+			"    {" +
+			"        \"xdm\": {" +
+			"            \"eventType\": \"analytics.track\"," +
+			"            \"timestamp\": \"STRING_TYPE\"," +
+			"            \"_id\": \"STRING_TYPE\"" +
+			"        }," +
+			"        \"data\": {" +
+			"            \"__adobe\": {" +
+			"                \"analytics\": {" +
+			"                    \"cp\": \"foreground\"," +
+			"                    \"linkName\": \"Rule Action\"," +
+			"                    \"linkType\": \"other\"," +
+			"                    \"pageName\": \"Rule State\"," +
+			"                    \"contextData\": {" +
+			// Data is defined in the rule, not from the dispatched PII event
+			"                        \"testKey\": \"testValue\"," +
+			"                        \"a.AppID\": \"com.adobe.marketing.mobile.edge.bridge.test\"" +
+			"                    }" +
+			"                }" +
+			"            }" +
+			"        }" +
+			"    }" +
+			"]" +
+			"}";
+
+		assertExactMatch(
+			expected,
+			networkRequests.get(0).getBodyJson(),
+			new ElementCount(18, Subtree),
+			new ValueTypeMatch("events[0].xdm.timestamp", "events[0].xdm._id")
 		);
 	}
 
@@ -234,8 +322,8 @@ public class EdgeBridgeFunctionalTests {
 		};
 
 		final String rulesUrl = "https://rules.com/" + localRulesName + ".zip";
-		setNetworkResponseFor(rulesUrl, HttpMethod.GET, response);
-		setExpectationNetworkRequest(rulesUrl, HttpMethod.GET, 1);
+		mockNetworkService.setMockResponseFor(rulesUrl, GET, response);
+		mockNetworkService.setExpectationForNetworkRequest(rulesUrl, GET, 1);
 
 		MobileCore.updateConfiguration(
 			new HashMap<String, Object>() {
@@ -244,7 +332,11 @@ public class EdgeBridgeFunctionalTests {
 				}
 			}
 		);
+		mockNetworkService.assertAllNetworkRequestExpectations();
+	}
 
-		assertNetworkRequestCount();
+	private void resetTestExpectations() {
+		mockNetworkService.reset();
+		TestHelper.resetTestExpectations();
 	}
 }
