@@ -25,4 +25,5 @@ jobs:
       run-test-functional: true
       run-build-app: true
       enable-codecov: true
+      javadoc-build-path: code/edgebridge/build/docs/javadoc
     secrets: inherit
