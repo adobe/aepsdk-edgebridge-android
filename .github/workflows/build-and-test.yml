@@ -26,3 +26,4 @@ jobs:
       run-build-app: true
       enable-codecov: true
     secrets: inherit
+    
