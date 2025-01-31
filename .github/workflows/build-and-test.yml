@@ -27,3 +27,4 @@ jobs:
       enable-codecov: true
       javadoc-build-path: code/edgebridge/build/docs/javadoc
     secrets: inherit
+    
